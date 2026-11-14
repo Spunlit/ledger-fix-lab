@@ -148,3 +148,157 @@ footer.closing.lf-foot .fx-beam { background: radial-gradient(40% 70% at 50% -10
 .lf-verdict b { color: var(--hot-text); font-weight: 600; font-size: 14px; }
 .lf-tile--c { grid-template-rows: auto auto auto auto 1fr; }
 .lf-tile--c .lf-verdict { align-self: end; }
+
+/* =====================================================================================================
+   v15: colour as light (after the founder's reference). Night: a burst of electric blue that turns
+   cantaloupe at the horizon, fine vertical rays, a few stars; the books window rises out of the glow.
+   Day: a sky-blue field with a hot-pink bloom behind ribbed glass. Display type is a serif with one
+   italic phrase; small labels are mono.
+   ===================================================================================================== */
+main#top > section.hero.lf-hero { position: relative; height: auto; min-height: 100svh; padding: calc(var(--nav, 72px) + 44px) 0 0; overflow: hidden; display: block; }
+main#top > section.hero.lf-hero > .wrap { position: relative; z-index: 1; height: auto; }
+.lf-hero__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(0, 1fr); column-gap: 24px; row-gap: 40px; align-items: center; }
+.lf-hero__words { grid-column: 2; display: grid; justify-items: center; text-align: center; gap: 0; }
+.lf-hero h1 { font-size: clamp(46px, 6.6vw, 96px); line-height: .98; letter-spacing: -0.015em; margin: 0 0 22px; text-wrap: balance; color: #F6FAFC; }
+.lf-hero h1 em { font-style: italic; }
+.lf-hero .hero__lead { font: 400 14.5px/1.7 var(--font-mono); letter-spacing: 0; color: color-mix(in oklab, #F6FAFC 78%, transparent); max-width: 52ch; margin: 0 0 28px; }
+.lf-hero .btn-row { justify-content: center; }
+.lf-hero .lf-pill { margin-bottom: 26px; font-family: var(--font-mono); font-size: 12.5px; background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16); color: #F6FAFC; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.lf-hero .lf-pill b { font-family: var(--font-mono); background: #F6FAFC; color: #02070A; }
+.lf-hero .btn.btn--primary { background: #F6FAFC; color: #02070A; border-radius: 999px; box-shadow: 0 0 0 1px rgb(255 255 255 / .5), 0 0 40px -6px rgb(255 255 255 / .45); }
+.lf-hero .btn.btn--primary:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 0 0 1px #fff, 0 0 54px -4px rgb(255 255 255 / .6); }
+.lf-hero .btn.btn--secondary { background: rgb(255 255 255 / .08); color: #F6FAFC; border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .22); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.lf-hero .btn.btn--secondary:hover { background: rgb(255 255 255 / .14); }
+.lf-stat { margin: 0; display: grid; gap: 22px; align-self: center; }
+.lf-stat--l { grid-column: 1; grid-row: 1; justify-self: start; }
+.lf-stat--r { grid-column: 3; grid-row: 1; justify-self: end; text-align: right; }
+.lf-stat dt { font: 400 44px/1 var(--font-display); color: #F6FAFC; }
+.lf-stat dd { margin: 4px 0 0; font: 400 12px/1.4 var(--font-mono); color: color-mix(in oklab, #F6FAFC 66%, transparent); }
+.lf-hero .lf-try { grid-column: 1 / -1; justify-self: center; width: min(100%, 940px); margin-bottom: -1px; }
+.lf-hero .lf-try > .lf-win { border-radius: 16px 16px 0 0; transform: none; box-shadow: 0 0 0 1px rgb(255 255 255 / .14), 0 -30px 90px -30px rgb(252 115 77 / .55); }
+.lf-hero .lf-try::before { display: none; }
+.lf-hero .lf-try::after { border-radius: 17px 17px 0 0; inset: -1px -1px 0 -1px; background: linear-gradient(180deg, rgb(255 190 160 / .9), rgb(2 151 222 / .5) 45%, transparent 85%); animation: none; }
+
+/* the sky */
+.sky { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: #02070A; }
+.sky > i { position: absolute; inset: 0; display: block; }
+.sky-stars { background-image: radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / .7), transparent 60%), radial-gradient(1px 1px at 27% 9%, rgb(255 255 255 / .5), transparent 60%), radial-gradient(1.2px 1.2px at 41% 22%, rgb(255 255 255 / .6), transparent 60%), radial-gradient(1px 1px at 63% 12%, rgb(255 255 255 / .55), transparent 60%), radial-gradient(1.2px 1.2px at 78% 24%, rgb(255 255 255 / .7), transparent 60%), radial-gradient(1px 1px at 91% 8%, rgb(255 255 255 / .5), transparent 60%), radial-gradient(1px 1px at 6% 41%, rgb(255 255 255 / .4), transparent 60%), radial-gradient(1px 1px at 95% 44%, rgb(255 255 255 / .45), transparent 60%), radial-gradient(1px 1px at 52% 5%, rgb(255 255 255 / .5), transparent 60%), radial-gradient(1px 1px at 19% 33%, rgb(255 255 255 / .35), transparent 60%), radial-gradient(1px 1px at 84% 36%, rgb(255 255 255 / .4), transparent 60%);
+  -webkit-mask-image: linear-gradient(#000, transparent 60%); mask-image: linear-gradient(#000, transparent 60%); }
+.sky-glow { background:
+    radial-gradient(34% 26% at 50% 86%, rgb(255 214 190 / .95) 0%, rgb(252 115 77 / .9) 26%, rgb(252 115 77 / 0) 72%),
+    radial-gradient(62% 46% at 50% 84%, rgb(252 115 77 / .55) 0%, rgb(252 115 77 / 0) 70%),
+    radial-gradient(70% 78% at 50% 78%, rgb(2 151 222 / .95) 0%, rgb(2 120 190 / .62) 34%, rgb(2 60 110 / .28) 60%, rgb(2 7 10 / 0) 82%),
+    linear-gradient(180deg, #02070A 0%, #03101A 40%, #052436 100%);
+  animation: sky-breathe 10s ease-in-out infinite alternate; }
+.sky-rays { background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / .11) 0 1px, rgb(255 255 255 / 0) 1px 5px, rgb(0 0 0 / .1) 5px 6px, rgb(255 255 255 / 0) 6px 9px);
+  mix-blend-mode: overlay;
+  -webkit-mask-image: radial-gradient(64% 78% at 50% 82%, #000 0%, rgb(0 0 0 / .65) 45%, transparent 82%); mask-image: radial-gradient(64% 78% at 50% 82%, #000 0%, rgb(0 0 0 / .65) 45%, transparent 82%); }
+.sky-floor { inset: auto 0 0 0 !important; height: 120px; background: linear-gradient(180deg, transparent, rgb(2 7 10 / .0)); }
+@keyframes sky-breathe { from { opacity: .86; transform: scale(1); } to { opacity: 1; transform: scale(1.04); } }
+
+/* the books window sitting in the light: frosted, so the glow shows through its edge */
+.lf-hero .lf-win { background: color-mix(in oklab, #071116 88%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); }
+.lf-hero .lf-win__bar, .lf-hero .lf-row { padding-left: 24px; padding-right: 24px; }
+.lf-hero .lf-task { padding-left: 24px; padding-right: 24px; }
+.lf-hero .lf-total { padding: 16px 24px; background: color-mix(in oklab, #0C1A21 70%, transparent); }
+.lf-win__bar, .lf-date, .lf-desc small, .lf-list__head, .lf-num, .lf-tag, .lf-ticker span, .chip, .lf-flag, .lf-ok { font-family: var(--font-mono); letter-spacing: 0; }
+.lf-win__bar { font-size: 12px; } .lf-win__bar b { font-family: var(--font-text); }
+.lf-desc small { font-size: 11.5px; } .lf-date { font-size: 12px; } .chip, .lf-ok, .lf-tag { font-size: 11.5px; } .lf-ticker span { font-size: 12.5px; }
+.lf-num { font-size: 12px; text-transform: none; }
+
+/* colour graded sections: the same light, quieter */
+main#top > section.section { position: relative; }
+#workbench::before, #steps::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(50% 40% at 85% 0%, rgb(2 151 222 / .13), transparent 70%), radial-gradient(40% 36% at 0% 100%, rgb(252 115 77 / .07), transparent 70%); }
+main#top > section.section > .wrap { position: relative; }
+.lf-frame { background: linear-gradient(180deg, rgb(255 190 160 / .55), rgb(2 151 222 / .45) 30%, var(--w-line) 70%); }
+.lf-frame::before { background: linear-gradient(90deg, rgb(2 151 222 / .7), rgb(252 115 77 / .6)); opacity: .28; }
+.lf-tile { background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 7%, var(--w-bg)), var(--w-bg) 60%); }
+.lf-tile--c, .lf-tile--b { background: linear-gradient(180deg, color-mix(in oklab, var(--hot) 6%, var(--w-bg)), var(--w-bg) 60%); }
+.card.card--plan.is-featured { background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 16%, var(--w-bg)), color-mix(in oklab, var(--hot) 5%, var(--w-bg)) 80%); }
+.lf-price { font-family: var(--font-display) !important; font-weight: 400 !important; font-size: 64px !important; letter-spacing: -0.01em !important; }
+
+/* the close: the horizon again */
+footer.closing.lf-foot { background: #02070A; }
+.sky--close .sky-glow { background:
+    radial-gradient(40% 44% at 50% 108%, rgb(255 214 190 / .9) 0%, rgb(252 115 77 / .8) 30%, rgb(252 115 77 / 0) 74%),
+    radial-gradient(70% 90% at 50% 104%, rgb(2 151 222 / .85) 0%, rgb(2 100 170 / .4) 45%, rgb(2 7 10 / 0) 80%); animation: none; }
+.sky--close .sky-rays { -webkit-mask-image: radial-gradient(60% 90% at 50% 104%, #000 0%, transparent 80%); mask-image: radial-gradient(60% 90% at 50% 104%, #000 0%, transparent 80%); }
+.lf-foot .lf-close h2 { font-size: clamp(42px, 5.6vw, 84px); letter-spacing: -0.015em; background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #F6FAFC; }
+.lf-foot .lf-close p, .lf-foot .lf-legal, .lf-foot__row nav a, .lf-foot__theme { color: color-mix(in oklab, #F6FAFC 72%, transparent); }
+.lf-foot .nav__logo { color: #F6FAFC; }
+.lf-foot .lf-close { border-bottom-color: rgb(255 255 255 / .14); padding-bottom: 96px; }
+.lf-foot .lf-close .btn.btn--primary { background: #F6FAFC; color: #02070A; border-radius: 999px; box-shadow: 0 0 44px -6px rgb(255 255 255 / .5); }
+.lf-legal { font-family: var(--font-mono); font-size: 12px; }
+
+/* ---------- day: sky blue, a hot-pink bloom, ribbed glass */
+:root[data-theme="light"] .sky { background: #0593C6; }
+:root[data-theme="light"] .sky-stars { display: none; }
+:root[data-theme="light"] .sky-glow { background:
+    radial-gradient(30% 34% at 56% 62%, rgb(255 170 120 / .95) 0%, rgb(216 57 149 / .92) 34%, rgb(216 57 149 / 0) 76%),
+    radial-gradient(22% 46% at 44% 70%, rgb(30 60 170 / .75) 0%, rgb(30 60 170 / 0) 74%),
+    radial-gradient(60% 60% at 60% 66%, rgb(216 57 149 / .5) 0%, rgb(216 57 149 / 0) 72%),
+    linear-gradient(180deg, #2AA7D8 0%, #0593C6 46%, #5BC3EA 100%); filter: blur(6px); }
+:root[data-theme="light"] .sky-rays { background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / .2) 0 1px, rgb(255 255 255 / 0) 1px 6px, rgb(0 40 80 / .1) 6px 7px, rgb(255 255 255 / 0) 7px 12px); mix-blend-mode: soft-light; -webkit-mask-image: none; mask-image: none; }
+:root[data-theme="light"] .lf-hero .lf-win { background: rgb(255 255 255 / .82); color: #06161D; }
+:root[data-theme="light"] .lf-hero .lf-try > .lf-win { box-shadow: 0 0 0 1px rgb(255 255 255 / .6), 0 -30px 90px -30px rgb(216 57 149 / .5); }
+:root[data-theme="light"] .lf-hero .lf-try::after { background: linear-gradient(180deg, rgb(255 255 255 / .95), rgb(255 255 255 / .3) 45%, transparent 85%); }
+:root[data-theme="light"] .lf-hero .lf-total { background: rgb(241 247 250 / .8); }
+:root[data-theme="light"] .sky--close { background: #0593C6; }
+:root[data-theme="light"] .sky--close .sky-glow { background: radial-gradient(40% 60% at 50% 108%, rgb(255 170 120 / .95) 0%, rgb(216 57 149 / .85) 36%, rgb(216 57 149 / 0) 78%), linear-gradient(180deg, #0593C6, #46B7E4); filter: none; }
+:root[data-theme="light"] #workbench::before, :root[data-theme="light"] #steps::before { background: radial-gradient(50% 40% at 85% 0%, rgb(5 147 198 / .14), transparent 70%), radial-gradient(40% 36% at 0% 100%, rgb(216 57 149 / .08), transparent 70%); }
+:root[data-theme="light"] .lf-frame { background: linear-gradient(180deg, rgb(216 57 149 / .5), rgb(5 147 198 / .5) 30%, var(--w-line) 70%); }
+:root[data-theme="light"] .lf-frame::before { background: linear-gradient(90deg, rgb(5 147 198 / .7), rgb(216 57 149 / .6)); }
+
+/* the fixed bar over the sky: clear at the top of the page, solid once you scroll */
+.nav { transition: background .25s, border-color .25s; }
+html:not(.is-scrolled) .nav { background: transparent; border-bottom-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+html:not(.is-scrolled) .nav .nav__link, html:not(.is-scrolled) .nav .nav__logo, html:not(.is-scrolled) .nav .theme-btn { color: #F6FAFC; }
+html:not(.is-scrolled) .nav .theme-btn { border-color: rgb(255 255 255 / .22); }
+html:not(.is-scrolled) .nav .btn.btn--primary { background: #F6FAFC; color: #02070A; border-radius: 999px; box-shadow: none; }
+html:not(.is-scrolled) .nav .mark { background: #F6FAFC; }
+.nav .nav__link { font-family: var(--font-mono); font-size: 13px; }
+
+@media (max-width: 1023px) {
+  .lf-hero__in { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  .lf-hero__words { grid-column: 1; }
+  .lf-stat { display: none; }
+  main#top > section.hero.lf-hero { padding-top: calc(var(--nav, 56px) + 28px); padding-bottom: 0; }
+  html:not(.is-scrolled) .nav.is-open { background: var(--p-bg); }
+  html:not(.is-scrolled) .nav.is-open .nav__link { color: var(--p-ink); }
+}
+@media (max-width: 639px) {
+  .lf-hero h1 { font-size: clamp(42px, 12.5vw, 56px); margin-bottom: 16px; }
+  .lf-hero .hero__lead { font-size: 13px; margin-bottom: 20px; }
+  .lf-hero .lf-pill { margin-bottom: 18px; font-size: 11.5px; }
+  .lf-hero .lf-win__bar, .lf-hero .lf-row, .lf-hero .lf-task { padding-left: 14px; padding-right: 14px; }
+  .lf-hero .lf-total { padding: 14px; }
+  .lf-hero .hero__text > .btn-row, .lf-hero .btn-row { flex-direction: row; flex-wrap: nowrap; gap: 8px; width: 100%; }
+  .lf-hero .btn-row > .btn { flex: 1 1 0; width: auto; padding: 0 10px; font-size: 14.5px; }
+  .lf-hero .btn-row .btn--secondary { text-decoration: none; background: rgb(255 255 255 / .08); }
+  main h2, .lf-foot h2 { font-size: clamp(32px, 9vw, 40px); }
+}
+@media (prefers-reduced-motion: reduce) { .sky-glow { animation: none; } }
+
+/* the burst is tied to the window's top edge, so it always shows above and beside it */
+.lf-hero .lf-try { position: relative; }
+.lf-hero .lf-try::before { display: block; content: ""; position: absolute; left: 50%; top: 0; width: min(1500px, 150vw); height: 880px; transform: translate(-50%, -52%); z-index: 0; filter: none; opacity: 1; pointer-events: none;
+  background:
+    radial-gradient(30% 13% at 50% 50%, rgb(255 226 206 / .98) 0%, rgb(252 115 77 / .92) 34%, rgb(252 115 77 / 0) 100%),
+    radial-gradient(50% 24% at 50% 50%, rgb(252 115 77 / .6) 0%, rgb(252 115 77 / 0) 100%),
+    radial-gradient(46% 50% at 50% 50%, rgb(2 151 222 / .95) 0%, rgb(2 124 187 / .6) 36%, rgb(2 60 110 / .22) 66%, rgb(2 7 10 / 0) 100%);
+  animation: sky-breathe 10s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes sky-breathe { from { opacity: .84; } to { opacity: 1; } }
+.lf-hero .lf-try > .lf-win { position: relative; z-index: 1; }
+.lf-hero .lf-try::after { z-index: 2; }
+.sky-glow { background: radial-gradient(80% 60% at 50% 58%, rgb(2 80 130 / .35), rgb(2 7 10 / 0) 75%), linear-gradient(180deg, #02070A 0%, #02101A 55%, #031723 100%); animation: none; }
+.sky-rays { -webkit-mask-image: radial-gradient(58% 46% at 50% 56%, #000 0%, rgb(0 0 0 / .6) 50%, transparent 100%); mask-image: radial-gradient(58% 46% at 50% 56%, #000 0%, rgb(0 0 0 / .6) 50%, transparent 100%); z-index: 2; }
+.lf-hero .lf-win { background: color-mix(in oklab, #061016 93%, transparent); }
+:root[data-theme="light"] .lf-hero .lf-try::before { background:
+    radial-gradient(30% 16% at 52% 50%, rgb(255 190 140 / .98) 0%, rgb(216 57 149 / .92) 40%, rgb(216 57 149 / 0) 100%),
+    radial-gradient(20% 30% at 40% 56%, rgb(30 60 170 / .7) 0%, rgb(30 60 170 / 0) 100%),
+    radial-gradient(48% 40% at 54% 52%, rgb(216 57 149 / .5) 0%, rgb(216 57 149 / 0) 100%); filter: blur(10px); }
+:root[data-theme="light"] .sky-glow { background: linear-gradient(180deg, #2AA7D8 0%, #0593C6 50%, #4DBDE8 100%); filter: none; }
+@media (prefers-reduced-motion: reduce) { .lf-hero .lf-try::before { animation: none; } }
+.lf-hero__words, .lf-hero .lf-stat { position: relative; z-index: 3; }
+.lf-hero .lf-try { z-index: 1; }
+.lf-hero .hero__lead { color: color-mix(in oklab, #F6FAFC 86%, transparent); text-shadow: 0 1px 12px rgb(2 7 10 / .5); }

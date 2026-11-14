@@ -359,3 +359,19 @@ h1, h2, h3, .next-t, .step-title, .brand, .drill-q, .drill-end h1, .warm-t b { f
   .tabs button span { font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 999px; background: var(--surface); color: var(--ink-3); }
   .desk.show-books > .statement, .desk.show-bank > .books { display: none; }
 }
+
+/* ================= v15: the landing page's type in the app. Serif for page titles, Inter for the interface,
+   mono for small labels. */
+:root { --font-head: 'Inter', system-ui, sans-serif; --font-serif: 'Instrument Serif', 'Times New Roman', serif; }
+h1, h2, h3, .next-t, .step-title, .brand, .warm-t b, .home-next__t b { font-family: var(--font-ui); font-weight: 600; letter-spacing: -0.015em; }
+.path-sec h1, .guide-head h1, .drill-end h1, .drill-q, .pw-hero h1, .pw-active h1, .guide-end h2, .home-week p b { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.path-sec h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1; }
+.guide-head h1 { font-size: clamp(40px, 6.4vw, 68px); line-height: 1; }
+.drill-q { font-size: clamp(28px, 6.6vw, 40px); line-height: 1.1; }
+.drill-end h1 { font-size: clamp(42px, 10vw, 72px); line-height: 1; }
+.pw-hero h1, .pw-active h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.02; }
+.drill-step, .next-n, .badge, .home-next__t small, .guide-tag, .lvl, .fig-label, .prog-text { font-family: var(--font-mono); letter-spacing: 0; }
+.drill-step, .next-n { font-size: 12px; }
+/* the same light as the landing page, kept low so the work stays readable */
+body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[data-page='upgrade'] { background: radial-gradient(60% 46% at 50% -6%, rgb(2 151 222 / 0.22), transparent 70%), radial-gradient(40% 30% at 100% 0%, rgb(252 115 77 / 0.10), transparent 70%), var(--bg); background-attachment: fixed; }
+:root[data-theme='light'] body[data-page='home'], :root[data-theme='light'] body[data-page='drill'], :root[data-theme='light'] body[data-page='guide'], :root[data-theme='light'] body[data-page='upgrade'] { background: radial-gradient(60% 46% at 50% -6%, rgb(5 147 198 / 0.20), transparent 70%), radial-gradient(40% 30% at 100% 0%, rgb(216 57 149 / 0.10), transparent 70%), var(--bg); background-attachment: fixed; }

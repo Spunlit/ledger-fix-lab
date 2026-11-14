@@ -161,3 +161,8 @@ if ('IntersectionObserver' in window) {
     seen.observe(el);
   });
 } else rv.forEach((el) => el.classList.add('is-seen'));
+
+/* The bar is clear over the hero's sky and turns solid once the page scrolls. */
+const onScroll = () => root.classList.toggle('is-scrolled', window.scrollY > 24);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();

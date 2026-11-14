@@ -160,3 +160,9 @@
 - Desk as a course home: one "Next up" action, seven-day strip with streak, level per skill (New / Practicing / Solid), best warm-up score.
 - Phone, exam files: Books / Bank statement tabs.
 - Checked: 112 unit tests, 65 e2e checks.
+
+## v15 (Nov 14, ~21:30 UTC): colour as light
+- Founder sent the reference his palette came from (a dark page with a blue-to-orange light burst, fine vertical rays, a serif display line with one italic word, mono labels; a day page in sky blue with a pink bloom behind ribbed glass).
+- Landing hero rebuilt in that manner: centred serif headline "Books that balance can still be wrong.", honest side figures (7 kinds, 4 checks, 900 generated files tested, $0 to start), the live books window rising out of the burst. Day theme: sky blue, pink bloom, frosted window. Sections and the close carry the same light, quieter.
+- Type: Instrument Serif (display) + Inter (text) + Geist Mono (labels), in the app too (page titles serif, interface Inter).
+- Checked: 112 unit tests, 65 e2e checks.

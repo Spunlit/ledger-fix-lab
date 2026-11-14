@@ -18,7 +18,7 @@
 <script>try{var t=localStorage.getItem('ledger-fix-lab:theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500..800&family=Inter:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/kit/system.css">
 <link rel="stylesheet" href="/kit/ui/cards.css">
 <link rel="stylesheet" href="/kit/motion/motion.css">
@@ -31,7 +31,7 @@
 <!-- type: software (fintech education: bookkeeping practice)
      palette: the founder's own; night midnight #02070A, electric blue #0297DE, cantaloupe #FC734D;
      day white #FCFFFF, sky blue #0593C6, hot pink #D83995 (tokens in src/landing.css)
-     type: Manrope (headings) + Inter (text), Geist Mono for raw bank text. Section heights are natural (not one screen each): decided
+     type: Instrument Serif (display, with one italic phrase) + Inter (text) + Geist Mono (labels), after the founder's reference. Section heights are natural (not one screen each): decided
      with the founder after the forced screens left dead space. -->
 
 <header class="nav">
@@ -57,21 +57,28 @@
 </header>
 
 <main id="top">
-  <section class="hero hero--collage" data-enter data-spot aria-labelledby="hero-h">
-    <div class="fx" aria-hidden="true"><i class="fx-grid"></i><i class="fx-beam"></i><i class="fx-spot"></i></div>
-    <div class="wrap"><div class="hero-text grid hero__grid">
-      <div class="hero__text span-5">
+  <section class="hero lf-hero" data-enter data-spot aria-labelledby="hero-h">
+    <div class="sky" aria-hidden="true"><i class="sky-stars"></i><i class="sky-glow"></i><i class="sky-rays"></i><i class="sky-floor"></i></div>
+    <div class="wrap"><div class="hero-text lf-hero__in">
+      <div class="lf-hero__words">
         <a class="lf-pill" href="app.html#/drill"><b>New</b>60-second warm-up: tap the wrong line<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <h1 id="hero-h">Bookkeeping practice for beginners</h1>
-        <p class="hero__lead" data-gloss>Match a small business's books to its bank statement, find what is wrong and fix it. You are graded on the books you end with, not on your clicks.</p>
+        <h1 id="hero-h">Books that balance can still be <em>wrong.</em></h1>
+        <p class="hero__lead" data-gloss>Bookkeeping practice for beginners. Match a small business's books to its bank statement, find the mistake and fix it.</p>
         <div class="btn-row">
           <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           <a class="btn btn--secondary" href="app.html#/daily">Open today's file</a>
         </div>
-        <p class="hero__proof">Two cases free. No sign-up. The first takes about 6 minutes.</p>
       </div>
+      <dl class="lf-stat lf-stat--l">
+        <div><dt>7</dt><dd>kinds of mistake</dd></div>
+        <div><dt>4</dt><dd>checks on every file</dd></div>
+      </dl>
+      <dl class="lf-stat lf-stat--r">
+        <div><dt>900</dt><dd>generated files tested</dd></div>
+        <div><dt>$0</dt><dd>to start, no sign-up</dd></div>
+      </dl>
 
-      <div class="lf-try span-6 start-7">
+      <div class="lf-try">
         <div class="lf-win" data-hero>
           <div class="lf-win__bar"><span>Rivera Mobile Detailing</span><b>Books, March 2026</b><span class="lf-match" data-testid="hero-recon">Matches the bank: $0.00 difference</span></div>
           <p class="lf-task" data-hero-task aria-live="polite"><b>Try it.</b> These books match the bank to the cent, yet profit is $5,000 too high. Tap the line that is booked wrong.</p>
@@ -98,7 +105,7 @@
   <section class="section" id="workbench" aria-labelledby="workbench-h">
     <div class="wrap">
       <div class="grid lf-head">
-        <h2 id="workbench-h" class="span-6">Every bank line next to its line in the books</h2>
+        <h2 id="workbench-h" class="span-6">Every bank line next to its line <em>in the books</em></h2>
         <p class="span-5 start-8 muted" data-gloss>Matched lines are done. What is left is your list: missing, doubled or mistyped. Fix each one and watch the difference drop to zero. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera case</a></p>
       </div>
       <div class="lf-frame"><div class="ui app lf-app" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
@@ -141,7 +148,7 @@
   <section class="section" id="steps" aria-labelledby="steps-h">
     <div class="wrap">
       <div class="grid lf-head" data-rv>
-        <h2 id="steps-h" class="span-6">A client file takes 3 steps</h2>
+        <h2 id="steps-h" class="span-6">A client file takes <em>3 steps</em></h2>
         <p class="span-5 start-8 muted">Match, fix, check. Then a new file tomorrow, and a record of the mistakes you catch on the first try.</p>
       </div>
       <div class="lf-bento">
@@ -262,10 +269,10 @@
 </main>
 
 <footer class="footer closing lf-foot" id="contact" aria-labelledby="close-h">
-  <div class="fx" aria-hidden="true"><i class="fx-grid"></i><i class="fx-beam"></i></div>
+  <div class="sky sky--close" aria-hidden="true"><i class="sky-glow"></i><i class="sky-rays"></i></div>
   <div class="wrap">
     <div class="lf-close">
-      <div><h2 id="close-h">Start with the free case</h2><p class="muted">Maple &amp; Pine's October books. No sign-up, about 6 minutes.</p></div>
+      <div><h2 id="close-h">Start with the <em>free case</em></h2><p class="muted">Maple &amp; Pine's October books. No sign-up, about 6 minutes.</p></div>
       <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
     </div>
     <div class="lf-foot__row">

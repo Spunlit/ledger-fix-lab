@@ -8,10 +8,10 @@
    the too-high figure), green and red are only right and wrong money. Button labels are #02070A: white
    fails contrast on all three brand fills. */
 :root {
-  --font-display: "Manrope", system-ui, sans-serif;
+  --font-display: "Instrument Serif", "Times New Roman", serif;
   --font-text: "Inter", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --display-weight: 700; --display-tracking: -0.025em; --display-tracking-xl: -0.03em;
+  --display-weight: 400; --display-tracking: -0.01em; --display-tracking-xl: -0.015em;
 
   --brand: #0297DE; --hot: #FC734D; --hot-text: #E3A08A; --hot-soft: rgb(252 115 77 / .08);
   --p-bg: #02070A; --p-surface: #0A1318; --p-ink: #E1EBF0; --p-muted: #8C9EA9;
@@ -38,9 +38,10 @@
 }
 
 /* ---------- type: Geist, tighter headings, tabular money */
-h1, h2 { font-family: var(--font-display); font-weight: 700; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; }
+h1 em, h2 em { font-style: italic; }
 .hero--collage h1 { font-size: clamp(36px, 4.2vw, 58px); line-height: 1.08; letter-spacing: -0.03em; }
-main h2, .lf-foot h2 { font-size: clamp(28px, 2.9vw, 40px); line-height: 1.1; letter-spacing: -0.025em; }
+main h2, .lf-foot h2 { font-size: clamp(34px, 3.7vw, 54px); line-height: 1.04; letter-spacing: -0.012em; }
 .hero__lead { font-size: clamp(17px, 1.35vw, 19px); line-height: 1.55; color: var(--p-muted); max-width: 44ch; }
 .lf-amt, .lf-big, .lf-profit, .lf-recon b, .lf-cmp__row b, .lf-skill b, .lf-price { font-family: var(--font-text); font-variant-numeric: tabular-nums; }
 .btn { font-weight: 600; }
@@ -257,5 +258,6 @@ footer.closing.lf-foot { padding-bottom: var(--s-7); border-top: 1px solid var(-
 @media (max-width: 639px) { .card.card--plan .lf-price { font-size: 34px; } .lf-row .lf-desc { overflow: hidden; } .lf-row .lf-amt { white-space: nowrap; } }
 
 /* headings in the display face everywhere on the page */
-.lf-tile h3, .lf-steps h3, .faq h3, .card--plan h3, .lf-h, .lf-close h2 { font-family: var(--font-display); }
-.lf-tile h3 { font-weight: 700; }
+.lf-close h2 { font-family: var(--font-display); }
+.lf-tile h3, .faq h3, .card--plan h3, .lf-h { font-family: var(--font-text); font-weight: 600; }
+.nav__logo { font-family: var(--font-text); font-weight: 600; letter-spacing: -0.02em; }
