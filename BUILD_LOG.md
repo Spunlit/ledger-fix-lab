@@ -113,3 +113,11 @@
 - Theme: midnight black / electric blue / cantaloupe orange; night by default, day/night switch remembered; cinematic
   home background. Open Graph share image.
 - npm test 94/94; e2e 47/47 locally.
+
+## 2026-11-14 ~21:20–22:00 Astana — v7: "the auditor's desk" (founder: still looked like AI slop)
+- Dropped the generic dark-SaaS hero (centered pill + glow + glass + stars). New concept from the subject: a printed
+  ledger page on a midnight desk. Colors are objects: electric-blue pencil ticks, cantaloupe highlighter on the
+  profit, red pen circle, green RECONCILED stamp. Honest lines get a pencil tick + handwritten margin note; the lie is
+  circled in red, BUT WRONG is stamped over RECONCILED, profit struck and corrected by hand. Engine-graded as before.
+- Day theme = same paper on a light desk. Books/statement on the case page and reviews render as paper (scoped tokens).
+- Caveat (OFL) bundled for margin notes only. npm test 94/94; e2e 47/47.

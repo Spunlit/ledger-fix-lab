@@ -100,14 +100,14 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
   const M = '−';
 
-  // ---------- home: the 30-second case ("one line is lying")
+  // ---------- home: the ledger page on the auditor's desk ("one line is lying")
   await go('');
-  ok((await text('.tile.ok strong')) === '$0.00' && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'home shows the paradox: $0.00 balanced, profit $10,410.76');
+  ok((await text('.rstamp.ok')).includes('Reconciled') && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'home shows the paradox: stamped reconciled, profit $10,410.76');
   await click('[data-hero-pick=E14]');
-  ok((await text('[data-testid=hero-why]')).includes("hasn't reached the bank"), 'picking the uncleared check explains why it is real');
+  ok((await text('.line.tried .note')).includes("hasn't cleared"), 'checking the uncleared check leaves a pencil note: real, just not cleared');
   await click('[data-hero-pick=E06]');
   await sleep(1500);
-  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return !!$('.ev.liar .stamp')`)), 'catching the owner transfer: profit rolls to $5,410.76 and the card is stamped');
+  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return !!$('[data-testid=hero-stamp]') && !!$('.line.liar .loop')`)), 'catching the owner transfer: line circled, BUT WRONG stamp, profit corrected to $5,410.76');
   ok((await text('[data-testid=hero-verdict]')).includes("owner's money, not a sale"), 'verdict explains the lesson');
   await shot('0-home', false);
 
