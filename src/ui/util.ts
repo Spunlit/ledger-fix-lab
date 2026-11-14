@@ -83,3 +83,86 @@ export function dailyStreak(done: Completed, today: string): number {
   }
   return n;
 }
+
+// ---------------------------------------------------------------- plan (paywall)
+
+const PLAN_KEY = 'ledger-fix-lab:v5:plan';
+const OPENED_KEY = 'ledger-fix-lab:v5:practice-opened';
+/** Free tier: both guided cases, every file of the day, and this many practice files. */
+export const FREE_PRACTICE_FILES = 1;
+
+export interface Plan {
+  plan: 'practice';
+  billing: 'monthly' | 'yearly';
+  since: string;
+  /** This build simulates checkout; nothing is charged. */
+  demo: true;
+}
+
+export function loadPlan(): Plan | null {
+  try {
+    const p = JSON.parse(localStorage.getItem(PLAN_KEY) ?? 'null');
+    return p && p.plan === 'practice' ? (p as Plan) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function savePlan(p: Plan | null): void {
+  try {
+    if (p) localStorage.setItem(PLAN_KEY, JSON.stringify(p));
+    else localStorage.removeItem(PLAN_KEY);
+  } catch {
+    /* storage blocked: the plan lasts for this page view only */
+  }
+}
+
+export function loadOpenedPractice(): string[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(OPENED_KEY) ?? '[]');
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveOpenedPractice(ids: string[]): void {
+  try {
+    localStorage.setItem(OPENED_KEY, JSON.stringify(ids.slice(-500)));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** A practice file can be opened if the visitor has a plan, already opened it, or still has free files left. */
+export function canOpenPractice(id: string, opened: string[], plan: Plan | null): boolean {
+  return Boolean(plan) || opened.includes(id) || opened.length < FREE_PRACTICE_FILES;
+}
+
+// ---------------------------------------------------------------- theme
+
+const THEME_KEY = 'ledger-fix-lab:theme';
+export type Theme = 'dark' | 'light';
+
+/** Night (dark) is the default look; the visitor's choice is remembered in this browser. */
+export function loadTheme(): Theme {
+  try {
+    return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+
+export function saveTheme(t: Theme): void {
+  try {
+    localStorage.setItem(THEME_KEY, t);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function themeButton(t: Theme): string {
+  const sun = `<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  const moon = `<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M15.5 12.6A6.5 6.5 0 0 1 7.4 4.5a6.5 6.5 0 1 0 8.1 8.1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  return `<button type="button" class="theme-btn" data-theme-toggle aria-label="Switch to ${t === 'dark' ? 'day' : 'night'} theme" title="Switch to ${t === 'dark' ? 'day' : 'night'} theme">${t === 'dark' ? sun : moon}</button>`;
+}

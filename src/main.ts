@@ -1,6 +1,7 @@
 import './style.css';
 import './workbench.css';
 import './paywall.css';
+import './theme.css';
 import { initWorkbenchEvents } from './ui/workbench-events';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
@@ -12,11 +13,24 @@ import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { renderLanding } from './ui/landing';
 import { resolve } from './ui/routes';
-import { dailyStreak, loadCompleted, loadHistory, parseDollarsToCents, saveCompleted, saveHistory } from './ui/util';
+import { loadTheme, saveTheme, themeButton } from './ui/util';
+import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
+import { renderPaywall, type PaywallState } from './ui/paywall';
 import { todaySeed } from './core/generator';
 import { isGuided, newCaseUI, renderWorkbench, shareText, type CaseUI } from './ui/workbench';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+let theme = loadTheme();
+document.documentElement.dataset.theme = theme;
+// The theme switch lives in page headers; one listener handles it everywhere.
+document.addEventListener('click', (ev) => {
+  const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-theme-toggle]');
+  if (!b) return;
+  theme = theme === 'dark' ? 'light' : 'dark';
+  saveTheme(theme);
+  document.documentElement.dataset.theme = theme;
+  b.outerHTML = themeButton(theme);
+});
 const cases = new Map<string, CaseUI>();
 let completed = loadCompleted();
 let history = loadHistory();
@@ -27,9 +41,20 @@ function current(): CaseUI | null {
 
 /** Home-page 30-second case: lines the visitor has tried, and whether the lie was caught. */
 let hero: HeroState = { tried: [], caught: false };
+let plan = loadPlan();
+let openedPractice = loadOpenedPractice();
+let paywall: PaywallState = { returnTo: null, step: 'plans', billing: 'monthly' };
+
+function renderUpgrade(): void {
+  currentId = null;
+  document.body.dataset.page = 'upgrade';
+  document.title = 'Practice plan | Ledger Fix Lab';
+  app.innerHTML = renderPaywall(paywall, plan);
+}
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function renderHome(animate = false): void {
+  document.body.dataset.page = 'home';
   app.innerHTML = renderLanding(completed, history, hero);
   const el = app.querySelector<HTMLElement>('[data-testid=hero-profit]');
   const box = app.querySelector<HTMLElement>('.case');
@@ -54,6 +79,25 @@ function route(): void {
     resolved = resolve(location.hash);
   } catch {
     resolved = null; // an unusable seed falls back to the home page
+  }
+  if (/^#\/upgrade/.test(location.hash)) {
+    renderUpgrade();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (resolved && resolved.scenario.kind === 'practice') {
+    const id = resolved.scenario.id;
+    if (!canOpenPractice(id, openedPractice, plan)) {
+      // Free practice used up: show the paywall, then come back to this exact file.
+      paywall = { returnTo: location.hash, step: 'plans', billing: paywall.billing };
+      renderUpgrade();
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (!openedPractice.includes(id)) {
+      openedPractice = [...openedPractice, id];
+      saveOpenedPractice(openedPractice);
+    }
   }
   if (resolved) {
     const { scenario, day } = resolved;
@@ -85,6 +129,7 @@ function render(): void {
   const ui = current();
   if (!ui) return;
   persistIfSolved(ui);
+  document.body.dataset.page = 'case';
   app.innerHTML = renderWorkbench(ui);
   const input = app.querySelector<HTMLInputElement>('.amt-form input');
   if (input) {
@@ -109,6 +154,30 @@ function dispatch(action: Action): void {
 app.addEventListener('click', (ev) => {
   const ui = current();
   if (!ui) {
+    const pw = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-pw]');
+    if (pw) {
+      const a = pw.dataset.pw;
+      if (a === 'monthly' || a === 'yearly') paywall = { ...paywall, billing: a };
+      else if (a === 'checkout') paywall = { ...paywall, step: 'checkout' };
+      else if (a === 'back') paywall = { ...paywall, step: 'plans' };
+      else if (a === 'confirm') {
+        plan = { plan: 'practice', billing: paywall.billing, since: new Date().toISOString(), demo: true };
+        savePlan(plan);
+      } else if (a === 'open' && paywall.returnTo) {
+        // The paywall is shown at the practice file's own URL, so re-route instead of navigating.
+        const target = paywall.returnTo;
+        paywall = { ...paywall, returnTo: null, step: 'plans' };
+        if (location.hash === target) route();
+        else location.hash = target;
+        return;
+      } else if (a === 'cancel') {
+        plan = null;
+        savePlan(null);
+        paywall = { returnTo: null, step: 'plans', billing: paywall.billing };
+      }
+      renderUpgrade();
+      return;
+    }
     const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-hero-pick]');
     if (!b || b.disabled) return;
     const id = b.dataset.heroPick!;

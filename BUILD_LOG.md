@@ -101,3 +101,15 @@
 - Workbench: one message at a time (warning replaces next step, with Undo), BALANCED, BUT WRONG / RECONCILED AND
   RIGHT stamps, profit before/after bars in the review, cleanup summary open by default, streak in shared result.
 - npm test 77/77; e2e 42/42 locally.
+
+## 2026-11-14 ~20:00–21:00 Astana — v6: matching workbench, paywall, night theme
+- Official brief + FAQ read (audience "working adults with jobs, families, bills and goals"; working paywall is the
+  minimum, Q37/Q55; renewals over DAU, Q30; numbers with sources, Q58). Strategy rev 4 with Census/QuickBooks/RevenueCat.
+- Workbench redesign (started by Fable, finished/integrated by Opus after Fable hit its rate limit): bank-feed style
+  matching (core/match.ts, visible data only, tested incl. 50 generated files), paired books/bank rows, "No bank match"
+  / "Not in books" rows, review counts, sticky bottom action bar, compact figures.
+- Paywall: free tier (cases, daily files, 1 practice file), Practice plan $12/mo or $96/yr, 7-day trial, demo checkout
+  clearly labelled (no card, nothing charged), returns to the requested file.
+- Theme: midnight black / electric blue / cantaloupe orange; night by default, day/night switch remembered; cinematic
+  home background. Open Graph share image.
+- npm test 94/94; e2e 47/47 locally.

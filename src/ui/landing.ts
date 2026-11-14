@@ -4,7 +4,7 @@ import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
 import { renderHero, type HeroState } from './hero';
 import { dailyHref, practiceHref } from './routes';
-import { dailyStreak, esc, newSeed, type Completed } from './util';
+import { dailyStreak, esc, loadTheme, newSeed, themeButton, type Completed } from './util';
 
 const tick = `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -29,6 +29,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
   return `
   <section class="path-sec" id="practice" aria-labelledby="path-h">
     <h2 id="path-h">Three steps to client-ready</h2>
+    <p class="path-sub">For freelancers and small-business owners who keep their own books, and anyone training to keep them for clients.</p>
     <div class="path">
       ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
       ${step('2', `#/case/${CASES[1].id}`, CASES[1].title, 'Guided, 10 min. The full reconciliation.', d2, d1 && !d2)}
@@ -50,7 +51,7 @@ export function renderLanding(done: Completed, history: SkillAttempt[], hero: He
   return `
   <header class="nav">
     <a class="brand" href="#/" aria-label="Ledger Fix Lab home"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
-    <a class="nav-link" href="#practice">Practice</a>
+    <div class="nav-right"><a class="nav-link" href="#practice">Practice</a>${themeButton(loadTheme())}</div>
   </header>
 
   <main class="home">
@@ -61,9 +62,9 @@ export function renderLanding(done: Completed, history: SkillAttempt[], hero: He
       <h2 id="compare-h" class="sr">Compared with other practice</h2>
       <div class="cmp">
         <div class="cmp-col"><span class="cmp-label">Practice clients elsewhere</span><p><b>$49–$119 per file.</b> You grade yourself against an answer sheet, inside your own paid QuickBooks.</p></div>
-        <div class="cmp-col us"><span class="cmp-label">Ledger Fix Lab</span><p><b>Graded instantly, in the browser.</b> A new file free every day. Unlimited weak-spot practice planned at $12 a month.</p></div>
+        <div class="cmp-col us"><span class="cmp-label">Ledger Fix Lab</span><p><b>Graded instantly, in the browser.</b> A new file free every day. Unlimited weak-spot practice for $12 a month.</p><a class="link small" href="#/upgrade">See the Practice plan</a></div>
       </div>
-      <p class="fine">Competitor prices from <a href="https://qbodojo.com/">qbodojo.com</a>, Nov 2026. Nothing is for sale yet.</p>
+      <p class="fine">Competitor prices from <a href="https://qbodojo.com/">qbodojo.com</a>, Nov 2026. Checkout is simulated in this build.</p>
     </section>
   </main>
 

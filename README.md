@@ -11,9 +11,13 @@ whether the books are actually right.
 Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have finished a course or certification
 but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
 
-## First 30 seconds
-The home page is a one-click challenge: the books are $412.50 off and one payment was imported twice. Delete the
-wrong copy and you see $0.00 together with "Balanced, but wrong": the core lesson, before reading anything.
+## For judges: a 2-minute tour
+1. **Home:** tap the line that is lying. The reconciliation already reads $0.00, yet profit is $5,000 too high; catch it
+   and the profit rolls down to the true figure. Graded by the real engine on case 2's books.
+2. **Case 2 ("Balanced, but wrong"):** fix the books with instant feedback, press *Check the books*, read the review.
+3. **Today's file:** a generated client file, no hints (exam mode). Its first check feeds your skill record.
+4. **Practice my weak spots → second practice file:** the paywall (Practice plan, $12/month or $96/year, 7-day trial).
+   Checkout is a clearly labelled demo: no card, nothing charged.
 
 ## Guided vs. unguided
 Guided cases give instant feedback after every move, a progress count and an optional hint, and show only the tools
@@ -48,22 +52,27 @@ sufficient. Any correct end state passes (either duplicate copy; editing the tra
 Clues use real bookkeeper heuristics on the live difference (matches a bank line, matches ticked rows, divisible by
 9 → swapped digits). On completion you get a client-ready cleanup summary generated from what changed.
 
+## Who it is for
+Working adults in the US (25–45) who keep the books for their own side business or freelance work (29.8 M nonemployer
+businesses, Census 2022; over two-thirds of small-business owners do their own bookkeeping, QuickBooks Dec 2025), and
+working adults building a side income doing bookkeeping for others. They pay out of pocket (B2C).
+
 ## What is real vs. not
 **Real:** the interactive books (tick cleared, edit amount, change category, delete, record a bank line), undo and
 start over, reconciliation worksheet, four checks with explanations, clues, P&L before/after, cleanup summary,
 completion remembered in your browser. All in the browser; nothing is sent anywhere.
 
 **Synthetic / not built:** all client files are fictional training data (the generated ones too). Simplified single-account model, no
-QuickBooks/Xero/bank connection, no accounts, no payments. The $12/month price on the site is a hypothesis to test;
-demand and retention are unmeasured.
+QuickBooks/Xero/bank connection, no accounts. The paywall works (free tier: both cases, daily files, 1 practice
+file), but checkout is simulated: no card data is collected and nothing is charged. Demand and retention are unmeasured.
 
 ## Run and test
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 76 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 94 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 42 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 47 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.

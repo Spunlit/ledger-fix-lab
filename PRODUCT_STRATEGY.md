@@ -76,6 +76,25 @@ share the daily file in learner communities for two weeks; measure completion, d
 a bar set in advance. Not built on purpose: accounts, payments, backend, QuickBooks import, AI tutor, leaderboards,
 certificates.
 
+## 7. Rev. 4 (14 Nov, night): official brief + FAQ
+- **Audience wording (official brief):** "working adults with jobs, families, bills and goals", US 25–45. Our user:
+  working adults who keep the books for their own side business or freelance work, and working adults building a
+  side income doing bookkeeping for others. Freelancers/solopreneurs paying out of pocket are B2C (FAQ Q38).
+- **Market [O]:** 29.8 M US nonemployer businesses in 2022 (Census Nonemployer Statistics). More than two-thirds of US
+  small-business owners do their own bookkeeping (QuickBooks Business Owner Report, Dec 2025). Practice clients sell
+  for $49–119 each (QBO Dojo); Akadian CAS $97–197/mo.
+- **Subscription benchmarks [O]:** cheap annual plans retain up to ~36% after a year, high-priced monthly ~6.7%
+  (RevenueCat SOSA 2025); first-year annual retention 28%, monthly 8% across categories (RevenueCat 2026); trials of
+  17–32 days convert best (45.7%). Education month-1 cancellations ~30% of annual cancellations.
+- **$100M ARR, long term [H]:** at $96/year, ~1.04 M subscribers ≈ 5% of ~20 M DIY bookkeepers (29.8 M × ⅔). A long-term
+  ceiling, not a forecast.
+- **Paywall:** FAQ Q37/Q55 — a working paywall with a clear price is the minimum; built as a demo checkout (no card).
+- **Retention metric:** FAQ Q30 — renewals matter more than DAU; the pitch argues monthly/annual renewal from the
+  month-end practice habit, measured against RevenueCat benchmarks.
+- Sources: https://www.census.gov/newsroom/press-releases/2024/2022-nonemployer-statistics.html ·
+  https://quickbooks.intuit.com/r/small-business-data/small-business-insights ·
+  https://www.revenuecat.com/state-of-subscription-apps-2025 · https://www.revenuecat.com/state-of-subscription-apps-2026-education
+
 ## Sources
 - https://quickbooks.intuit.com/community/off-topic-discussion-73/how-to-kickstart-my-bookkeeping-gig-165177
 - https://quickbooks.intuit.com/learn-support/en-us/other-questions/how-can-i-become-a-bookkeeping-trainee-for-a-professional/00/1498241

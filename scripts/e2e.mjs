@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 42; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 47; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -184,6 +184,19 @@ async function main() {
   ok(/^#\/practice\/[a-z0-9]+\//.test(practice), `weak-spot practice link targets missed skills (${practice})`);
   await go(practice);
   ok((await text('.badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
+
+  // ---------- paywall: free tier allows one practice file, then the Practice plan (demo checkout)
+  await go('#/practice/zzz999/timing');
+  ok(await js(`return !!$('.pw-card')`) && (await text('.pill')).includes('free practice file'), 'a second practice file opens the paywall');
+  await click('[data-pw=yearly]');
+  ok((await text('[data-testid=pw-price]')).includes('$96'), 'yearly price shown ($96/year)');
+  await click('[data-pw=checkout]');
+  ok((await text('[data-testid=pw-checkout]')).includes('nothing is charged'), 'checkout is clearly labelled as a demo');
+  await click('[data-pw=confirm]');
+  ok(await js(`return !!$('[data-testid=plan-active]')`), 'demo plan activates');
+  await click('[data-pw=open]');
+  await sleep(300);
+  ok((await text('.badge')) === 'Practice file', 'after upgrading, the requested practice file opens');
 
   // ---------- phone width
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });

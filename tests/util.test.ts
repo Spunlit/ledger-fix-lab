@@ -37,3 +37,15 @@ describe('daily streak', () => {
     expect(dailyStreak({ 'daily-2026-11-13': at }, '2026-11-15')).toBe(0);
   });
 });
+
+import { canOpenPractice, FREE_PRACTICE_FILES } from '../src/ui/util';
+describe('paywall entitlement', () => {
+  const plan = { plan: 'practice' as const, billing: 'monthly' as const, since: 'x', demo: true as const };
+  it('allows the free practice files, re-opening, and everything with a plan', () => {
+    expect(FREE_PRACTICE_FILES).toBe(1);
+    expect(canOpenPractice('a', [], null)).toBe(true);
+    expect(canOpenPractice('a', ['a'], null)).toBe(true);
+    expect(canOpenPractice('b', ['a'], null)).toBe(false);
+    expect(canOpenPractice('b', ['a'], plan)).toBe(true);
+  });
+});
