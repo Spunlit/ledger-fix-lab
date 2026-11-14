@@ -38,3 +38,10 @@
   <select>; also escaped source/entryId for hardening.
 - npm test 17/17, build OK, local e2e 16/16.
 - Decision (user): no further Codex reviews; main session owns review.
+
+## 2026-11-14 ~16:15 Astana — exhaustive test + pitch deck
+- Added exhaustive test: all 2^14 keep/delete subsets (categories fixed) → exactly 2 pass (delete E09 or E10). npm test 18/18.
+- Pitch: `pitch/slides.html` → `pitch/LedgerFixLab_pitch.pdf` via headless Chrome print-to-pdf (10 pages, verified
+  by page count + per-slide screenshots; no overflow). Only facts from code/tests/brief; unvalidated items marked UNKNOWN.
+- Skills check (user request): no frontend-design/UI-UX skill installed; available relevant ones: artifact-design,
+  dataviz, run, code-review, simplify, security-review, pptx/pdf/docx. Nothing installed.

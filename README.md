@@ -35,3 +35,9 @@ node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/   # same check ag
 - `src/core/` — pure engine (no DOM): `engine.ts` (actions, undo, checks), `scenario.ts` (fixture), `explain.ts`, `money.ts` (integer cents).
 - `src/main.ts`, `src/style.css` — UI.
 - `tests/engine.test.ts`, `scripts/e2e.mjs` — checks.
+
+## Pitch
+- PDF (10 slides): [`pitch/LedgerFixLab_pitch.pdf`](pitch/LedgerFixLab_pitch.pdf). Source: `pitch/slides.html`
+  (screenshots in `pitch/img/` are from the live site).
+- Rebuild: open `pitch/slides.html` in Chrome and print to PDF, or
+  `chrome --headless=new --no-pdf-header-footer --print-to-pdf=pitch/LedgerFixLab_pitch.pdf pitch/slides.html`.

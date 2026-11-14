@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ledger Fix Lab — pitch</title>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  :root { --ink:#1d2320; --muted:#5f6964; --line:#dedcd3; --bg:#f5f4ef; --accent:#1f6f54; --bad:#b3261e; --badbg:#fcebea; --good:#1f7a4d; --goodbg:#e7f4ec; --warn:#fff4d6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #888; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .s { width: 1280px; height: 720px; background: var(--bg); position: relative; overflow: hidden; padding: 56px 72px; page-break-after: always; break-after: page; }
+  .s:last-child { page-break-after: auto; break-after: auto; }
+  .k { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+  h1 { font-size: 64px; line-height: 1.05; margin: 0 0 18px; letter-spacing: -.02em; }
+  h2 { font-size: 40px; line-height: 1.15; margin: 0 0 26px; letter-spacing: -.01em; }
+  p, li { font-size: 22px; line-height: 1.45; }
+  ul { margin: 0; padding-left: 26px; }
+  li + li { margin-top: 10px; }
+  .muted { color: var(--muted); }
+  .foot { position: absolute; left: 72px; right: 72px; bottom: 26px; display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+  .logo { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 14px; background: var(--accent); color: #fff; font-size: 38px; font-weight: 800; margin-bottom: 26px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; }
+  .box h3 { margin: 0 0 8px; font-size: 22px; }
+  .box p { margin: 0; font-size: 19px; }
+  .unk { background: var(--warn); border: 1px solid #e8d9a6; border-radius: 12px; padding: 14px 20px; font-size: 18px; }
+  .unk b { color: #7a5a00; }
+  .shot { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 24px rgb(0 0 0 / .10); }
+  .shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  .crop { border: 1px solid var(--line); border-radius: 12px; background-color: #fff; background-repeat: no-repeat; box-shadow: 0 6px 24px rgb(0 0 0 / .10); }
+  .cap { font-size: 20px; line-height: 1.4; }
+  .big { font-size: 30px; font-weight: 700; }
+  .neg { color: var(--bad); } .pos { color: var(--good); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 30px; }
+  .flow div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 18px; line-height: 1.35; position: relative; }
+  .flow div b { display: block; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .chk { background: #fff; border-left: 6px solid var(--accent); border-radius: 10px; padding: 16px 20px; }
+  .chk h3 { margin: 0 0 6px; font-size: 21px; }
+  .chk p { margin: 0; font-size: 18px; }
+  .tag { display: inline-block; font-size: 14px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .tag.real { background: var(--goodbg); color: var(--good); }
+  .tag.mock { background: var(--badbg); color: var(--bad); }
+  .tag.hyp { background: var(--warn); color: #7a5a00; }
+  .links { font-size: 22px; line-height: 1.7; }
+  .links b { display: inline-block; width: 90px; color: var(--muted); font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: 19px; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { font-weight: 700; width: 300px; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="s">
+  <div class="logo">✓</div>
+  <p class="k">Business Cup 2.0 · Track: Money</p>
+  <h1>Ledger Fix Lab</h1>
+  <p style="font-size:28px;max-width:960px;margin:0 0 40px">A practice range for fixing small-business books. You clean up a messy ledger; a deterministic engine grades the <b>final state of the books</b>, not a text answer.</p>
+  <div class="links">
+    <div><b>Live</b>spunlit.github.io/ledger-fix-lab</div>
+    <div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div>
+  </div>
+  <p class="muted" style="font-size:18px;margin-top:30px">Web-only · no sign-up · works on phones · synthetic practice data</p>
+  <div class="foot"><span>Ledger Fix Lab</span><span>1 / 10</span></div>
+</section>
+
+<!-- 2 -->
+<section class="s">
+  <p class="k">Problem &amp; user</p>
+  <h2>Fixing the books is scary when every click hits live data</h2>
+  <div class="cols" style="margin-bottom:26px">
+    <div class="box"><h3>Who</h3><p>A beginner freelance bookkeeper or small-business owner in the US, 25–45, who keeps their own books in QuickBooks Online.</p></div>
+    <div class="box"><h3>When</h3><p>The monthly bank reconciliation turns up duplicates, wrong categories and a balance that doesn't match the statement.</p></div>
+  </div>
+  <div class="box" style="margin-bottom:26px"><h3>The trap</h3><p>Deleting the <i>wrong</i> row can make the balance match while the books are still wrong. A matching number feels like success, and that is exactly the mistake people need to practice catching.</p></div>
+  <div class="unk"><b>Not validated (UNKNOWN):</b> how many such users exist, their ages, willingness to pay, how often they would come back.</div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>2 / 10</span></div>
+</section>
+
+<!-- 3 -->
+<section class="s">
+  <p class="k">Existing options</p>
+  <h2>People already learn this elsewhere</h2>
+  <table style="margin-bottom:28px">
+    <tr><td>ChatGPT, forums</td><td>Explain what to do, but don't check what you actually did to the ledger.</td></tr>
+    <tr><td>YouTube courses</td><td>Passive: no feedback on your own fix.</td></tr>
+    <tr><td>QuickBooks Online Test Drive</td><td>Free sample company to click around in safely.</td></tr>
+    <tr><td>Akadian ClickStudy</td><td>QuickBooks training product, a direct competitor.</td></tr>
+  </table>
+  <div class="box"><h3>Our angle (not a proven advantage)</h3><p>One narrow, checkable cleanup task: the engine verifies the end state with three separate checks and names the rule you broke, including when the balance matches but the books are wrong.</p></div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>3 / 10</span></div>
+</section>
+
+<!-- 4 -->
+<section class="s">
+  <p class="k">How it works</p>
+  <h2>Graded on the state of the books</h2>
+  <div class="flow">
+    <div><b>1 · Given</b>A messy ledger and the bank statement (source of truth)</div>
+    <div><b>2 · You</b>Delete rows or change categories. Undo any time</div>
+    <div><b>3 · Engine</b>Runs three independent checks on the result</div>
+    <div><b>4 · Feedback</b>Plain-language explanation of each broken rule</div>
+  </div>
+  <div class="checks" style="margin-bottom:26px">
+    <div class="chk"><h3>1 · Transactions</h3><p>Every statement transaction is in the ledger exactly once: nothing real deleted, no duplicate left.</p></div>
+    <div class="chk"><h3>2 · Matches statement</h3><p>Opening balance + ledger rows = statement closing balance, computed in integer cents.</p></div>
+    <div class="chk"><h3>3 · Categories</h3><p>Every row fits its category rule. Independent of money: recategorizing never moves the balance.</p></div>
+  </div>
+  <p style="margin:0">Success only when <b>all three</b> pass. Any correct end state passes: either copy of a duplicate may be deleted; two real identical purchases are not a duplicate.</p>
+  <div class="foot"><span>Ledger Fix Lab</span><span>4 / 10</span></div>
+</section>
+
+<!-- 5 -->
+<section class="s" style="display:grid;grid-template-columns:330px 1fr;gap:36px;align-items:start">
+  <div>
+    <p class="k">Demo · start</p>
+    <h2 style="font-size:34px">October books don't reconcile</h2>
+    <p class="cap">Difference: <span class="big neg">−$412.50</span></p>
+    <p class="cap">Three planted problems: one payment recorded twice (bank feed + manual entry), two rows in the wrong category.</p>
+    <p class="cap">Two traps: two real identical coffees on the same day, and a second real payment of the same $412.50.</p>
+  </div>
+  <div class="crop" style="height:590px;background-image:url(img/1-initial.png);background-size:819px auto;background-position:-35px -160px"></div>
+  <div class="foot"><span>Screenshot of the live site · synthetic data</span><span>5 / 10</span></div>
+</section>
+
+<!-- 6 -->
+<section class="s">
+  <p class="k">Demo · the trap</p>
+  <h2 style="font-size:34px;margin-bottom:18px">$0.00 and still wrong</h2>
+  <div class="crop" style="height:340px;background-image:url(img/2-compensating-error.png);background-size:1215px auto;background-position:-52px -237px;margin-bottom:22px"></div>
+  <div class="cols" style="gap:36px">
+    <p class="cap" style="margin:0">Delete the <b>real</b> Oct 29 payment instead of the Oct 15 duplicate: the difference shows <b class="pos">$0.00</b>, which looks done.</p>
+    <p class="cap" style="margin:0">The engine still fails it: a real transaction is missing and the duplicate remains, so the errors cancel out. Undo restores the exact previous state.</p>
+  </div>
+  <div class="foot"><span>Screenshot of the live site · synthetic data (categories not fixed yet at this point)</span><span>6 / 10</span></div>
+</section>
+
+<!-- 7 -->
+<section class="s">
+  <p class="k">Demo · solved</p>
+  <h2 style="font-size:34px;margin-bottom:18px">All three checks green</h2>
+  <div class="crop" style="height:236px;background-image:url(img/3-solved.png);background-size:1215px auto;background-position:-52px -237px;margin-bottom:24px"></div>
+  <p class="cap" style="margin-top:0">Fix: delete one copy of the duplicate (either one), move Adobe to Software &amp; Subscriptions and Shell fuel to Car &amp; Truck.</p>
+  <p class="cap">Recategorizing never changes the difference: money and categories are checked separately.</p>
+  <p class="cap">The same flow works on a phone: ledger rows become stacked cards (tested at 375&nbsp;px).</p>
+  <div class="foot"><span>Screenshots of the live site · synthetic data</span><span>7 / 10</span></div>
+</section>
+
+<!-- 8 -->
+<section class="s">
+  <p class="k">Engineering</p>
+  <h2>The core loop is tested, not just shown</h2>
+  <ul>
+    <li>Pure TypeScript engine with no UI code; money as integer cents; immutable state; undo restores the exact previous state.</li>
+    <li><b>18 unit tests</b> (Vitest): correct, equivalent, deleting a needed row, compensating errors, wrong category at $0.00, identical purchases ≠ duplicate, exact undo.</li>
+    <li><b>Exhaustive test:</b> all 16,384 keep/delete combinations of the 14 rows: exactly 2 pass (delete either duplicate copy).</li>
+    <li><b>16-step end-to-end check</b> in headless Chrome against the live URL, desktop and 375&nbsp;px phone.</li>
+    <li>CI: every push runs tests and build before deploying to GitHub Pages.</li>
+    <li>Static site: no backend, no accounts, no data collected; an offline build is ready for the demo.</li>
+  </ul>
+  <div class="foot"><span>Ledger Fix Lab</span><span>8 / 10</span></div>
+</section>
+
+<!-- 9 -->
+<section class="s">
+  <p class="k">Honest scope &amp; business hypothesis</p>
+  <h2>What is real, what is not</h2>
+  <div class="cols" style="grid-template-columns:1fr 1fr 1fr;gap:20px">
+    <div class="box"><span class="tag real">REAL</span><p>Interactive ledger: delete, recategorize, undo, reset. Three independent checks and explanations, running in the browser. Tests and CI.</p></div>
+    <div class="box"><span class="tag mock">MOCK / NOT BUILT</span><p>One fixed synthetic scenario. No QuickBooks or bank connection. No accounts, saved progress or payments.</p></div>
+    <div class="box"><span class="tag hyp">HYPOTHESIS</span><p>First scenario free; paid packs of harder cleanup scenarios. Return reason: new practice cases for the monthly close. Prices, demand and retention: UNKNOWN.</p></div>
+  </div>
+  <p class="muted" style="margin-top:28px;font-size:19px">No revenue, user or retention numbers are claimed: none have been measured.</p>
+  <div class="foot"><span>Ledger Fix Lab</span><span>9 / 10</span></div>
+</section>
+
+<!-- 10 -->
+<section class="s">
+  <p class="k">Risks &amp; next step</p>
+  <h2>What could kill it, and the cheapest test</h2>
+  <div class="cols">
+    <div class="box">
+      <h3>Risks</h3>
+      <ul style="padding-left:22px">
+        <li style="font-size:19px">Free QBO Test Drive and Akadian may already cover the need.</li>
+        <li style="font-size:19px">After mastering cleanup, users may not come back.</li>
+        <li style="font-size:19px">Target buyers and their ages are unconfirmed.</li>
+        <li style="font-size:19px">Each new scenario costs authoring time.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Next cheapest test (not done yet)</h3>
+      <p>Share the live link with people learning bookkeeping. Measure who finishes the scenario, which trap catches them, and who asks for another scenario.</p>
+    </div>
+  </div>
+  <div class="links" style="margin-top:34px">
+    <div><b>Live</b>spunlit.github.io/ledger-fix-lab</div>
+    <div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div>
+  </div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>10 / 10</span></div>
+</section>
+
+</body>
+</html>

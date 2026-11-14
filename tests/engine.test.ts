@@ -157,6 +157,21 @@ describe('money formatting', () => {
   });
 });
 
+describe('exhaustive', () => {
+  it('of all 2^14 ways to keep/delete rows, exactly two pass: delete either duplicate copy', () => {
+    const fixed = run(FIX_CATEGORIES);
+    const all = fixed.state.entries;
+    const passing: string[][] = [];
+    for (let mask = 0; mask < 1 << all.length; mask++) {
+      const entries = all.filter((_, i) => mask & (1 << i));
+      if (checkAll(SCENARIO_1, { entries }).ok) {
+        passing.push(all.filter((_, i) => !(mask & (1 << i))).map((e) => e.entryId));
+      }
+    }
+    expect(passing.sort()).toEqual([['E09'], ['E10']]);
+  });
+});
+
 describe('scenario validation (review regressions)', () => {
   it('reports repeated unknown transactions instead of crashing', () => {
     const bad: Scenario = {
