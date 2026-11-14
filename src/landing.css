@@ -348,3 +348,15 @@ h2 { font: 400 clamp(36px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing: -0.02
 :root[data-theme="light"] .plan.is-main .pill { background: #FCFFFF; color: #0B1214; }
 :root[data-theme="light"] .close-media .sky-glow { background: radial-gradient(34% 44% at 50% 100%, rgb(255 196 150 / .95) 0%, rgb(216 57 149 / .85) 42%, rgb(216 57 149 / 0) 100%), linear-gradient(180deg, #0593C6, #38B6E4); }
 :root[data-theme="light"] .close-media .sky-rays { background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / .16) 0 1px, transparent 1px 12px); mix-blend-mode: normal; -webkit-mask-image: none; mask-image: none; }
+
+/* v17.1 (day): no box. The sky-blue field grows out of the white page and melts back into it. */
+:root[data-theme="light"] .hero { position: relative; isolation: isolate; }
+:root[data-theme="light"] .hero-copy { position: relative; z-index: 2; }
+:root[data-theme="light"] .vista { overflow: visible; background: none; --in: 0px !important; --r: 0px !important; z-index: 1; height: auto; margin-top: clamp(120px, 20vh, 220px); padding-top: 0; padding-bottom: clamp(150px, 24vh, 240px); align-items: center; }
+:root[data-theme="light"] .vista-media { inset: -300px 0 -40px 0; z-index: -1; transform: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / .35) 16%, #000 36%, #000 66%, rgb(0 0 0 / .35) 86%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / .35) 16%, #000 36%, #000 66%, rgb(0 0 0 / .35) 86%, transparent 100%); }
+:root[data-theme="light"] .vista .sky-glow { transform: none; background:
+    radial-gradient(26% 26% at 50% 60%, rgb(255 196 150 / .95) 0%, rgb(216 57 149 / .9) 42%, rgb(216 57 149 / 0) 100%),
+    radial-gradient(48% 44% at 50% 60%, rgb(216 57 149 / .4) 0%, rgb(216 57 149 / 0) 100%),
+    linear-gradient(180deg, #2FAEDF 0%, #0593C6 45%, #0A9FD4 70%, #2FAEDF 100%); }
+@media (max-width: 1023px) { :root[data-theme="light"] .vista { margin-top: 110px; padding-bottom: 130px; } :root[data-theme="light"] .vista-media { inset: -220px 0 -30px 0; } }
