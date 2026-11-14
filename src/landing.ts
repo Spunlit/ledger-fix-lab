@@ -55,11 +55,11 @@ function pick(btn: HTMLButtonElement) {
   }
   caught = true;
   btn.classList.add('is-liar');
-  small.innerHTML = `<s>${cat}</s> <em>Owner contribution</em>`;
+  small.innerHTML = `<s>${cat}</s> <em>Owner's contribution</em>`;
   document.querySelectorAll<HTMLButtonElement>('[data-hero-pick]').forEach((b) => (b.disabled = true));
   task.classList.add('is-caught');
   task.setAttribute('data-testid', 'hero-verdict');
-  task.innerHTML = `<b>That is the one.</b> Dani moved her own savings in: owner's money, not a sale. Moved to Owner contribution, and profit drops by $5,000. Matching the bank never shows this.`;
+  task.innerHTML = `<b>That is the one.</b> Dani moved her own savings in: owner's money, not a sale. Moved to Owner's contribution, and profit drops by $5,000. Matching the bank never shows this.`;
   const total = document.querySelector<HTMLElement>('[data-hero-card]')!;
   total.classList.add('is-caught');
   total.querySelector<HTMLElement>('[data-hero-was]')!.hidden = false;

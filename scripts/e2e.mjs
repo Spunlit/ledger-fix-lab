@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 52; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 56; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -217,6 +217,24 @@ async function main() {
   await record('R13', 'bankfees');
   ok((await diff()) === `${M}$84.37`, 'phone: recording from the statement works');
   await shot('5-case2-mobile', false);
+
+  // ---------- warm-up drill (phone): five one-tap rounds graded by the engine's checks
+  await go('#/drill');
+  ok((await text('[data-testid=drill-prompt]')).length > 10 && (await js(`return document.querySelectorAll('[data-drill-row]').length`)) >= 4, 'drill shows a question and at least four tappable lines');
+  ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'drill: no horizontal scroll at 375px');
+  let explained = true;
+  for (let round = 0; round < 5; round++) {
+    // tap lines top to bottom until the round is solved, the way a guessing learner would
+    for (let k = 0; k < 6; k++) {
+      if (await js(`return !!$('[data-drill=next]')`)) break;
+      await js(`const b = [...document.querySelectorAll('[data-drill-row]:not(:disabled)')][0]; if (b) b.click()`);
+    }
+    explained = explained && (await text('[data-testid=drill-say]')).includes('Right.');
+    await click('[data-drill=next]');
+  }
+  ok(explained, 'drill explains the right answer after each solved round');
+  ok(/^\d of 5 on the first tap$/.test(await text('[data-testid=drill-score]')), `drill ends with a first-tap score (${await text('[data-testid=drill-score]')})`);
+  await shot('6-drill-mobile', false);
 
   ok(consoleErrors.length === 0, `no console errors (${consoleErrors.join('; ') || 'none'})`);
   ws.close();

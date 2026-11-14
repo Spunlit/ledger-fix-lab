@@ -9,6 +9,7 @@ import { actionFeedback } from './core/feedback';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
+import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './ui/drill';
 import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
@@ -41,6 +42,16 @@ let plan = loadPlan();
 let openedPractice = loadOpenedPractice();
 let paywall: PaywallState = { returnTo: null, step: 'plans', billing: 'monthly' };
 
+/** The warm-up drill (#/drill): five one-tap rounds. A new visit starts a new set. */
+let drill: DrillState | null = null;
+function renderDrillPage(): void {
+  currentId = null;
+  drill ??= newDrill();
+  document.body.dataset.page = 'drill';
+  document.title = 'Warm-up drill | Ledger Fix Lab';
+  app.innerHTML = renderDrill(drill);
+}
+
 function renderUpgrade(): void {
   currentId = null;
   document.body.dataset.page = 'upgrade';
@@ -62,6 +73,11 @@ function route(): void {
     resolved = resolve(location.hash);
   } catch {
     resolved = null; // an unusable seed falls back to the home page
+  }
+  if (/^#\/drill/.test(location.hash)) {
+    renderDrillPage();
+    window.scrollTo(0, 0);
+    return;
   }
   if (/^#\/upgrade/.test(location.hash)) {
     renderUpgrade();
@@ -133,6 +149,15 @@ function dispatch(action: Action): void {
 }
 
 app.addEventListener('click', (ev) => {
+  const dr = (ev.target as HTMLElement).closest<HTMLElement>('[data-drill-row], [data-drill]');
+  if (dr && drill) {
+    if (dr.dataset.drillRow) drill = tapDrill(drill, dr.dataset.drillRow);
+    else if (dr.dataset.drill === 'next') drill = nextDrill(drill);
+    else if (dr.dataset.drill === 'again') drill = newDrill();
+    renderDrillPage();
+    if (dr.dataset.drill) window.scrollTo(0, 0);
+    return;
+  }
   const ui = current();
   if (!ui) {
     const pw = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-pw]');

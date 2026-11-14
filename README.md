@@ -12,15 +12,19 @@ Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have 
 but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
 
 ## For judges: a 2-minute tour
-1. **Home:** tap the line that is lying. The reconciliation already reads $0.00, yet profit is $5,000 too high; catch it
-   and the profit rolls down to the true figure. Graded by the real engine on case 2's books.
-2. **Case 2 ("Balanced, but wrong"):** fix the books with instant feedback, press *Check the books*, read the review.
-3. **Today's file:** a generated client file, no hints (exam mode). Its first check feeds your skill record.
-4. **Practice my weak spots → second practice file:** the paywall (Practice plan, $12/month or $96/year, 7-day trial).
+1. **Landing page:** in the books window, click the line that is booked wrong. The books match the bank to $0.00, yet
+   profit is $5,000 too high; catch it and the profit counts down to the true figure. Graded by the real engine on
+   case 2's books.
+2. **Warm-up drill** (`app.html#/drill`, best on a phone): five one-tap rounds, "tap the line that is wrong". Rounds are
+   cut from generated files and answered by the same checks that grade full files.
+3. **Case 2 ("Balanced, but wrong"):** a coach names one problem at a time, the row it is about and what to click;
+   every fix says what changed ("Difference $99.37 to $84.37"). Press *Check the books* and read the review.
+4. **Today's file:** a generated client file, no hints (exam mode). Its first check feeds your skill record.
+5. **Practice my weak spots, second practice file:** the paywall (Practice plan, $12/month or $96/year, 7-day trial).
    Checkout is a clearly labelled demo: no card, nothing charged.
 
 ## Guided vs. unguided
-Guided cases give instant feedback after every move, a progress count and an optional hint, and show only the tools
+Guided cases have a coach (the single next step, from the same checks that grade the file), instant feedback after every move, a progress count and an optional hint, and show only the tools
 the case needs (case 1: delete and category). Files of the day and practice files are exams: no hints or feedback
 until you check, and only they feed the skill record.
 
@@ -70,9 +74,9 @@ file), but checkout is simulated: no card data is collected and nothing is charg
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 94 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 102 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 47 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 56 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.
@@ -80,7 +84,9 @@ CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub 
 ## Structure
 - `src/core/` — pure engine, no DOM: `engine.ts` (actions, undo, reconciliation, checks, validation),
   `scenarios.ts` (the two cases), `generator.ts` (generated files), `skills.ts` (skill record), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
-- `src/ui/`, `src/main.ts`, `src/style.css` — interface (vanilla TypeScript, Public Sans bundled locally).
+  `coach.ts` (next step for guided cases), `drill.ts` (warm-up rounds), `feedback.ts`, `match.ts`.
+- `index.html`, `src/landing.*` — the landing page (static, on the MIT design kit in `public/kit`).
+- `app.html`, `src/main.ts`, `src/ui/`, `src/*.css` — the trainer (vanilla TypeScript, hash routes). Fonts: Geist via Google Fonts.
 - `tests/` — Vitest; `scripts/e2e.mjs` — browser checks.
 - `pitch/` — pitch deck source and PDF.
 

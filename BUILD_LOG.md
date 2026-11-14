@@ -136,3 +136,9 @@
 - Motion: difference tick, staggered check results, coach target pulse; all off under prefers-reduced-motion.
 - Checked: 99 unit tests (5 new coach tests incl. "following the coach solves both cases"), 52 e2e checks.
 - Design gate of the taste skill: fails on section-height rules by decision (forced one-screen sections left dead space).
+
+## v10–v11 (Nov 14, ~20:30 UTC)
+- Landing: grid + beam light, pointer-lit cards, travelling border on the books window, bento for the three steps, ticker, scroll reveals (plain CSS/TS, founder palette).
+- New: warm-up drill (app.html#/drill), five one-tap rounds cut from generated files; pure module src/core/drill.ts, answers from checkAll. Honest filler lines are visually unique (genuine repeats excluded).
+- Phone: 44px+ touch targets in cases.
+- Checked: 102 unit tests, 56 e2e checks.
