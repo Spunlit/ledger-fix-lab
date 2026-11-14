@@ -51,6 +51,7 @@ function pick(btn: HTMLButtonElement) {
     btn.disabled = true;
     small.innerHTML = `${cat}, <em>checks out</em>`;
     task.innerHTML = `<b>Not that one.</b> It is a ${v.why}. Try another line.`;
+    task.classList.add('is-miss');
     return;
   }
   caught = true;

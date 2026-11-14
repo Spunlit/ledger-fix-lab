@@ -2,6 +2,7 @@ import { category, categoryName } from './categories';
 import { checkAll, initialState } from './engine';
 import { shortDate } from './explain';
 import { generateFile, rng } from './generator';
+import type { GuideId } from './guide';
 import { formatCents, formatSignedCents } from './money';
 import type { SkillId } from './types';
 
@@ -37,6 +38,7 @@ export interface DrillRound {
 }
 
 const ORDER: DrillKind[] = ['duplicate', 'category', 'amount', 'owner', 'category'];
+export const DRILL_TOPIC: Record<DrillKind, GuideId> = { duplicate: 'duplicate', category: 'category', amount: 'transposed', owner: 'owner' };
 const FOCUS: Record<DrillKind, SkillId> = { duplicate: 'duplicates', category: 'categories', amount: 'transposition', owner: 'ownerEquity' };
 export const DRILL_ROUNDS = ORDER.length;
 

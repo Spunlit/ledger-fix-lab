@@ -10,6 +10,7 @@ import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './ui/drill';
+import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
@@ -73,6 +74,17 @@ function route(): void {
     resolved = resolve(location.hash);
   } catch {
     resolved = null; // an unusable seed falls back to the home page
+  }
+  const g = /^#\/guide(?:\/([a-z]+))?$/.exec(location.hash);
+  if (g) {
+    currentId = null;
+    document.body.dataset.page = 'guide';
+    document.title = 'Field guide | Ledger Fix Lab';
+    app.innerHTML = renderGuide();
+    const target = g[1] ? document.getElementById(`g-${g[1]}`) : null;
+    if (target) target.scrollIntoView({ block: 'start' });
+    else window.scrollTo(0, 0);
+    return;
   }
   if (/^#\/drill/.test(location.hash)) {
     renderDrillPage();

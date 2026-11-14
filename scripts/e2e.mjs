@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 56; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 58; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -122,6 +122,7 @@ async function main() {
   ok((await diff()) === '+$412.50', `case 1 starts at +$412.50 (got ${await diff()})`);
   ok((await js(`return document.querySelectorAll('[data-clear], [data-edit], [data-record]').length`)) === 0, 'case 1 shows only delete and category tools');
   ok((await cls('integrity')) === 'absent', 'review hidden before the first check');
+  ok((await text('[data-testid=coach] .why')).includes('Why?') && (await js(`return $('[data-testid=coach] .why a').getAttribute('href')`)) === '#/guide/duplicate', 'coach step has a "Why?" that links to its guide topic');
   ok((await text('[data-testid=coach]')).includes('in the books twice') && (await js(`return document.querySelectorAll('tr.co-t').length`)) === 2, 'coach names the first problem and marks both copies of the doubled row');
   await click('[data-act=toggle-hint]');
   ok((await clue()).includes('3 ticked rows'), 'hint points at the three $412.50 rows');
@@ -217,6 +218,10 @@ async function main() {
   await record('R13', 'bankfees');
   ok((await diff()) === `${M}$84.37`, 'phone: recording from the statement works');
   await shot('5-case2-mobile', false);
+
+  // ---------- field guide (phone)
+  await go('#/guide/owner');
+  ok((await js(`return document.querySelectorAll('.guide-topic').length`)) === 7 && (await text('#g-owner')).includes('Owner') && (await evaluate('document.documentElement.scrollWidth')) <= 375, 'guide shows seven topics, opens at the linked one, no horizontal scroll at 375px');
 
   // ---------- warm-up drill (phone): five one-tap rounds graded by the engine's checks
   await go('#/drill');

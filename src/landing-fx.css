@@ -4,7 +4,7 @@
    prefers-reduced-motion. */
 
 @property --lf-a { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-:root { --glow: rgb(2 151 222 / .55); --glow-soft: rgb(2 151 222 / .16); --grid-line: rgb(234 243 247 / .055); --r-card: 12px; }
+:root { --glow: rgb(2 151 222 / .38); --glow-soft: rgb(2 151 222 / .13); --grid-line: rgb(234 243 247 / .055); --r-card: 12px; }
 :root[data-theme="light"] { --glow: rgb(5 147 198 / .45); --glow-soft: rgb(5 147 198 / .12); --grid-line: rgb(6 22 29 / .06); }
 
 /* ---------- the hero's light: a fine grid, one beam from the top, a pool that follows the pointer */
@@ -31,7 +31,7 @@ main#top > section.hero > .wrap { position: relative; z-index: 1; }
 
 /* ---------- hero words */
 .lf-pill { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px 0 4px; margin-bottom: 20px; border-radius: 999px; font: 500 13px/1 var(--font-text); color: var(--p-ink); text-decoration: none; background: color-mix(in oklab, var(--brand) 9%, var(--w-bg)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand) 32%, transparent); position: relative; overflow: hidden; transition: background .2s; }
-.lf-pill b { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--brand); color: #02070A; font-weight: 600; font-size: 12px; }
+.lf-pill b { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--p-action); color: #fff; font-weight: 600; font-size: 12px; }
 .lf-pill svg { width: 12px; height: 12px; transition: transform .2s; }
 .lf-pill:hover { background: color-mix(in oklab, var(--brand) 16%, var(--w-bg)); }
 .lf-pill:hover svg { transform: translateX(3px); }
@@ -39,8 +39,8 @@ main#top > section.hero > .wrap { position: relative; z-index: 1; }
 @keyframes fx-sheen { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* the primary button: a soft lift and a glow of its own colour */
-.btn.btn--primary { box-shadow: 0 0 0 1px color-mix(in oklab, var(--brand) 60%, #fff 0%), 0 10px 30px -12px var(--glow); transition: transform .15s, box-shadow .2s, background .15s; }
-.btn.btn--primary:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--brand), 0 16px 36px -12px var(--glow); }
+.btn.btn--primary { box-shadow: inset 0 1px 0 rgb(255 255 255 / .16), 0 10px 28px -14px var(--glow); transition: transform .15s, box-shadow .2s, background .15s; }
+.btn.btn--primary:hover { transform: translateY(-1px); background: color-mix(in oklab, var(--p-action) 88%, #fff); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 16px 34px -14px var(--glow); }
 .btn.btn--primary:active { transform: translateY(0); }
 
 /* ---------- the books window: a border light that travels round it, and its glow on the ground */
@@ -49,7 +49,7 @@ main#top > section.hero > .wrap { position: relative; z-index: 1; }
 .lf-try > .lf-win { position: relative; z-index: 1; border-radius: var(--r-card); box-shadow: 0 0 0 1px var(--w-line), 0 30px 80px -40px rgb(0 0 0 / .8); transform: perspective(1400px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .25s ease-out; }
 :root[data-theme="light"] .lf-try > .lf-win { box-shadow: 0 0 0 1px var(--w-line), 0 30px 70px -40px rgb(5 60 90 / .45); }
 .lf-try::after { content: ""; position: absolute; inset: -1px; z-index: 2; border-radius: calc(var(--r-card) + 1px); padding: 1px; pointer-events: none;
-  background: conic-gradient(from var(--lf-a), transparent 0 62%, var(--brand) 78%, #fff 84%, var(--hot) 90%, transparent 100%);
+  background: conic-gradient(from var(--lf-a), transparent 0 70%, color-mix(in oklab, var(--brand) 70%, transparent) 86%, color-mix(in oklab, var(--brand) 40%, #fff) 92%, transparent 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   animation: fx-orbit 7s linear infinite; }
 @keyframes fx-orbit { to { --lf-a: 360deg; } }

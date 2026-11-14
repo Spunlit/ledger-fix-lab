@@ -3,6 +3,7 @@ import { clues } from '../core/clues';
 import { canUndo, checkAll, initialState, isLocked, statementLines, type CheckReport } from '../core/engine';
 import { explain, shortDate, SKILL_LABEL } from '../core/explain';
 import { coachStep, type CoachStep } from '../core/coach';
+import { guideTopic } from '../core/guide';
 import { progress, type Feedback, type Progress } from '../core/feedback';
 import { MATCH_WINDOW_DAYS, matchRows, type RowMatch } from '../core/match';
 import { formatCents, formatSignedCents } from '../core/money';
@@ -237,7 +238,7 @@ export function renderWorkbench(ui: CaseUI): string {
         solved
           ? ''
           : step && prog
-            ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${esc(step.title)}</p><p class="next-a">${esc(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p></div>`
+            ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${esc(step.title)}</p><p class="next-a">${esc(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p>${step.topic ? `<details class="why"><summary>Why?</summary><p>${esc(guideTopic(step.topic).why)}</p><p><b>How to tell:</b> ${esc(guideTopic(step.topic).tell)} <a href="#/guide/${step.topic}">Open the guide</a></p></details>` : ''}</div>`
             : `<p class="next">${esc(coachText(report, pairs))}</p>`
       }
       ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}

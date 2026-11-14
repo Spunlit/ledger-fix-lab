@@ -8,26 +8,26 @@
    the too-high figure), green and red are only right and wrong money. Button labels are #02070A: white
    fails contrast on all three brand fills. */
 :root {
-  --font-display: "Geist", system-ui, sans-serif;
-  --font-text: "Geist", system-ui, sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-text: "Inter", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --display-weight: 600; --display-tracking: -0.03em; --display-tracking-xl: -0.035em;
+  --display-weight: 700; --display-tracking: -0.025em; --display-tracking-xl: -0.03em;
 
-  --brand: #0297DE; --hot: #FC734D; --hot-text: #FC734D; --hot-soft: rgb(252 115 77 / .13);
-  --p-bg: #02070A; --p-surface: #0A1318; --p-ink: #EAF3F7; --p-muted: #8FA2AD;
-  --p-accent: #3DB4EE; --p-accent-ink: #02070A; --p-action: #0297DE; --p-action-ink: #02070A;
+  --brand: #0297DE; --hot: #FC734D; --hot-text: #F58A6B; --hot-soft: rgb(252 115 77 / .10);
+  --p-bg: #02070A; --p-surface: #0A1318; --p-ink: #E1EBF0; --p-muted: #8C9EA9;
+  --p-accent: #4FB6E8; --p-accent-ink: #02070A; --p-action: #027CBB; --p-action-ink: #FFFFFF;
   --p-inv-bg: #FCFFFF; --p-inv-surface: #F1F7FA; --p-inv-ink: #06161D; --p-inv-muted: #4C626D;
   --p-inv-accent: #04739B; --p-inv-accent-ink: #FFFFFF; --p-inv-action: #0593C6; --p-inv-action-ink: #02070A;
-  --w-bg: #071116; --w-raise: #0C1A21; --w-line: #17242B; --w-ink: #EAF3F7; --w-muted: #8FA2AD;
+  --w-bg: #071116; --w-raise: #0C1A21; --w-line: #17242B; --w-ink: #E1EBF0; --w-muted: #8C9EA9;
   --w-hover: rgb(2 151 222 / .12); --ring: 0 0 0 1px #17242B;
-  --ok: #2FD39A; --ok-bg: rgb(47 211 154 / .12);
-  --bad: #FF5C7C; --bad-bg: rgb(255 92 124 / .12);
-  --link: #3DB4EE; --link-bg: rgb(2 151 222 / .14);
+  --ok: #45C79A; --ok-bg: rgb(69 199 154 / .11);
+  --bad: #F0728A; --bad-bg: rgb(240 114 138 / .11);
+  --link: #4FB6E8; --link-bg: rgb(2 151 222 / .12);
 }
 :root[data-theme="light"] {
   --brand: #0593C6; --hot: #D83995; --hot-text: #B8286F; --hot-soft: #FBE6F1;
   --p-bg: #FCFFFF; --p-surface: #F1F7FA; --p-ink: #06161D; --p-muted: #4C626D;
-  --p-accent: #04739B; --p-accent-ink: #FFFFFF; --p-action: #0593C6; --p-action-ink: #02070A;
+  --p-accent: #04739B; --p-accent-ink: #FFFFFF; --p-action: #047CA6; --p-action-ink: #FFFFFF;
   --p-inv-bg: #02070A; --p-inv-surface: #0A1318; --p-inv-ink: #EAF3F7; --p-inv-muted: #8FA2AD;
   --p-inv-accent: #3DB4EE; --p-inv-accent-ink: #02070A; --p-inv-action: #0297DE; --p-inv-action-ink: #02070A;
   --w-bg: #FFFFFF; --w-raise: #F1F7FA; --w-line: #D9E6EC; --w-ink: #06161D; --w-muted: #4C626D;
@@ -38,8 +38,8 @@
 }
 
 /* ---------- type: Geist, tighter headings, tabular money */
-h1, h2 { font-weight: 600; }
-.hero--collage h1 { font-size: clamp(38px, 4.3vw, 60px); line-height: 1.04; letter-spacing: -0.035em; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; }
+.hero--collage h1 { font-size: clamp(36px, 4.2vw, 58px); line-height: 1.08; letter-spacing: -0.03em; }
 main h2, .lf-foot h2 { font-size: clamp(28px, 2.9vw, 40px); line-height: 1.1; letter-spacing: -0.025em; }
 .hero__lead { font-size: clamp(17px, 1.35vw, 19px); line-height: 1.55; color: var(--p-muted); max-width: 44ch; }
 .lf-amt, .lf-big, .lf-profit, .lf-recon b, .lf-cmp__row b, .lf-skill b, .lf-price { font-family: var(--font-text); font-variant-numeric: tabular-nums; }
@@ -82,7 +82,7 @@ main#top > section.section + section.section { border-top: 1px solid var(--w-lin
 .lf-win__bar { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--w-line); font-size: 13px; color: var(--w-muted); }
 .lf-win__bar b { color: var(--w-ink); font-weight: 600; font-size: 14px; }
 .lf-match { margin-left: auto; color: var(--ok); font-weight: 500; white-space: nowrap; }
-.lf-task { margin: 0; padding: 12px 18px; background: var(--hot-soft); color: var(--w-ink); font-size: 14px; line-height: 1.45; border-left: 2px solid var(--hot); transition: background .3s, border-color .3s; }
+.lf-task { margin: 0; padding: 12px 18px; background: var(--link-bg); color: var(--w-ink); font-size: 14px; line-height: 1.45; border-left: 2px solid var(--brand); transition: background .3s, border-color .3s; }
 .lf-task b { font-weight: 600; }
 .lf-task.is-caught { background: var(--ok-bg); border-left-color: var(--ok); }
 .lf-rows { list-style: none; margin: 0; padding: 0; }
@@ -106,7 +106,9 @@ main#top > section.section + section.section { border-top: 1px solid var(--w-lin
 .lf-row.is-liar .lf-desc small em { font-style: normal; color: var(--ok); font-weight: 600; }
 .lf-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 18px; background: var(--w-raise); }
 .lf-total__label { font-weight: 600; }
-.lf-profit { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--hot-text); transition: color .3s; }
+.lf-profit { display: inline-flex; align-items: baseline; gap: 10px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--w-ink); transition: color .3s; }
+.lf-flag { font: 500 12px/1 var(--font-text); font-style: normal; letter-spacing: 0; padding: 4px 8px; border-radius: 4px; background: var(--hot-soft); color: var(--hot-text); align-self: center; }
+.lf-total.is-caught .lf-flag { display: none; }
 .lf-profit s { color: var(--w-muted); font-size: 14px; font-weight: 400; margin-right: 10px; }
 .lf-total.is-caught .lf-profit { color: var(--ok); }
 @keyframes lf-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -252,3 +254,7 @@ footer.closing.lf-foot { padding-bottom: var(--s-7); border-top: 1px solid var(-
 /* phone and tablet: the hero grows with the books window instead of cutting it at the fold */
 @media (max-width: 1023px) { main#top > section.hero { height: auto; min-height: 0; padding-bottom: 56px; } main#top > section.hero > .wrap, main#top > section.hero .hero-text { height: auto; } }
 @media (max-width: 639px) { .card.card--plan .lf-price { font-size: 34px; } .lf-row .lf-desc { overflow: hidden; } .lf-row .lf-amt { white-space: nowrap; } }
+
+/* headings in the display face everywhere on the page */
+.lf-tile h3, .lf-steps h3, .faq h3, .card--plan h3, .lf-h, .lf-close h2 { font-family: var(--font-display); }
+.lf-tile h3 { font-weight: 700; }

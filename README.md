@@ -74,9 +74,9 @@ file), but checkout is simulated: no card data is collected and nothing is charg
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 102 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 104 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 56 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 58 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.
@@ -86,7 +86,7 @@ CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub 
   `scenarios.ts` (the two cases), `generator.ts` (generated files), `skills.ts` (skill record), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
   `coach.ts` (next step for guided cases), `drill.ts` (warm-up rounds), `feedback.ts`, `match.ts`.
 - `index.html`, `src/landing.*` — the landing page (static, on the MIT design kit in `public/kit`).
-- `app.html`, `src/main.ts`, `src/ui/`, `src/*.css` — the trainer (vanilla TypeScript, hash routes). Fonts: Geist via Google Fonts.
+- `app.html`, `src/main.ts`, `src/ui/`, `src/*.css` — the trainer (vanilla TypeScript, hash routes). Fonts: Manrope + Inter via Google Fonts. `guide.ts` is the field guide (also the coach's "Why?").
 - `tests/` — Vitest; `scripts/e2e.mjs` — browser checks.
 - `pitch/` — pitch deck source and PDF.
 

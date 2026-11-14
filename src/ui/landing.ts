@@ -30,6 +30,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
     <h1 id="path-h">Your practice desk</h1>
     <p class="path-sub">Two guided cases, then a new file every day. Your skill record appears after the first file without hints.</p>
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.</span></span><span class="btn primary">Start</span></a>
+    <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
     <div class="path">
       ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
       ${step('2', `#/case/${CASES[1].id}`, CASES[1].title, 'Guided, 10 min. The full reconciliation.', d2, d1 && !d2)}

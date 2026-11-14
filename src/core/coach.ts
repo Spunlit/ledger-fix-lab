@@ -1,6 +1,7 @@
-import { categoryName } from './categories';
+import { category, categoryName } from './categories';
 import { checkAll, type CheckReport } from './engine';
 import { shortDate } from './explain';
+import type { GuideId } from './guide';
 import { formatCents } from './money';
 import type { LedgerState, Scenario } from './types';
 
@@ -16,6 +17,8 @@ export interface CoachStep {
   title: string;
   /** What to click. */
   action: string;
+  /** The guide topic that explains this kind of problem (none when everything is right). */
+  topic: GuideId | null;
   /** Book rows and bank lines to highlight. */
   entryIds: string[];
   txnIds: string[];
@@ -33,6 +36,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
         ? `You deleted a real payment: ${money(gone.amountCents)} on ${shortDate(gone.date)} is on the bank statement.`
         : `You deleted a real payment of ${money(gone.amountCents)}. It just has not reached the bank yet.`,
       action: 'Press Undo to put it back.',
+      topic: gone.onStatement ? 'repeat' : 'outstanding',
       entryIds: [],
       txnIds: gone.onStatement ? [gone.txnId] : [],
     };
@@ -44,6 +48,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
       kind: 'record',
       title: `The bank took ${money(missing.amountCents)} on ${shortDate(missing.date)}. The books do not have it.`,
       action: 'Press "Add to the books" on that bank line and pick its category.',
+      topic: 'missing',
       entryIds: [],
       txnIds: [missing.txnId],
     };
@@ -56,6 +61,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
       kind: 'duplicate',
       title: `${copies[0]?.description ?? 'One purchase'} is in the books ${extra.count === 2 ? 'twice' : `${extra.count} times`}. The bank has it once.`,
       action: 'Delete one copy with the bin icon on its row.',
+      topic: 'duplicate',
       entryIds: copies.map((e) => e.entryId),
       txnIds: [],
     };
@@ -67,6 +73,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
       kind: 'amount',
       title: `${amt.entry.description}: the books say ${money(amt.entry.amountCents)}, the bank says ${money(amt.expectedCents)}.`,
       action: `Click the amount in the books and type ${(Math.abs(amt.expectedCents) / 100).toFixed(2)}.`,
+      topic: 'transposed',
       entryIds: [amt.entry.entryId],
       txnIds: [],
     };
@@ -79,6 +86,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
           kind: 'tick',
           title: `${cl.entry.description} is on the bank statement, but it is not ticked as cleared.`,
           action: 'Tick its Cleared box.',
+          topic: 'outstanding',
           entryIds: [cl.entry.entryId],
           txnIds: [cl.entry.txnId],
         }
@@ -86,6 +94,7 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
           kind: 'untick',
           title: `${cl.entry.description} is ticked as cleared, but the bank has not paid it yet.`,
           action: 'Untick its Cleared box. It stays in the books as outstanding.',
+          topic: 'outstanding',
           entryIds: [cl.entry.entryId],
           txnIds: [],
         };
@@ -97,11 +106,12 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
       kind: 'category',
       title: `${cat.entry.description} is booked as ${categoryName(cat.entry.category)}. Is that what it really is?`,
       action: "Read the client's note and the category guide, then change the category on that row.",
+      topic: category(cat.expected).kind === 'equity' ? 'owner' : 'category',
       entryIds: [cat.entry.entryId],
       txnIds: [],
     };
   }
-  return { kind: 'done', title: 'Everything checks out.', action: 'Press Check the books to confirm.', entryIds: [], txnIds: [] };
+  return { kind: 'done', title: 'Everything checks out.', action: 'Press Check the books to confirm.', topic: null, entryIds: [], txnIds: [] };
 }
 
 /** True when the handed-over books contained this transaction (so its absence means the user deleted it). */

@@ -142,3 +142,9 @@
 - New: warm-up drill (app.html#/drill), five one-tap rounds cut from generated files; pure module src/core/drill.ts, answers from checkAll. Honest filler lines are visually unique (genuine repeats excluded).
 - Phone: 44px+ touch targets in cases.
 - Checked: 102 unit tests, 56 e2e checks.
+
+## v12 (Nov 14, ~20:30 UTC)
+- Type: Manrope headings + Inter text (compared four options on the phone hero). Softer palette: calmer ink/green/red, deeper blue under white button labels (#027CBB night, #047CA6 day; brand blues stay for accents).
+- "Try it" banner and the coach are blue instructions; the attention colour is only for the wrong line and too-high figures.
+- New: field guide (app.html#/guide), seven topics from src/core/guide.ts; the coach has "Why?" per step linking to its topic; drill results link to the guide.
+- Checked: 104 unit tests, 58 e2e checks.

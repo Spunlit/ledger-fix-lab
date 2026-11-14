@@ -18,7 +18,7 @@
 <script>try{var t=localStorage.getItem('ledger-fix-lab:theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500..800&family=Inter:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/kit/system.css">
 <link rel="stylesheet" href="/kit/ui/cards.css">
 <link rel="stylesheet" href="/kit/motion/motion.css">
@@ -31,7 +31,7 @@
 <!-- type: software (fintech education: bookkeeping practice)
      palette: the founder's own; night midnight #02070A, electric blue #0297DE, cantaloupe #FC734D;
      day white #FCFFFF, sky blue #0593C6, hot pink #D83995 (tokens in src/landing.css)
-     type: Geist + Geist Mono, radius sharp. Section heights are natural (not one screen each): decided
+     type: Manrope (headings) + Inter (text), Geist Mono for raw bank text. Section heights are natural (not one screen each): decided
      with the founder after the forced screens left dead space. -->
 
 <header class="nav">
@@ -41,6 +41,7 @@
     <nav class="nav__links" aria-label="Main">
       <div class="nav__item"><a class="nav__link" href="#workbench">Workbench</a></div>
       <div class="nav__item"><a class="nav__link" href="#steps">How it works</a></div>
+      <div class="nav__item"><a class="nav__link" href="app.html#/guide">Guide</a></div>
       <div class="nav__item"><a class="nav__link" href="#pricing">Pricing</a></div>
       <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
       <div class="nav__item lf-phone-only"><a class="nav__link" href="app.html#/">Your desk</a></div>
@@ -73,7 +74,7 @@
       <div class="lf-try span-6 start-7">
         <div class="lf-win" data-hero>
           <div class="lf-win__bar"><span>Rivera Mobile Detailing</span><b>Books, March 2026</b><span class="lf-match" data-testid="hero-recon">Matches the bank: $0.00 difference</span></div>
-          <p class="lf-task" data-hero-task aria-live="polite"><b>Try it.</b> These books match the bank to the cent, yet profit is $5,000 too high. Click the line that is booked wrong.</p>
+          <p class="lf-task" data-hero-task aria-live="polite"><b>Try it.</b> These books match the bank to the cent, yet profit is $5,000 too high. Tap the line that is booked wrong.</p>
           <ol class="lf-rows" aria-label="Book entries, March 2026">
             <li><button type="button" class="lf-row" data-hero-pick="E01"><span class="lf-date">Mar 2</span><span class="lf-desc"><b>Square payout, customer payments</b><small>Sales income</small></span><span class="lf-amt">+$1,286.40</span></button></li>
             <li><button type="button" class="lf-row" data-hero-pick="E03"><span class="lf-date">Mar 5</span><span class="lf-desc"><b>Verizon, business phone</b><small>Phone &amp; internet</small></span><span class="lf-amt">−$84.37</span></button></li>
@@ -85,7 +86,7 @@
           </ol>
           <div class="lf-total" data-hero-card>
             <span class="lf-total__label">Net profit, March</span>
-            <span class="lf-profit"><s data-hero-was hidden>$10,410.76</s><span data-testid="hero-profit">$10,410.76</span></span>
+            <span class="lf-profit"><em class="lf-flag" data-hero-flag>$5,000 too high</em><s data-hero-was hidden>$10,410.76</s><span data-testid="hero-profit">$10,410.76</span></span>
           </div>
         </div>
       </div>
@@ -273,6 +274,8 @@
         <a href="app.html#/case/maple-pine-oct">Case 1</a>
         <a href="app.html#/case/rivera-mar">Case 2</a>
         <a href="app.html#/daily">Today's file</a>
+        <a href="app.html#/drill">Warm-up</a>
+        <a href="app.html#/guide">Guide</a>
         <a href="app.html#/upgrade">Practice plan</a>
         <a href="app.html#/">Your desk</a>
         <a href="https://github.com/Spunlit/ledger-fix-lab">GitHub</a>
