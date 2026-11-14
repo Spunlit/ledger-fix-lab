@@ -118,3 +118,41 @@ document.querySelectorAll<HTMLElement>('.lf-app, .lf-card--wide').forEach((el) =
   el.classList.add('lf-reveal');
   io.observe(el);
 });
+
+/* ---------- light and depth (landing-fx.css): pointer-lit surfaces, a slight tilt on the books window,
+   and one reveal per block as it scrolls into view */
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (fine) {
+  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }, { passive: true });
+  });
+  const tryBox = document.querySelector<HTMLElement>('.lf-try');
+  const win = tryBox?.querySelector<HTMLElement>('.lf-win');
+  if (tryBox && win && !calm()) {
+    tryBox.addEventListener('pointermove', (e) => {
+      const r = tryBox.getBoundingClientRect();
+      win.style.setProperty('--ry', `${(((e.clientX - r.left) / r.width) - 0.5) * 3}deg`);
+      win.style.setProperty('--rx', `${(0.5 - ((e.clientY - r.top) / r.height)) * 2}deg`);
+    }, { passive: true });
+    tryBox.addEventListener('pointerleave', () => { win.style.setProperty('--ry', '0deg'); win.style.setProperty('--rx', '0deg'); });
+  }
+}
+const rv = [...document.querySelectorAll<HTMLElement>('[data-rv]')];
+if ('IntersectionObserver' in window) {
+  const seen = new IntersectionObserver((entries, obs) => {
+    for (const en of entries) {
+      if (!en.isIntersecting) continue;
+      obs.unobserve(en.target);
+      en.target.classList.add('is-seen');
+    }
+  }, { threshold: 0.25 });
+  rv.forEach((el) => {
+    const sibs = [...(el.parentElement?.children ?? [])].filter((c) => c.hasAttribute('data-rv'));
+    el.style.setProperty('--rv-d', `${sibs.indexOf(el) * 0.08}s`);
+    seen.observe(el);
+  });
+} else rv.forEach((el) => el.classList.add('is-seen'));

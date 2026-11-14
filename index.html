@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="/kit/motion/motion.css">
 <link rel="stylesheet" href="/kit/layout/layout.css">
 <link rel="stylesheet" href="/src/landing.css">
+<link rel="stylesheet" href="/src/landing-fx.css">
 <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 </head>
 <body>
@@ -55,9 +56,11 @@
 </header>
 
 <main id="top">
-  <section class="hero hero--collage" data-enter aria-labelledby="hero-h">
+  <section class="hero hero--collage" data-enter data-spot aria-labelledby="hero-h">
+    <div class="fx" aria-hidden="true"><i class="fx-grid"></i><i class="fx-beam"></i><i class="fx-spot"></i></div>
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5">
+        <a class="lf-pill" href="app.html#/daily"><b>New</b>A fresh client file every day<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <h1 id="hero-h">Reconciliation practice for new bookkeepers</h1>
         <p class="hero__lead">Fix a small business's books against its bank statement. You are graded on the books you end with, not on your clicks.</p>
         <div class="btn-row">
@@ -89,13 +92,15 @@
     </div></div>
   </section>
 
+  <div class="lf-ticker" aria-label="What the files test"><div class="lf-ticker__track"><div><span>Duplicate entries</span><span>Genuine repeat purchases</span><span>Missing bank charges</span><span>Transposed amounts</span><span>Outstanding checks</span><span>Wrong expense category</span><span>Owner money booked as income</span></div><div aria-hidden="true"><span>Duplicate entries</span><span>Genuine repeat purchases</span><span>Missing bank charges</span><span>Transposed amounts</span><span>Outstanding checks</span><span>Wrong expense category</span><span>Owner money booked as income</span></div></div></div>
+
   <section class="section" id="workbench" aria-labelledby="workbench-h">
     <div class="wrap">
       <div class="grid lf-head">
         <h2 id="workbench-h" class="span-6">Every bank line next to its book entry</h2>
         <p class="span-5 start-8 muted">Matched lines are done. What is left is your list: missing, doubled or mistyped. Fix each one and watch the difference drop to zero. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera case</a></p>
       </div>
-      <div class="ui app lf-app" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
+      <div class="lf-frame"><div class="ui app lf-app" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
         <div class="app__pane app__pane--list">
           <div class="lf-list">
             <div class="lf-list__head"><span>Date</span><span>Bank statement</span><span>Amount</span><span>In the books</span></div>
@@ -128,72 +133,66 @@
             <p class="lf-next">Fix the amount and mark it cleared: the difference drops to $15.00, the bank fee the books never recorded.</p>
           </div>
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
 
   <section class="section" id="steps" aria-labelledby="steps-h">
     <div class="wrap">
-      <div class="section-head">
-        <h2 id="steps-h">A client file takes 3 steps</h2>
+      <div class="grid lf-head" data-rv>
+        <h2 id="steps-h" class="span-6">A client file takes 3 steps</h2>
+        <p class="span-5 start-8 muted">Match, fix, check. Then a new file tomorrow, and a record of the mistakes you catch on the first try.</p>
       </div>
-      <div class="grid lf-steps">
-        <article class="span-4">
-          <span class="lf-num">1</span>
+      <div class="lf-bento">
+        <article class="lf-tile lf-tile--a" data-spot data-rv>
+          <span class="lf-num">Step 1</span>
           <h3>Match the bank feed</h3>
           <p>Each bank line pairs with a book entry. Anything without a pair goes on your list.</p>
-          <ul class="lf-lines">
-            <li><i class="ok">✓</i><span>11 of 13 bank lines matched</span></li>
-            <li><i class="warn">!</i><span>AutoZone hose is in the books twice</span></li>
-            <li><i class="bad">×</i><span>A $15.00 bank fee is not in the books</span></li>
-          </ul>
+          <div class="lf-pairs" data-match-demo role="img" aria-label="Bank lines pairing with book entries; the AutoZone hose is in the books twice and a bank fee is missing">
+            <div class="lf-mrow"><span>Square payout</span><i></i><span>SQUARE INC DEPOSIT</span></div>
+            <div class="lf-mrow"><span>Chemical Guys, wax</span><i></i><span>CHEMICAL GUYS CA</span></div>
+            <div class="lf-mrow"><span>AutoZone, hose</span><i></i><span>AUTOZONE #3321</span></div>
+            <div class="lf-mrow is-gap"><span>AutoZone, hose</span><i></i><span>No bank line: booked twice</span></div>
+            <div class="lf-mrow is-gap is-bank"><span>Not in the books</span><i></i><span>MONTHLY MAINTENANCE FEE</span></div>
+          </div>
         </article>
-        <article class="span-4">
-          <span class="lf-num">2</span>
+        <article class="lf-tile lf-tile--b" data-spot data-rv>
+          <span class="lf-num">Step 2</span>
           <h3>Fix each problem</h3>
           <p>Five tools, the same ones a bookkeeper uses. Undo works on every step.</p>
           <ul class="lf-lines">
             <li><b>Delete</b><span>the second AutoZone copy</span></li>
             <li><b>Fix amount</b><span>Verizon, $48.37 to $84.37</span></li>
+            <li><b>Mark cleared</b><span>once it is on the statement</span></li>
             <li><b>Record</b><span>the monthly fee as Bank fees</span></li>
             <li><b>Recategorize</b><span>the savings transfer</span></li>
           </ul>
         </article>
-        <article class="span-4">
-          <span class="lf-num">3</span>
+        <article class="lf-tile lf-tile--c" data-spot data-rv>
+          <span class="lf-num">Step 3</span>
           <h3>Check the books</h3>
           <p>Four checks run on the books you end with. Each one says what it found.</p>
-          <ul class="lf-lines">
+          <ul class="lf-lines lf-checks">
             <li><i class="ok">✓</i><span>Each transaction recorded exactly once</span></li>
             <li><i class="ok">✓</i><span>Amounts match the bank</span></li>
             <li><i class="ok">✓</i><span>Cleared items ticked correctly</span></li>
             <li><i class="bad">×</i><span>Categories right: $5,000 still in sales</span></li>
           </ul>
+          <div class="lf-verdict"><b>Balanced, but wrong</b><span>The difference is $0.00 and 1 check fails. Profit is overstated by $5,000.</span></div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="daily" aria-labelledby="daily-h">
-    <div class="wrap">
-      <div class="grid lf-split">
-        <div class="span-5 lf-split__text">
-          <h2 id="daily-h">Today's file and your skill record</h2>
-          <p class="muted">Each day brings a new business with new mistakes, graded with no hints. Your record shows which kinds of mistake you catch on the first check, and practice files drill the ones you miss.</p>
-          <p class="muted">Every file comes from a generator. The test suite solves 900 of them against a reference solution on each build.</p>
-          <a class="link" href="app.html#/daily">Open today's file</a>
-        </div>
-        <div class="span-6 start-7" role="img" aria-label="A skill record: which kinds of mistake were caught on the first check across recent files">
-          <div class="lf-card lf-card--wide">
-            <div class="lf-card__row"><h3 class="lf-h5">Skill record</h3><span class="lf-tag">Example</span></div>
+        <article class="lf-tile lf-tile--d" data-spot data-rv id="daily">
+          <span class="lf-num">Every day after</span>
+          <h3>Today's file and your skill record</h3>
+          <p>A new business with new mistakes, graded with no hints. Practice files drill what you miss. The test suite solves 900 generated files on each build.</p>
+          <div class="lf-rec" role="img" aria-label="An example skill record: which kinds of mistake were caught on the first check">
+            <div class="lf-card__row"><span class="lf-h5">Skill record</span><span class="lf-tag">Example</span></div>
             <div class="lf-skill"><span>Duplicate entries</span><span class="lf-bar"><i style="--v:100%"></i></span><b>3 of 3</b></div>
             <div class="lf-skill"><span>Missing bank charges</span><span class="lf-bar"><i style="--v:67%"></i></span><b>2 of 3</b></div>
             <div class="lf-skill"><span>Transposed amounts</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
-            <div class="lf-skill"><span>Outstanding checks</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
             <div class="lf-skill is-weak"><span>Owner money vs income</span><span class="lf-bar"><i style="--v:0%"></i></span><b>0 of 2</b></div>
-            <p class="lf-card__foot">Next practice file: owner money</p>
           </div>
-        </div>
+          <a class="link" href="app.html#/daily">Open today's file</a>
+        </article>
       </div>
     </div>
   </section>
@@ -209,7 +208,7 @@
             <div class="lf-cmp__row"><span>Practice plan here</span><b>$12 a month</b><em>Graded at once</em></div>
           </div>
         </div>
-        <article class="card card--plan span-4 start-5">
+        <article class="card card--plan span-4 start-5" data-spot>
           <h3>Free</h3>
           <p class="muted">Try a real cleanup today</p>
           <p class="lf-price">$0</p>
@@ -221,7 +220,7 @@
             <li>Feedback after each step</li>
           </ul>
         </article>
-        <article class="card card--plan is-featured span-4 start-9">
+        <article class="card card--plan is-featured span-4 start-9" data-spot>
           <h3>Practice</h3>
           <p class="muted">Build the habit before a first client</p>
           <p class="lf-price">$12<small>a month, or $96 a year</small></p>
@@ -262,6 +261,7 @@
 </main>
 
 <footer class="footer closing lf-foot" id="contact" aria-labelledby="close-h">
+  <div class="fx" aria-hidden="true"><i class="fx-grid"></i><i class="fx-beam"></i></div>
   <div class="wrap">
     <div class="lf-close">
       <div><h2 id="close-h">Start with the free case</h2><p class="muted">Maple &amp; Pine's October books. No sign-up, about 6 minutes.</p></div>
