@@ -237,3 +237,36 @@ i.q { background: var(--blue-bg); color: var(--blue); }
 .lf-theme-item { display: none; }
 .lf-theme-item button { background: none; border: 0; font: inherit; color: inherit; cursor: pointer; padding: 0; }
 @media (max-width: 1023px) { .lf-theme-item { display: block; } }
+
+/* ---------- gate fixes: visuals for pricing and questions, columns on the page's lines, phone room */
+.lf-cmp, .lf-mini { margin: var(--s-2) 0; }
+.lf-cmp__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--w-line); font-size: 13.5px; }
+.lf-cmp__row:first-child { border-top: 0; padding-top: 0; }
+.lf-cmp__row > span:first-child { color: var(--w-muted); grid-column: 1 / -1; font-size: 12.5px; }
+.lf-cmp__row b { font: 500 16px/1.2 var(--font-mono); }
+.lf-mini .lf-line:first-child { border-top: 0; }
+.app.lf-app { grid-template-columns: calc(50% + 12px) minmax(0, 1fr); }
+.lf-panel { padding: var(--s-9, 72px) var(--s-8); }
+.lf-card--wide .lf-skill { padding: 14px 0; }
+@media (max-width: 639px) {
+  .lf-pair { grid-template-columns: minmax(0, 1fr); }
+  .lf-pair span { white-space: normal; }
+  .lf-act b { white-space: normal; }
+  .card.card--plan .lf-price { font-size: 36px; }
+  .lf-panel { padding: var(--s-5); }
+}
+@media (max-width: 359px) { .hero .hero__text > .btn-row { flex-wrap: wrap; } .hero .hero__text > .btn-row > .btn { flex: 1 1 100%; } }
+
+.close__word { line-height: 1.04; padding-top: .04em; }
+.lf-facts b { font-size: 30px; }
+.lf-open { min-width: 0; }
+.lf-fix { flex-wrap: wrap; }
+.lf-recon > div { min-width: 0; }
+@media (max-width: 639px) {
+  #steps .card:not(:first-of-type) > .panel { display: none; }
+  .lf-rows > li:nth-child(n+5) { display: none; }
+  .lf-main__head { display: none; }
+  .lf-recon { grid-template-columns: minmax(0, 1fr); }
+  .lf-li b, .lf-clue { overflow-wrap: anywhere; }
+}
+@media (max-width: 639px) { .lf-open__head { flex-wrap: wrap; justify-content: flex-start; } }

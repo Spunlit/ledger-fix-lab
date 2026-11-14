@@ -112,7 +112,7 @@
               <span class="is-on"><i></i>Books</span><span><i></i>Bank feed</span><span><i></i>Reconcile</span><span><i></i>Reports</span>
             </div>
             <div class="lf-main">
-              <div class="lf-main__head"><h2 class="lf-h">Books, March 2026</h2><span class="chip chip--ok" data-testid="hero-recon">Difference $0.00</span></div>
+              <div class="lf-main__head"><p class="lf-h">Books, March 2026</p><span class="chip chip--ok" data-testid="hero-recon">Difference $0.00</span></div>
               <p class="lf-task" data-hero-task aria-live="polite">Balanced to the cent, yet profit is <b>$5,000 too high</b>. Click the line that's wrong.</p>
               <ol class="lf-rows" aria-label="Book entries, March 2026">
                 <li><button type="button" class="lf-row" data-hero-pick="E01"><span class="lf-date">Mar 2</span><span class="lf-desc"><b>Square payout, customer payments</b><small>Sales income</small></span><span class="lf-amt">+$1,286.40</span><span class="lf-st"></span></button></li>
@@ -127,7 +127,7 @@
           </div>
         </div>
         <div class="ly-piece ly-piece--note lf-card" data-hero-card data-ly-steps="800" aria-live="polite">
-          <div class="lf-card__row"><h3 class="lf-h5">Net profit, March</h3><span class="lf-profit" data-testid="hero-profit">$10,410.76</span></div>
+          <div class="lf-card__row"><p class="lf-h5">Net profit, March</p><span class="lf-profit" data-testid="hero-profit">$10,410.76</span></div>
           <div class="lf-line" data-step><i class="ok">✓</i><span>Bank and books agree, <b>$0.00</b> apart</span></div>
           <div class="lf-line" data-step><i class="warn">!</i><span>Profit is <b>$5,000.00</b> too high</span></div>
           <div class="lf-line" data-step><i class="q">?</i><span>One line is booked to the wrong category</span></div>
@@ -142,7 +142,7 @@
         <h2 id="workbench-h" class="span-5">Every bank line beside the entry it should match</h2>
         <p class="span-6 start-7 muted lf-para">Lines that pair up are done. What's missing, doubled or mistyped is left over, and you fix it with a bookkeeper's tools: delete, recategorize, fix the amount, mark cleared, record from the statement. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera file</a></p>
       </div>
-      <div class="app lf-app fill" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
+      <div class="ui app lf-app fill" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
         <div class="app__pane app__pane--list">
           <div class="lf-win lf-win--flat">
             <div class="lf-win__bar"><span class="lf-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Rivera <i>/</i> <b>Bank statement, March</b></span></div>
@@ -229,11 +229,12 @@
     <div class="wrap">
       <div class="grid lf-split">
         <div class="span-5 lf-split__text">
-          <h2 id="daily-h">A new client file every day</h2>
+          <h2 id="daily-h">Today's file and your skill record</h2>
           <p class="muted lf-para">Today's file is a fresh business with fresh mistakes, graded in exam mode with no hints. Practice files aim at the problems you miss most. Each one is generated from a seed and solved by a reference solution before you see it.</p>
           <ul class="lf-facts">
             <li><b>900</b><span>generated files checked by the test suite on every build</span></li>
             <li><b>4</b><span>separate checks, so you see exactly which part is wrong</span></li>
+            <li><b>7</b><span>kinds of mistake the files mix, from doubled charges to owner money</span></li>
           </ul>
           <a class="link" href="app.html#/daily">Open today's file</a>
         </div>
@@ -252,12 +253,16 @@
     </div>
   </section>
 
-  <section class="section" id="pricing" aria-labelledby="pricing-h">
+  <section class="section" id="pricing" style="--hm: 2" aria-labelledby="pricing-h">
     <div class="wrap">
       <div class="grid">
         <div class="span-4 stack-4">
           <h2 id="pricing-h">Pricing</h2>
           <p class="muted">Every plan includes the full workbench, the four-check grader and today's file. Practice client files sold elsewhere cost $49 to $119 each and are self-graded against an answer sheet (qbodojo.com, Nov 2026).</p>
+          <div class="lf-card lf-cmp" role="img" aria-label="Comparison: a practice client file elsewhere costs $49 to $119 and is self-graded; the Practice plan is $12 a month and graded instantly">
+            <div class="lf-cmp__row"><span>Practice file elsewhere</span><b>$49 to $119 each</b><span class="chip chip--warn">Self-graded</span></div>
+            <div class="lf-cmp__row"><span>Practice plan here</span><b>$12 a month</b><span class="chip chip--ok">Graded at once</span></div>
+          </div>
           <a class="link" href="app.html#/upgrade">See the Practice plan</a>
         </div>
         <article class="card card--plan span-4 start-5">
@@ -294,14 +299,19 @@
         <div class="span-5 stack-4">
           <h2 id="faq-h">Questions</h2>
           <p class="muted">Something else? The project's code and notes are public.</p>
+          <div class="lf-card lf-mini" role="img" aria-label="A balanced but wrong file: bank and books agree, but a savings transfer is booked as sales, so profit is $5,000 too high">
+            <div class="lf-line"><i class="ok">✓</i><span>Bank and books agree, <b>$0.00</b> apart</span></div>
+            <div class="lf-line"><i class="bad">×</i><span>Savings transfer booked as <b>Sales income</b></span></div>
+            <div class="lf-line"><i class="warn">!</i><span>Profit and tax come out <b>$5,000</b> too high</span></div>
+          </div>
           <a class="link" href="https://github.com/Spunlit/ledger-fix-lab">Read the code on GitHub</a>
         </div>
         <div class="faq span-6 start-7">
-          <div class="faq__item"><h3>Who is it for?</h3><p>New bookkeepers and students before their first client, and owners who do their own books and want to check their work.</p></div>
-          <div class="faq__item"><h3>Is this real client data?</h3><p>No. Every business, bank line and name is made up for practice. The mistakes are the common real ones.</p></div>
+          <div class="faq__item"><h3>Who is Ledger Fix Lab for?</h3><p>New bookkeepers and students before their first client, and owners who do their own books and want to check their work.</p></div>
+          <div class="faq__item"><h3>Are the client files real?</h3><p>No. Each file is a practice business written for the trainer, so no one's real books are shared. The mistakes in them are the common real ones.</p></div>
           <div class="faq__item"><h3>Do I need QuickBooks or Xero?</h3><p>No. It runs in the browser and teaches the cleanup itself, which is the same in any accounting software.</p></div>
-          <div class="faq__item"><h3>How is it graded?</h3><p>On the books you end with: nothing missing or extra, amounts matching the statement, cleared status, and categories. Any correct fix passes.</p></div>
-          <div class="faq__item"><h3>What does balanced but wrong mean?</h3><p>The bank and books agree to the cent, but a line sits in the wrong category, so profit and taxes come out wrong.</p></div>
+          <div class="faq__item"><h3>How is a file graded?</h3><p>On the books you end with: nothing missing or extra, amounts matching the statement, cleared status, and categories. Any correct fix passes.</p></div>
+          <div class="faq__item"><h3>What is a balanced but wrong file?</h3><p>The bank and books agree to the cent, but a line sits in the wrong category, so profit and taxes come out wrong.</p></div>
         </div>
       </div>
     </div>
