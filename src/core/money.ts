@@ -31,7 +31,7 @@ export function sumCents(values: number[]): number {
   for (const v of values) {
     assertCents(v);
     total += v;
+    assertCents(total); // checked at every step: an intermediate overflow would silently lose cents
   }
-  assertCents(total);
   return total;
 }

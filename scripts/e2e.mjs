@@ -31,10 +31,18 @@ const browser = spawn(browserPath, [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let failures = 0;
+let ran = 0;
+const EXPECTED_CHECKS = 16; // a run that stops early must not count as green
 const ok = (cond, msg) => {
+  ran++;
   console.log(`${cond ? 'PASS' : 'FAIL'}  ${msg}`);
   if (!cond) failures++;
 };
+const watchdog = setTimeout(() => {
+  console.error('FAIL  e2e timed out after 120s');
+  browser.kill();
+  process.exit(1);
+}, 120_000);
 
 async function main() {
   let target;
@@ -51,9 +59,18 @@ async function main() {
   const pending = new Map();
   ws.onmessage = (m) => {
     const msg = JSON.parse(m.data);
-    if (msg.id && pending.has(msg.id)) { pending.get(msg.id)(msg); pending.delete(msg.id); }
+    if (msg.id && pending.has(msg.id)) { pending.get(msg.id).resolve(msg); pending.delete(msg.id); }
   };
-  const send = (method, params = {}) => new Promise((r) => { const n = ++id; pending.set(n, r); ws.send(JSON.stringify({ id: n, method, params })); });
+  // If the browser or socket dies mid-run, fail loudly instead of hanging or exiting 0.
+  const failPending = (why) => { for (const p of pending.values()) p.reject(new Error(why)); pending.clear(); };
+  ws.onclose = () => failPending('DevTools socket closed before the run finished');
+  ws.onerror = () => failPending('DevTools socket error');
+  const send = (method, params = {}) => new Promise((resolve, reject) => {
+    if (ws.readyState !== WebSocket.OPEN) return reject(new Error(`DevTools socket not open (${method})`));
+    const n = ++id;
+    pending.set(n, { resolve, reject });
+    ws.send(JSON.stringify({ id: n, method, params }));
+  });
   const evaluate = async (expr) => {
     const res = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
     if (res.result?.exceptionDetails) throw new Error(`eval failed: ${expr}\n${JSON.stringify(res.result.exceptionDetails)}`);
@@ -128,6 +145,11 @@ async function main() {
 main()
   .catch((e) => { console.error(e); failures++; })
   .finally(() => {
+    clearTimeout(watchdog);
+    if (ran !== EXPECTED_CHECKS) {
+      console.error(`FAIL  only ${ran} of ${EXPECTED_CHECKS} checks ran`);
+      failures++;
+    }
     browser.kill();
     setTimeout(() => { try { rmSync(profile, { recursive: true, force: true }); } catch { /* profile still locked */ } }, 500);
     console.log(failures ? `\n${failures} check(s) FAILED` : '\nAll UI checks passed');

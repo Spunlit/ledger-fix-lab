@@ -9,9 +9,9 @@ import {
   validateScenario,
 } from '../src/core/engine';
 import { explain } from '../src/core/explain';
-import { formatCents, formatSignedCents } from '../src/core/money';
+import { formatCents, formatSignedCents, sumCents } from '../src/core/money';
 import { SCENARIO_1 } from '../src/core/scenario';
-import type { Action, Session } from '../src/core/types';
+import type { Action, Scenario, Session } from '../src/core/types';
 
 const run = (actions: Action[], start: Session = createSession(SCENARIO_1)) =>
   actions.reduce((s, a) => applyAction(s, a), start);
@@ -149,5 +149,26 @@ describe('money formatting', () => {
     expect(formatSignedCents(0)).toBe('$0.00');
     expect(formatSignedCents(1250)).toBe('+$12.50');
     expect(() => formatCents(1.5)).toThrow();
+  });
+
+  it('sumCents rejects intermediate overflow instead of silently losing cents', () => {
+    expect(() => sumCents([Number.MAX_SAFE_INTEGER, 2, -2])).toThrow();
+    expect(sumCents([41250, -41250, 1250])).toBe(1250);
+  });
+});
+
+describe('scenario validation (review regressions)', () => {
+  it('reports repeated unknown transactions instead of crashing', () => {
+    const bad: Scenario = {
+      ...SCENARIO_1,
+      ledger: [
+        ...SCENARIO_1.ledger,
+        { ...SCENARIO_1.ledger[0], entryId: 'X1', txnId: 'UNKNOWN' },
+        { ...SCENARIO_1.ledger[0], entryId: 'X2', txnId: 'UNKNOWN' },
+      ],
+    };
+    const problems = validateScenario(bad);
+    expect(problems).toContain('entry X1 references unknown transaction UNKNOWN');
+    expect(problems).toContain('entry X2 references unknown transaction UNKNOWN');
   });
 });

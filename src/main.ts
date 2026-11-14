@@ -75,17 +75,17 @@ function render(): void {
           ${state.entries
             .map(
               (e) => `
-            <tr data-entry="${e.entryId}" class="${wrongCat.has(e.entryId) ? 'flag' : ''}">
+            <tr data-entry="${esc(e.entryId)}" class="${wrongCat.has(e.entryId) ? 'flag' : ''}">
               <td class="nowrap c-date">${shortDate(e.date)}</td>
               <td class="c-desc">${esc(e.description)}</td>
-              <td class="muted nowrap c-src">${e.source}</td>
+              <td class="muted nowrap c-src">${esc(e.source)}</td>
               <td class="r num c-amt ${e.amountCents > 0 ? 'in' : ''}">${formatSignedCents(e.amountCents)}</td>
               <td class="c-cat">
-                <select data-cat="${e.entryId}" aria-label="Category for ${esc(e.description)}, ${shortDate(e.date)}">
+                <select data-cat="${esc(e.entryId)}" aria-label="Category for ${esc(e.description)}, ${shortDate(e.date)}">
                   ${CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === e.category ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
                 </select>
               </td>
-              <td class="c-del"><button type="button" class="del" data-del="${e.entryId}" aria-label="Delete ${esc(e.description)}, ${shortDate(e.date)}">Delete</button></td>
+              <td class="c-del"><button type="button" class="del" data-del="${esc(e.entryId)}" aria-label="Delete ${esc(e.description)}, ${shortDate(e.date)}">Delete</button></td>
             </tr>`,
             )
             .join('')}

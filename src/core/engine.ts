@@ -172,7 +172,10 @@ export function validateScenario(s: Scenario): string[] {
     entryIds.add(e.entryId);
     perTxn.set(e.txnId, (perTxn.get(e.txnId) ?? 0) + 1);
     const line = lines.get(e.txnId);
-    if (!line) continue;
+    if (!line) {
+      problems.push(`entry ${e.entryId} references unknown transaction ${e.txnId}`);
+      continue;
+    }
     if (signature(line) !== signature(e)) problems.push(`entry ${e.entryId} does not match statement ${e.txnId}`);
     if (!Number.isSafeInteger(e.amountCents)) problems.push(`entry ${e.entryId} non-integer cents`);
   }
@@ -180,8 +183,9 @@ export function validateScenario(s: Scenario): string[] {
     if (!(line.txnId in s.expectedCategory)) problems.push(`no expected category for ${line.txnId}`);
   }
   for (const [txnId, n] of perTxn) {
-    if (n < 2) continue;
-    const sig = signature(lines.get(txnId)!);
+    const line = lines.get(txnId);
+    if (n < 2 || !line) continue; // unknown txns already reported above
+    const sig = signature(line);
     const clash = s.statement.filter((l) => signature(l) === sig).length;
     if (clash > 1) problems.push(`duplicated ${txnId} is visually indistinguishable from another statement line`);
   }
