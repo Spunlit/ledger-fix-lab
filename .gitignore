@@ -1,0 +1,10 @@
+node_modules
+dist
+*.log
+.claude/settings.local.json
+.env
+.env.*
+# Local builder/process files — not part of the product repo
+.claude/
+CLAUDE.md
+BUILD_BRIEF.md
