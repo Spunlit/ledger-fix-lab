@@ -100,17 +100,15 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
   const M = '−';
 
-  // ---------- home: the 30-second challenge
+  // ---------- home: the 30-second case ("one line is lying")
   await go('');
-  ok((await text('[data-testid=ch-diff]')) === '+$412.50', 'home challenge starts $412.50 off');
-  await click('[data-ch-del=E14]');
-  await sleep(900);
-  ok((await text('[data-testid=ch-diff]')) === '$0.00' && (await text('[data-testid=ch-verdict]')).includes('Balanced, but wrong'), 'deleting the real Oct 29 payment: $0.00 but "Balanced, but wrong"');
-  ok(await js(`return !!$('.ch-rows.bank li.proof')`), 'the bank line that proves it is highlighted');
-  await click('[data-ch-reset]');
-  await click('[data-ch-del=E10]');
-  await sleep(900);
-  ok((await text('[data-testid=ch-verdict]')).includes('Right, and balanced'), 'deleting the duplicate copy: "Right, and balanced"');
+  ok((await text('.tile.ok strong')) === '$0.00' && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'home shows the paradox: $0.00 balanced, profit $10,410.76');
+  await click('[data-hero-pick=E14]');
+  ok((await text('[data-testid=hero-why]')).includes("hasn't reached the bank"), 'picking the uncleared check explains why it is real');
+  await click('[data-hero-pick=E06]');
+  await sleep(1500);
+  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return !!$('.ev.liar .stamp')`)), 'catching the owner transfer: profit rolls to $5,410.76 and the card is stamped');
+  ok((await text('[data-testid=hero-verdict]')).includes("owner's money, not a sale"), 'verdict explains the lesson');
   await shot('0-home', false);
 
   // ---------- case 1 (guided: instant feedback, delete + category only)
@@ -180,7 +178,7 @@ async function main() {
   ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
 
   await go('');
-  ok((await js(`return document.querySelectorAll('.card-meta .done').length`)) === 2, 'home marks both guided cases completed');
+  ok((await js(`return document.querySelectorAll('.step.done').length`)) === 2, 'home path marks both guided cases completed');
   ok((await js(`return document.querySelectorAll('.record li').length`)) >= 2, 'skill record appears after the first unguided file');
   const practice = await js(`return $('.record a.btn').getAttribute('href')`);
   ok(/^#\/practice\/[a-z0-9]+\//.test(practice), `weak-spot practice link targets missed skills (${practice})`);

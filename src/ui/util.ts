@@ -70,3 +70,16 @@ export function longDate(isoDay: string): string {
   const [y, m, d] = isoDay.split('-').map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
 }
+
+/** Consecutive UTC days, ending today (or yesterday), on which the file of the day was completed. */
+export function dailyStreak(done: Completed, today: string): number {
+  const has = (d: string) => Boolean(done[`daily-${d}`]);
+  const dayBefore = (d: string) => new Date(Date.parse(`${d}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
+  let d = has(today) ? today : dayBefore(today);
+  let n = 0;
+  while (has(d)) {
+    n += 1;
+    d = dayBefore(d);
+  }
+  return n;
+}

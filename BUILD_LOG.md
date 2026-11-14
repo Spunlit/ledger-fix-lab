@@ -91,3 +91,13 @@
 - New visual language (white, airy, one elevated element). Two screenshot review passes; fixed truncated labels,
   layout shift, a CSS class collision and the phone header.
 - npm test 76/76; e2e rewritten, 42/42 locally.
+
+## 2026-11-14 ~19:00–20:00 Astana — v5: "one line is lying" (Fable critique + founder/Gemini direction)
+- Home rebuilt as a detective case: "The books balance. One line is lying." Paradox tiles ($0.00 balanced vs
+  profit $10,410.76), four evidence cards from case 2 graded by the engine; wrong picks explain why the line is
+  honest; the right pick rolls profit to $5,410.76 and stamps CAUGHT. Everyone reaches the aha by succeeding.
+- Path of three steps (case 1 → case 2 → today's file) with done ticks and a daily streak; comparison row with
+  verified competitor prices; "How it works"/pricing sections removed; ink-black primary buttons.
+- Workbench: one message at a time (warning replaces next step, with Undo), BALANCED, BUT WRONG / RECONCILED AND
+  RIGHT stamps, profit before/after bars in the review, cleanup summary open by default, streak in shared result.
+- npm test 77/77; e2e 42/42 locally.

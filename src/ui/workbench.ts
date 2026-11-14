@@ -47,12 +47,12 @@ function badgeText(ui: CaseUI): string {
 }
 
 /** Plain-text result to share (no answers in it). */
-export function shareText(ui: CaseUI, url: string): string {
+export function shareText(ui: CaseUI, url: string, streak = 0): string {
   const s = ui.session.scenario;
   const fc = Object.values(ui.firstCheck ?? {});
   return [
     `Ledger Fix Lab: ${badgeText(ui)} (${s.business}, ${s.period})`,
-    `Reconciled and right. Checks run: ${ui.checksRun}.${fc.length ? ` First check: ${fc.filter(Boolean).length} of ${fc.length} skills clean.` : ''}`,
+    `Reconciled and right. Checks run: ${ui.checksRun}.${fc.length ? ` First check: ${fc.filter(Boolean).length} of ${fc.length} skills clean.` : ''}${streak > 1 ? ` ${streak}-day streak.` : ''}`,
     url,
   ].join('\n');
 }
@@ -130,10 +130,10 @@ export function renderWorkbench(ui: CaseUI): string {
     </section>
 
     <section class="coach" aria-live="polite">
-      <p class="next">${esc(coachText(s, report))}</p>
+      ${ui.feedback?.tone === 'warn' ? '' : `<p class="next">${esc(coachText(s, report))}</p>`}
       ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}
       ${showHint ? `<p class="hint">${esc(cl[0].text)}</p>` : ''}
-      ${ui.feedback ? `<p class="toast ${ui.feedback.tone}" role="status" data-testid="feedback">${esc(ui.feedback.text)}</p>` : ''}
+      ${ui.feedback ? `<p class="toast ${ui.feedback.tone}" role="status" data-testid="feedback">${esc(ui.feedback.text)}${ui.feedback.tone === 'warn' ? ' <button type="button" class="link small" data-act="undo">Undo</button>' : ''}</p>` : ''}
     </section>
 
     <aside class="note-strip ${ui.noteOpen ? 'open' : ''}">
@@ -233,9 +233,22 @@ function renderReview(report: CheckReport): string {
   const verdict = report.balanced
     ? `The difference is $0.00, but ${failing.length === 1 ? 'one check fails' : `${failing.length} checks fail`}. Balanced isn't the same as right.`
     : `Not yet: ${formatSignedCents(report.recon.differenceCents)} to go, and ${failing.length === 1 ? 'one check fails' : `${failing.length} checks fail`}.`;
+  const { booked, correct } = report.categories;
+  const gap = booked.netIncomeCents - correct.netIncomeCents;
+  const max = Math.max(Math.abs(booked.netIncomeCents), Math.abs(correct.netIncomeCents), 1);
+  const bars =
+    gap !== 0
+      ? `<div class="pnl" aria-label="Net profit as booked versus correct">
+        <p class="pnl-head">Profit ${gap > 0 ? 'overstated' : 'understated'} by ${formatCents(Math.abs(gap))}</p>
+        <div class="bar-row"><span>As booked</span><span class="bar bad" style="--w:${Math.round((Math.abs(booked.netIncomeCents) / max) * 100)}%"></span><b class="num">${formatCents(booked.netIncomeCents)}</b></div>
+        <div class="bar-row"><span>Correct</span><span class="bar good" style="--w:${Math.round((Math.abs(correct.netIncomeCents) / max) * 100)}%"></span><b class="num">${formatCents(correct.netIncomeCents)}</b></div>
+      </div>`
+      : '';
   return `
   <section class="review" aria-live="polite" aria-labelledby="review-h">
+    ${report.balanced ? '<span class="stamp-inline bad">Balanced, but wrong</span>' : ''}
     <h2 id="review-h">${esc(verdict)}</h2>
+    ${bars}
     <ul class="checks">
       ${rows
         .map(
@@ -257,6 +270,7 @@ function renderSolved(ui: CaseUI, report: CheckReport): string {
   const afterNet = rep.after.pnl.netIncomeCents;
   return `
   <section class="solved" data-testid="success" aria-live="polite" aria-labelledby="solved-h">
+    <span class="stamp-inline good">Reconciled and right</span>
     <h2 id="solved-h">Books reconciled, and right.</h2>
     <div class="beforeafter">
       <div><span>Difference</span><strong class="num"><s>${formatSignedCents(rep.before.recon.differenceCents)}</s> ${formatSignedCents(report.recon.differenceCents)}</strong></div>
@@ -264,7 +278,7 @@ function renderSolved(ui: CaseUI, report: CheckReport): string {
       <div><span>Checks run</span><strong class="num">${ui.checksRun}</strong></div>
     </div>
     ${renderFirstCheck(ui)}
-    <details class="summary">
+    <details class="summary" open>
       <summary>The cleanup summary you'd send ${esc(s.client.split(' ')[0])} (${rep.items.length} fixes)</summary>
       <ul>${rep.items.map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>
     </details>

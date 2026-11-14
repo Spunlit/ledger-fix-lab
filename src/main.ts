@@ -2,13 +2,15 @@ import './style.css';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
 import { actionFeedback } from './core/feedback';
-import { formatSignedCents } from './core/money';
+import { formatCents } from './core/money';
+import { heroVerdict, type HeroState } from './ui/hero';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { renderLanding } from './ui/landing';
 import { resolve } from './ui/routes';
-import { loadCompleted, loadHistory, parseDollarsToCents, saveCompleted, saveHistory } from './ui/util';
+import { dailyStreak, loadCompleted, loadHistory, parseDollarsToCents, saveCompleted, saveHistory } from './ui/util';
+import { todaySeed } from './core/generator';
 import { isGuided, newCaseUI, renderWorkbench, shareText, type CaseUI } from './ui/workbench';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -16,32 +18,31 @@ const cases = new Map<string, CaseUI>();
 let completed = loadCompleted();
 let history = loadHistory();
 let currentId: string | null = null;
-/** Home-page challenge: which row the visitor deleted. */
-let challengeDeleted: string | null = null;
+function current(): CaseUI | null {
+  return currentId ? cases.get(currentId) ?? null : null;
+}
+
+/** Home-page 30-second case: lines the visitor has tried, and whether the lie was caught. */
+let hero: HeroState = { tried: [], caught: false };
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function renderHome(animate = false): void {
-  app.innerHTML = renderLanding(completed, history, challengeDeleted);
-  const el = app.querySelector<HTMLElement>('[data-testid=ch-diff]');
-  const box = app.querySelector<HTMLElement>('.challenge');
+  app.innerHTML = renderLanding(completed, history, hero);
+  const el = app.querySelector<HTMLElement>('[data-testid=hero-profit]');
+  const box = app.querySelector<HTMLElement>('.case');
   if (!animate || !el || !box || !el.dataset.from || reducedMotion()) return;
-  // Count the difference down to its new value, then reveal the verdict.
+  // Roll the profit down to the corrected figure, then reveal the verdict.
   const from = Number(el.dataset.from);
-  const to = 0;
+  const to = Number(el.dataset.to);
   box.classList.add('counting');
   const t0 = performance.now();
-  const tick = (now: number) => {
-    const k = Math.min(1, (now - t0) / 650);
-    const v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-    el.textContent = formatSignedCents(v);
-    if (k < 1) requestAnimationFrame(tick);
+  const step = (now: number) => {
+    const k = Math.min(1, (now - t0) / 900);
+    el.textContent = formatCents(Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))));
+    if (k < 1) requestAnimationFrame(step);
     else box.classList.remove('counting');
   };
-  requestAnimationFrame(tick);
-}
-
-function current(): CaseUI | null {
-  return currentId ? cases.get(currentId) ?? null : null;
+  requestAnimationFrame(step);
 }
 
 function route(): void {
@@ -105,10 +106,12 @@ function dispatch(action: Action): void {
 app.addEventListener('click', (ev) => {
   const ui = current();
   if (!ui) {
-    const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ch-del], [data-ch-reset]');
-    if (!b) return;
-    challengeDeleted = b.dataset.chDel ?? null;
-    renderHome(Boolean(challengeDeleted));
+    const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-hero-pick]');
+    if (!b || b.disabled) return;
+    const id = b.dataset.heroPick!;
+    const v = heroVerdict(id);
+    hero = v.caught ? { ...hero, caught: true } : { ...hero, tried: [...hero.tried, id] };
+    renderHome(v.caught);
     return;
   }
   const t = (ev.target as HTMLElement).closest<HTMLElement>('button, [data-act]');
@@ -170,7 +173,7 @@ app.addEventListener('click', (ev) => {
       return;
     }
     case 'copy-result': {
-      navigator.clipboard?.writeText(shareText(ui, location.href)).then(
+      navigator.clipboard?.writeText(shareText(ui, location.href, dailyStreak(completed, todaySeed()))).then(
         () => (t.textContent = 'Copied'),
         () => (t.textContent = 'Copy failed'),
       );
