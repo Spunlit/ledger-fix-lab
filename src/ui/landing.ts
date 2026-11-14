@@ -2,6 +2,7 @@ import { SKILL_LABEL } from '../core/explain';
 import { generateFile, todaySeed } from '../core/generator';
 import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
+import { basicsDone } from './basics';
 import { dailyHref, practiceHref } from './routes';
 import { gloss } from './terms';
 import { dailyStreak, esc, loadDrillRecord, loadTheme, masteryLevel, newSeed, themeButton, weekDays, type Completed } from './util';
@@ -30,7 +31,10 @@ function path(done: Completed, history: SkillAttempt[]): string {
   const drillRec = loadDrillRecord();
   const weak = weakestSkills(history, 2);
   // One clear next action, the way a course home does it.
-  const next = !d1
+  const zero = !basicsDone() && !d1;
+  const next = zero
+    ? { href: '#/basics', label: 'Start from zero', note: 'Five ideas in two minutes. No experience needed.' }
+    : !d1
     ? { href: `#/case/${CASES[0].id}`, label: 'Start case 1', note: 'Guided, about 6 minutes.' }
     : !d2
       ? { href: `#/case/${CASES[1].id}`, label: 'Continue with case 2', note: 'Guided, about 10 minutes. The one that balances and is still wrong.' }
@@ -50,6 +54,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
         <div class="home-days">${week.map((w) => `<span class="${w.done ? 'on' : ''} ${w.today ? 'today' : ''}"><i></i>${esc(w.label)}</span>`).join('')}</div>
       </div>
     </div>
+    <a class="warm quiet" href="#/basics"><span class="warm-t"><b>Start from zero</b><span>New to bookkeeping? Five ideas in two minutes: statement, books, matching, difference, categories.</span></span><span class="btn">${basicsDone() ? 'Again' : 'Start'}</span></a>
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
     <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
     <div class="path">

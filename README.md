@@ -12,8 +12,10 @@ Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have 
 but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
 
 ## For judges: a 2-minute tour
-1. **Landing page:** a calling card: what it is, three steps, the seven mistakes, pricing. Day/night switch.
-   **Start the free case** opens case 1 with a 30-second tour that lights each part of the screen and explains it.
+1. **Landing page:** a calling card: what it is, why it matters when software enters the lines, the path from zero,
+   the seven mistakes, pricing. Day/night switch.
+   **Start from zero** (`app.html#/basics`) teaches five ideas in two minutes, one tap each, for someone who has never
+   kept books. Case 1 then opens with a 30-second tour that lights each part of the screen and explains it.
 2. **Warm-up drill** (`app.html#/drill`, best on a phone): five one-tap rounds, "tap the line that is wrong". Rounds are
    cut from generated files and answered by the same checks that grade full files.
 3. **Case 2 ("Balanced, but wrong"):** a coach names one problem at a time, the row it is about and what to click;
@@ -73,9 +75,9 @@ file), but checkout is simulated: no card data is collected and nothing is charg
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 112 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 115 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 67 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 71 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.

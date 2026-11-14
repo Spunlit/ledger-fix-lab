@@ -178,3 +178,9 @@
 - Terms and Conditions page (app.html#/terms), a plain-language draft marked as not reviewed by a lawyer; linked from the landing footer and the plan page.
 - Day theme made crisp: no blur on the colour field, sharper ribs, solid white card with ink text, ink featured plan.
 - Checked: 112 unit tests, 67 e2e checks.
+
+## v18 (Nov 14, ~23:50 UTC)
+- New: Start from zero (app.html#/basics), a two-minute lesson of five ideas (statement, books, matching, difference, categories), one tap each; hand-written content in src/core/basics.ts with a test on its arithmetic. It is the first step on the landing page and on the desk for a newcomer.
+- Landing answers "will AI not do this": a short block and an FAQ item (automation enters the lines and makes exactly these mistakes; review is the job that stays). No AI is built in, and the page does not claim one.
+- Phone pass at 390px: landing, basics, desk, guide, plan, drill; no horizontal scroll.
+- Checked: 115 unit tests, 71 e2e checks.

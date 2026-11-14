@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 67; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 71; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -237,6 +237,19 @@ async function main() {
   ok((await text('.term-pop .term-pop__d')).includes("bank's balance minus the books' balance"), 'tapping "Difference" explains it in plain words');
   await click('.term-pop__x');
   ok(await js(`return $('.term-pop').hidden`), 'the explanation closes with "Got it"');
+
+  // ---------- start from zero (phone): five ideas, one tap each
+  await go('#/basics');
+  ok((await text('[data-testid=basics-title]')) === 'The bank statement' && (await js(`return document.querySelectorAll('[data-basics-pick]').length`)) === 3 && (await evaluate('document.documentElement.scrollWidth')) <= 375, 'basics lesson opens on the bank statement with three choices, no horizontal scroll');
+  await click('[data-basics-pick=fuel]');
+  ok((await text('[data-testid=basics-say]')).includes('Not quite'), 'a wrong tap gets a nudge, not the answer');
+  await click('[data-basics-pick=deposit]');
+  ok((await text('[data-testid=basics-say]')).includes('Right.'), 'the right tap is confirmed and explained');
+  for (const pick of [null, 'fuel', 'fee', 'fee', 'owner']) {
+    if (pick) await click(`[data-basics-pick=${pick}]`);
+    await click('[data-basics=next]');
+  }
+  ok((await text('[data-testid=basics-done]')).includes('five ideas') && (await evaluate(`localStorage.getItem('ledger-fix-lab:v18:basics-done')`)) === '1', 'basics lesson finishes and is remembered');
 
   // ---------- terms (draft)
   await go('#/terms');

@@ -9,6 +9,7 @@ import { actionFeedback } from './core/feedback';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
+import { newBasics, nextBasics, renderBasics, tapBasics, type BasicsState } from './ui/basics';
 import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './ui/drill';
 import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
@@ -48,6 +49,16 @@ function current(): CaseUI | null {
 let plan = loadPlan();
 let openedPractice = loadOpenedPractice();
 let paywall: PaywallState = { returnTo: null, step: 'plans', billing: 'monthly' };
+
+/** Start from zero (#/basics): five ideas, one tap each. */
+let basics: BasicsState | null = null;
+function renderBasicsPage(): void {
+  currentId = null;
+  basics ??= newBasics();
+  document.body.dataset.page = 'drill';
+  document.title = 'Start from zero | Ledger Fix Lab';
+  app.innerHTML = renderBasics(basics);
+}
 
 /** The warm-up drill (#/drill): five one-tap rounds. A new visit starts a new set. */
 let drill: DrillState | null = null;
@@ -95,6 +106,12 @@ function route(): void {
     const target = g[1] ? document.getElementById(`g-${g[1]}`) : null;
     if (target) target.scrollIntoView({ block: 'start' });
     else window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/basics/.test(location.hash)) {
+    if (basics?.done) basics = newBasics();
+    renderBasicsPage();
+    window.scrollTo(0, 0);
     return;
   }
   if (/^#\/terms/.test(location.hash)) {
@@ -182,6 +199,13 @@ function dispatch(action: Action): void {
 }
 
 app.addEventListener('click', (ev) => {
+  const bs = (ev.target as HTMLElement).closest<HTMLElement>('[data-basics-pick], [data-basics]');
+  if (bs && basics) {
+    basics = bs.dataset.basicsPick ? tapBasics(basics, bs.dataset.basicsPick) : nextBasics(basics);
+    renderBasicsPage();
+    if (bs.dataset.basics) window.scrollTo(0, 0);
+    return;
+  }
   const dr = (ev.target as HTMLElement).closest<HTMLElement>('[data-drill-row], [data-drill]');
   if (dr && drill) {
     if (dr.dataset.drillRow) drill = tapDrill(drill, dr.dataset.drillRow);
