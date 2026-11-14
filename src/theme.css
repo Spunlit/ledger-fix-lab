@@ -375,3 +375,12 @@ h1, h2, h3, .next-t, .step-title, .brand, .warm-t b, .home-next__t b { font-fami
 /* the same light as the landing page, kept low so the work stays readable */
 body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[data-page='upgrade'] { background: radial-gradient(60% 46% at 50% -6%, rgb(2 151 222 / 0.22), transparent 70%), radial-gradient(40% 30% at 100% 0%, rgb(252 115 77 / 0.10), transparent 70%), var(--bg); background-attachment: fixed; }
 :root[data-theme='light'] body[data-page='home'], :root[data-theme='light'] body[data-page='drill'], :root[data-theme='light'] body[data-page='guide'], :root[data-theme='light'] body[data-page='upgrade'] { background: radial-gradient(60% 46% at 50% -6%, rgb(5 147 198 / 0.20), transparent 70%), radial-gradient(40% 30% at 100% 0%, rgb(216 57 149 / 0.10), transparent 70%), var(--bg); background-attachment: fixed; }
+
+/* ================= terms (draft) */
+.legal { gap: 22px; }
+.legal-draft { padding: 14px 16px; border-radius: 10px; background: var(--amber-soft); color: var(--ink-2); font-size: 15px; box-shadow: inset 2px 0 0 var(--amber); max-width: 70ch; }
+.legal-draft b { color: var(--amber); }
+.legal-sec { display: grid; gap: 10px; padding-top: 22px; border-top: 1px solid var(--line); }
+.legal-sec h2 { font-family: var(--font-ui); font-size: 19px; font-weight: 600; }
+.legal-sec p { color: var(--ink-2); font-size: 15.5px; line-height: 1.65; max-width: 72ch; }
+.pw-terms { margin-top: 14px; font-size: 13px; color: var(--ink-3); }

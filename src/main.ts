@@ -13,6 +13,7 @@ import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './u
 import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
+import { renderTerms } from './ui/legal';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
 import { startTour, tourSeen } from './ui/tour';
@@ -94,6 +95,14 @@ function route(): void {
     const target = g[1] ? document.getElementById(`g-${g[1]}`) : null;
     if (target) target.scrollIntoView({ block: 'start' });
     else window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/terms/.test(location.hash)) {
+    currentId = null;
+    document.body.dataset.page = 'guide';
+    document.title = 'Terms and Conditions | Ledger Fix Lab';
+    app.innerHTML = renderTerms();
+    window.scrollTo(0, 0);
     return;
   }
   if (/^#\/drill/.test(location.hash)) {

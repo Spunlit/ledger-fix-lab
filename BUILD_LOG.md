@@ -173,3 +173,8 @@
 - Day theme in that template manner: white page, ink text, black pills, the sky-blue and pink scene inside the frame.
 - New: first-visit tour of the workbench (src/ui/tour.ts): 7 steps, lit target, Next/Back/Skip, keys, replay from the header.
 - Checked: 112 unit tests, 66 e2e checks.
+
+## v17 (Nov 14, ~23:00 UTC)
+- Terms and Conditions page (app.html#/terms), a plain-language draft marked as not reviewed by a lawyer; linked from the landing footer and the plan page.
+- Day theme made crisp: no blur on the colour field, sharper ribs, solid white card with ink text, ink featured plan.
+- Checked: 112 unit tests, 67 e2e checks.

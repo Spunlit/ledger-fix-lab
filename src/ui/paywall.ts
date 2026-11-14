@@ -74,6 +74,7 @@ export function renderPaywall(st: PaywallState, plan: Plan | null): string {
       <h2>Free forever</h2>
       <p>Both guided cases, a new file of the day every day, your skill record, and ${FREE_PRACTICE_FILES} practice file.</p>
       <a class="link" href="#/">Keep using the free version</a>
+      <p class="pw-terms">By starting a plan you agree to the <a href="#/terms">Terms and Conditions</a> (draft).</p>
     </section>`
     }
   </main>

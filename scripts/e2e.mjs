@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 66; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 67; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -237,6 +237,10 @@ async function main() {
   ok((await text('.term-pop .term-pop__d')).includes("bank's balance minus the books' balance"), 'tapping "Difference" explains it in plain words');
   await click('.term-pop__x');
   ok(await js(`return $('.term-pop').hidden`), 'the explanation closes with "Got it"');
+
+  // ---------- terms (draft)
+  await go('#/terms');
+  ok((await text('h1')) === 'Terms and Conditions' && (await text('[data-testid=terms-draft]')).includes('Draft') && (await js(`return document.querySelectorAll('.legal-sec').length`)) === 8, 'terms page: eight plain sections, clearly marked as a draft');
 
   // ---------- field guide (phone)
   await go('#/guide/owner');
