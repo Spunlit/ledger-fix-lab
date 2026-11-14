@@ -1,4 +1,7 @@
 import './style.css';
+import './workbench.css';
+import './paywall.css';
+import { initWorkbenchEvents } from './ui/workbench-events';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
 import { actionFeedback } from './core/feedback';
@@ -243,5 +246,6 @@ app.addEventListener('mouseover', (ev) => {
   if (lit.length > 1) lit.forEach((el) => el.classList.add('peer'));
 });
 
+initWorkbenchEvents(app);
 window.addEventListener('hashchange', route);
 route();
