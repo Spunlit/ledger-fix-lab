@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { centsToPlain, esc, parseDollarsToCents } from '../src/ui/util';
+import { centsToPlain, esc, parseDollarsToCents, masteryLevel, weekDays } from '../src/ui/util';
 
 describe('amount input parsing (no floats)', () => {
   it.each([
@@ -47,5 +47,23 @@ describe('paywall entitlement', () => {
     expect(canOpenPractice('a', ['a'], null)).toBe(true);
     expect(canOpenPractice('b', ['a'], null)).toBe(false);
     expect(canOpenPractice('b', ['a'], plan)).toBe(true);
+  });
+});
+
+describe('course home helpers', () => {
+  it('weekDays lists seven UTC days ending today and marks the ones done', () => {
+    const w = weekDays({ 'daily-2026-11-13': { at: 'x', checksRun: 1 }, 'daily-2026-11-08': { at: 'x', checksRun: 1 } }, '2026-11-14');
+    expect(w.map((d) => d.day)).toEqual(['2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13', '2026-11-14']);
+    expect(w.filter((d) => d.done).map((d) => d.day)).toEqual(['2026-11-08', '2026-11-13']);
+    expect(w[6].today).toBe(true);
+    expect(w[6].label).toBe('Sa');
+  });
+
+  it('masteryLevel needs two tries before calling a skill solid', () => {
+    expect(masteryLevel(0, 0)).toBe('New');
+    expect(masteryLevel(1, 1)).toBe('Practicing');
+    expect(masteryLevel(2, 2)).toBe('Solid');
+    expect(masteryLevel(5, 4)).toBe('Solid');
+    expect(masteryLevel(5, 3)).toBe('Practicing');
   });
 });

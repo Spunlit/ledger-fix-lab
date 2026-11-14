@@ -10,11 +10,13 @@ import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './ui/drill';
+import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
+import { saveDrillRun } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
 import { renderPaywall, type PaywallState } from './ui/paywall';
 import { todaySeed } from './core/generator';
@@ -47,9 +49,14 @@ let paywall: PaywallState = { returnTo: null, step: 'plans', billing: 'monthly' 
 
 /** The warm-up drill (#/drill): five one-tap rounds. A new visit starts a new set. */
 let drill: DrillState | null = null;
+function drillTopic(): GuideId | null {
+  const m = /^#\/drill\/([a-z]+)$/.exec(location.hash);
+  return m && GUIDE.some((t) => t.id === m[1]) ? (m[1] as GuideId) : null;
+}
 function renderDrillPage(): void {
   currentId = null;
-  drill ??= newDrill();
+  const topic = drillTopic();
+  if (!drill || drill.topic !== topic) drill = newDrill(topic);
   document.body.dataset.page = 'drill';
   document.title = 'Warm-up drill | Ledger Fix Lab';
   app.innerHTML = renderDrill(drill);
@@ -166,8 +173,10 @@ app.addEventListener('click', (ev) => {
   const dr = (ev.target as HTMLElement).closest<HTMLElement>('[data-drill-row], [data-drill]');
   if (dr && drill) {
     if (dr.dataset.drillRow) drill = tapDrill(drill, dr.dataset.drillRow);
-    else if (dr.dataset.drill === 'next') drill = nextDrill(drill);
-    else if (dr.dataset.drill === 'again') drill = newDrill();
+    else if (dr.dataset.drill === 'next') {
+      drill = nextDrill(drill);
+      if (drill.done && !drill.topic) saveDrillRun(drill.firstTry);
+    } else if (dr.dataset.drill === 'again') drill = newDrill(drill.topic);
     renderDrillPage();
     if (dr.dataset.drill) window.scrollTo(0, 0);
     return;
@@ -224,6 +233,10 @@ app.addEventListener('click', (ev) => {
       return render();
     case 'toggle-note':
       ui.noteOpen = !ui.noteOpen;
+      return render();
+    case 'tab-books':
+    case 'tab-bank':
+      ui.tab = d.act === 'tab-bank' ? 'bank' : 'books';
       return render();
     case 'toggle-math':
       ui.mathOpen = !ui.mathOpen;

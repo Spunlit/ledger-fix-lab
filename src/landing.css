@@ -13,16 +13,16 @@
   --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --display-weight: 700; --display-tracking: -0.025em; --display-tracking-xl: -0.03em;
 
-  --brand: #0297DE; --hot: #FC734D; --hot-text: #F58A6B; --hot-soft: rgb(252 115 77 / .10);
+  --brand: #0297DE; --hot: #FC734D; --hot-text: #E3A08A; --hot-soft: rgb(252 115 77 / .08);
   --p-bg: #02070A; --p-surface: #0A1318; --p-ink: #E1EBF0; --p-muted: #8C9EA9;
-  --p-accent: #4FB6E8; --p-accent-ink: #02070A; --p-action: #027CBB; --p-action-ink: #FFFFFF;
+  --p-accent: #9CC7DD; --p-accent-ink: #02070A; --p-action: #027CBB; --p-action-ink: #FFFFFF;
   --p-inv-bg: #FCFFFF; --p-inv-surface: #F1F7FA; --p-inv-ink: #06161D; --p-inv-muted: #4C626D;
   --p-inv-accent: #04739B; --p-inv-accent-ink: #FFFFFF; --p-inv-action: #0593C6; --p-inv-action-ink: #02070A;
   --w-bg: #071116; --w-raise: #0C1A21; --w-line: #17242B; --w-ink: #E1EBF0; --w-muted: #8C9EA9;
   --w-hover: rgb(2 151 222 / .12); --ring: 0 0 0 1px #17242B;
-  --ok: #45C79A; --ok-bg: rgb(69 199 154 / .11);
-  --bad: #F0728A; --bad-bg: rgb(240 114 138 / .11);
-  --link: #4FB6E8; --link-bg: rgb(2 151 222 / .12);
+  --ok: #7FBFA6; --ok-bg: rgb(127 191 166 / .10);
+  --bad: #DE8C98; --bad-bg: rgb(222 140 152 / .10);
+  --link: #9CC7DD; --link-bg: rgb(2 151 222 / .10);
 }
 :root[data-theme="light"] {
   --brand: #0593C6; --hot: #D83995; --hot-text: #B8286F; --hot-soft: #FBE6F1;
@@ -81,7 +81,8 @@ main#top > section.section + section.section { border-top: 1px solid var(--w-lin
 .lf-win { background: var(--w-bg); color: var(--w-ink); box-shadow: var(--ring); border-radius: 6px; overflow: hidden; font: 400 14px/1.4 var(--font-text); }
 .lf-win__bar { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--w-line); font-size: 13px; color: var(--w-muted); }
 .lf-win__bar b { color: var(--w-ink); font-weight: 600; font-size: 14px; }
-.lf-match { margin-left: auto; color: var(--ok); font-weight: 500; white-space: nowrap; }
+.lf-match { margin-left: auto; color: var(--w-muted); font-weight: 500; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+.lf-match::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 .lf-task { margin: 0; padding: 12px 18px; background: var(--link-bg); color: var(--w-ink); font-size: 14px; line-height: 1.45; border-left: 2px solid var(--brand); transition: background .3s, border-color .3s; }
 .lf-task b { font-weight: 600; }
 .lf-task.is-caught { background: var(--ok-bg); border-left-color: var(--ok); }
@@ -177,12 +178,12 @@ i.warn { background: var(--hot-soft); color: var(--hot-text); }
 
 /* ---------- steps: three columns on hairlines, no card kit */
 .lf-steps > article { border-top: 1px solid var(--w-line); padding-top: var(--s-5); display: grid; gap: 10px; align-content: start; }
-.lf-num { font: 600 13px/1 var(--font-text); color: var(--link); }
+.lf-num { font: 600 13px/1 var(--font-text); color: var(--p-muted); }
 .lf-steps h3 { font: 600 20px/1.3 var(--font-text); letter-spacing: -0.01em; margin: 0; }
 .lf-steps p { color: var(--muted); margin: 0; max-width: 38ch; }
 .lf-lines { list-style: none; margin: 8px 0 0; padding: 0; font-size: 14px; }
 .lf-lines li { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--w-line); }
-.lf-lines b { flex: none; width: 96px; font: 500 12px/1 var(--font-mono); color: var(--link); }
+.lf-lines b { flex: none; width: 112px; font: 500 13px/1.2 var(--font-text); color: var(--p-ink); }
 @media (max-width: 1023px) { .lf-steps > article { grid-column: 1 / -1; } }
 
 /* ---------- today's file: text beside the skill record */

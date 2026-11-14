@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 60; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 65; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -188,6 +188,7 @@ async function main() {
   ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
 
   await go('#/');
+  ok((await text('[data-testid=home-next]')).includes("Do today's file") && (await js(`return document.querySelectorAll('.home-days span').length`)) === 7, 'desk shows one next action (the file of the day, still unsolved) and the seven-day strip');
   ok((await js(`return document.querySelectorAll('.step.done').length`)) === 2, 'home path marks both guided cases completed');
   ok((await js(`return document.querySelectorAll('.record li').length`)) >= 2, 'skill record appears after the first unguided file');
   const practice = await js(`return $('.record a.btn').getAttribute('href')`);
@@ -219,6 +220,12 @@ async function main() {
   ok((await diff()) === `${M}$84.37`, 'phone: recording from the statement works');
   await shot('5-case2-mobile', false);
 
+  // ---------- phone, exam file: Books / Bank tabs
+  await go('#/daily');
+  ok(await js(`return getComputedStyle($('.desk .statement')).display === 'none' && getComputedStyle($('.desk .books')).display !== 'none'`), 'phone exam file opens on the Books tab, the statement is one tap away');
+  await click('[data-act=tab-bank]');
+  ok(await js(`return getComputedStyle($('.desk .books')).display === 'none' && getComputedStyle($('.desk .statement')).display !== 'none' && $('[data-act=tab-bank]').classList.contains('on')`), 'the Bank statement tab shows the statement');
+
   // ---------- plain words: a tapped term explains itself (phone: bottom sheet)
   await go('#/case/rivera-mar');
   await click('[data-testid=difference] .term');
@@ -229,6 +236,12 @@ async function main() {
   // ---------- field guide (phone)
   await go('#/guide/owner');
   ok((await js(`return document.querySelectorAll('.guide-topic:not(.guide-words)').length`)) === 7 && (await js(`return document.querySelectorAll('#g-words dt').length`)) >= 12 && (await text('#g-owner')).includes('Owner') && (await evaluate('document.documentElement.scrollWidth')) <= 375, 'guide shows seven topics, opens at the linked one, no horizontal scroll at 375px');
+
+  // ---------- topic drill from the guide: "what do you do?" choices
+  await go('#/drill/outstanding');
+  ok((await text('[data-testid=drill-prompt]')).endsWith('What do you do?') && (await js(`return document.querySelectorAll('[data-drill-row]').length`)) === 3, 'topic drill asks a decision with three choices');
+  await click('[data-drill-row=right]');
+  ok((await text('[data-testid=drill-say]')).includes('Right.'), 'the right choice is confirmed and explained');
 
   // ---------- warm-up drill (phone): five one-tap rounds graded by the engine's checks
   await go('#/drill');

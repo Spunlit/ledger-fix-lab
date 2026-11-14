@@ -27,6 +27,8 @@ export interface CaseUI {
   editing: string | null;
   editError: string | null;
   recording: string | null;
+  /** Phone only, exam files: which list is on screen. */
+  tab: 'books' | 'bank';
   /** UTC day for a file of the day. */
   day?: string;
   /** Skill outcomes of the first check (unguided files only). */
@@ -38,7 +40,7 @@ export interface CaseUI {
 export function newCaseUI(session: Session, day?: string): CaseUI {
   return {
     session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, guideOpen: false,
-    editing: null, editError: null, recording: null, day, firstCheck: null, feedback: null,
+    editing: null, editError: null, recording: null, tab: 'books', day, firstCheck: null, feedback: null,
   };
 }
 
@@ -330,8 +332,13 @@ function renderLists(v: View, s: Scenario, entries: LedgerEntry[], lines: Statem
   const rec = v.tools.has('record');
   const balance = (label: string, cents: number, cls: string) =>
     `<tr class="bal ${cls}"><td class="st s-desc">${label}</td><td class="st s-amt r num">${formatCents(cents)}</td>${rec ? '<td class="st s-rec"></td>' : ''}</tr>`;
+  const tab = v.ui.tab;
   return `
-  <div class="desk">
+  <div class="tabs" role="tablist" aria-label="Books or bank statement">
+    <button type="button" role="tab" aria-selected="${tab === 'books'}" class="${tab === 'books' ? 'on' : ''}" data-act="tab-books">Books<span>${entries.length}</span></button>
+    <button type="button" role="tab" aria-selected="${tab === 'bank'}" class="${tab === 'bank' ? 'on' : ''}" data-act="tab-bank">Bank statement<span>${lines.length}</span></button>
+  </div>
+  <div class="desk show-${tab}">
     <section class="books" aria-labelledby="books-h">
       <div class="desk-head"><h2 id="books-h">Books</h2>${guide}</div>
       ${guideList}

@@ -84,6 +84,46 @@ export function dailyStreak(done: Completed, today: string): number {
   return n;
 }
 
+/** The last seven UTC days, oldest first, with whether that day's file was completed. */
+export function weekDays(done: Completed, today: string): { day: string; label: string; done: boolean; today: boolean }[] {
+  const t = Date.parse(`${today}T00:00:00Z`);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(t - (6 - i) * 86400000);
+    const day = d.toISOString().slice(0, 10);
+    return { day, label: d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }).slice(0, 2), done: Boolean(done[`daily-${day}`]), today: day === today };
+  });
+}
+
+/** A plain level for a skill from first-check results: needs two tries before it can be called solid. */
+export function masteryLevel(attempts: number, firstTry: number): 'New' | 'Practicing' | 'Solid' {
+  if (attempts === 0) return 'New';
+  return attempts >= 2 && firstTry / attempts >= 0.8 ? 'Solid' : 'Practicing';
+}
+
+const DRILL_KEY = 'ledger-fix-lab:v11:drill';
+export interface DrillRecord {
+  runs: number;
+  best: number;
+}
+export function loadDrillRecord(): DrillRecord {
+  try {
+    const v = JSON.parse(localStorage.getItem(DRILL_KEY) ?? 'null');
+    return v && Number.isInteger(v.runs) && Number.isInteger(v.best) ? { runs: v.runs, best: v.best } : { runs: 0, best: 0 };
+  } catch {
+    return { runs: 0, best: 0 };
+  }
+}
+export function saveDrillRun(firstTry: number): DrillRecord {
+  const r = loadDrillRecord();
+  const next = { runs: r.runs + 1, best: Math.max(r.best, firstTry) };
+  try {
+    localStorage.setItem(DRILL_KEY, JSON.stringify(next));
+  } catch {
+    /* storage blocked */
+  }
+  return next;
+}
+
 // ---------------------------------------------------------------- plan (paywall)
 
 const PLAN_KEY = 'ledger-fix-lab:v5:plan';

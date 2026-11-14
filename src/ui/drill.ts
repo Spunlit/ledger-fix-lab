@@ -1,10 +1,13 @@
 import { CASES } from '../core/scenarios';
-import { DRILL_ROUNDS, DRILL_TOPIC, drillRounds, type DrillRound } from '../core/drill';
+import { DRILL_TOPIC, drillRounds, topicRounds, type DrillRound } from '../core/drill';
+import { guideTopic, type GuideId } from '../core/guide';
 import { gloss } from './terms';
 import { esc, loadTheme, newSeed, themeButton } from './util';
 
 /** The warm-up drill page (app.html#/drill): five one-tap rounds, made for a phone. */
 export interface DrillState {
+  /** Set for a topic drill from the guide; null for the mixed warm-up. */
+  topic: GuideId | null;
   seed: string;
   rounds: DrillRound[];
   /** Index of the round on screen. */
@@ -18,8 +21,8 @@ export interface DrillState {
   done: boolean;
 }
 
-export function newDrill(seed = newSeed()): DrillState {
-  return { seed, rounds: drillRounds(seed), i: 0, missed: [], hit: null, firstTry: 0, done: false };
+export function newDrill(topic: GuideId | null = null, seed = newSeed()): DrillState {
+  return { topic, seed, rounds: topic ? topicRounds(seed, topic) : drillRounds(seed), i: 0, missed: [], hit: null, firstTry: 0, done: false };
 }
 
 /** Apply a tap; returns the next state (never mutates). */
@@ -43,16 +46,17 @@ const header = () => `
 
 export function renderDrill(d: DrillState): string {
   if (d.done) {
-    const all = d.firstTry === DRILL_ROUNDS;
+    const all = d.firstTry === d.rounds.length;
+    const name = d.topic ? guideTopic(d.topic).title : 'Warm-up';
     return `${header()}
   <main class="drill">
     <section class="drill-end" aria-live="polite">
-      <p class="drill-step">Warm-up done</p>
-      <h1 data-testid="drill-score">${d.firstTry} of ${DRILL_ROUNDS} on the first tap</h1>
+      <p class="drill-step">${esc(name)}: done</p>
+      <h1 data-testid="drill-score">${d.firstTry} of ${d.rounds.length} on the first tap</h1>
       <p class="drill-sub">${all ? 'Clean run. The full cases hide the same mistakes among fourteen lines and a bank statement.' : 'Each miss is a habit to build. The full cases put the same mistakes among fourteen lines and a bank statement.'}</p>
       <div class="drill-actions">
         <a class="btn primary big" href="#/case/${CASES[0].id}">Start case 1</a>
-        <button type="button" class="btn big" data-drill="again">Another five</button>
+        <button type="button" class="btn big" data-drill="again">${d.topic ? 'Three more' : 'Another five'}</button>
       </div>
       <a class="link" href="#/guide">Read the field guide: seven things to check</a>
     </section>
@@ -63,17 +67,17 @@ export function renderDrill(d: DrillState): string {
   return `${header()}
   <main class="drill">
     <div class="drill-top">
-      <p class="drill-step">Warm-up, ${d.i + 1} of ${d.rounds.length}<span>${esc(r.business)}</span></p>
+      <p class="drill-step">${esc(d.topic ? guideTopic(d.topic).title : 'Warm-up')}, ${d.i + 1} of ${d.rounds.length}<span>${esc(r.business)}</span></p>
       <div class="drill-bar" role="img" aria-label="Round ${d.i + 1} of ${d.rounds.length}">${d.rounds.map((_, k) => `<i class="${k < d.i || (k === d.i && d.hit) ? 'on' : k === d.i ? 'now' : ''}"></i>`).join('')}</div>
     </div>
     <h1 class="drill-q" data-testid="drill-prompt">${gloss(r.prompt)}</h1>
-    <ol class="drill-rows">
+    <ol class="drill-rows ${r.shape === 'decide' ? 'is-choices' : ''}">
       ${r.rows
         .map((row) => {
           const hit = d.hit !== null && r.answers.includes(row.id);
           const missed = d.missed.includes(row.id);
           return `<li><button type="button" class="drill-row ${hit ? 'is-hit' : ''} ${missed ? 'is-miss' : ''} ${row.id === lastMiss && !d.hit ? 'is-fresh' : ''}" data-drill-row="${esc(row.id)}" ${d.hit || missed ? 'disabled' : ''}>
-            <span class="drill-main"><b>${esc(row.title)}</b><small>${esc(row.detail)}</small></span>
+            <span class="drill-main"><b>${esc(row.title)}</b>${row.detail ? `<small>${esc(row.detail)}</small>` : ''}</span>
             <span class="drill-amt num">${esc(row.amount)}</span>
             <span class="drill-mark" aria-hidden="true"></span>
           </button></li>`;
@@ -81,7 +85,7 @@ export function renderDrill(d: DrillState): string {
         .join('')}
     </ol>
     <div class="drill-say ${d.hit ? 'good' : d.missed.length ? 'warn' : ''}" role="status" aria-live="polite" data-testid="drill-say">
-      ${d.hit ? `<p><b>Right.</b> ${gloss(r.why)} <a href="#/guide/${DRILL_TOPIC[r.kind]}">More in the guide</a></p><button type="button" class="btn primary big" data-drill="next">${d.i + 1 >= d.rounds.length ? 'See my score' : 'Next'}</button>` : d.missed.length ? `<p><b>Not that one.</b> ${gloss(r.nudge)}</p>` : '<p class="quiet">Tap a line. You can try again if you miss.</p>'}
+      ${d.hit ? `<p><b>Right.</b> ${gloss(r.why)} <a href="#/guide/${DRILL_TOPIC[r.kind]}">More in the guide</a></p><button type="button" class="btn primary big" data-drill="next">${d.i + 1 >= d.rounds.length ? 'See my score' : 'Next'}</button>` : d.missed.length ? `<p><b>Not that one.</b> ${gloss(r.nudge)}</p>` : `<p class="quiet">${r.shape === 'decide' ? 'Pick one. You can try again if you miss.' : 'Tap a line. You can try again if you miss.'}</p>`}
     </div>
   </main>`;
 }

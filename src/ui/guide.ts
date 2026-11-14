@@ -38,7 +38,7 @@ export function renderGuide(): string {
         <div><dt>What to do</dt><dd>${gloss(t.fix)}</dd></div>
         <div><dt>Why it matters</dt><dd>${gloss(t.why)}${t.differenceNote ? ` ${esc(t.differenceNote)}` : ''}</dd></div>
       </dl>
-      <a class="link" href="${t.practice.href}">Practice it in ${esc(t.practice.label)}</a>
+      <div class="guide-do"><a class="btn primary" href="#/drill/${t.id}">Practice this: 3 quick rounds</a><a class="link" href="${t.practice.href}">or see it in ${esc(t.practice.label)}</a></div>
     </article>`,
     ).join('')}
 

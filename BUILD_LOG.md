@@ -153,3 +153,10 @@
 - Founder feedback: some bookkeeping words are unknown to a beginner. Added src/core/glossary.ts (15 terms, one plain sentence each) and tappable terms (dashed underline; card on desktop, bottom sheet on a phone) in the coach, hints, review, figures, guide, drill and landing page. Guide has a "Words explained" list.
 - Plainer copy: h1 "Bookkeeping practice for beginners"; "swapped digits" instead of "transposed", "checks not at the bank yet", "Change category".
 - Checked: 108 unit tests (4 new for the glossary), 60 e2e checks.
+
+## v14 (Nov 14, ~22:00 UTC)
+- Text colours desaturated (links, green, red, attention); glow around the hero window kept (founder: the neon was the text colour).
+- Drill: "what do you do?" rounds with three choices (outstanding check, real repeat, missing bank charge); every guide topic has a 3-round drill (app.html#/drill/<topic>).
+- Desk as a course home: one "Next up" action, seven-day strip with streak, level per skill (New / Practicing / Solid), best warm-up score.
+- Phone, exam files: Books / Bank statement tabs.
+- Checked: 112 unit tests, 65 e2e checks.
