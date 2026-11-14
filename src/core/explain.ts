@@ -1,82 +1,86 @@
-import { CATEGORIES, categoryName } from './categories';
-import { signature, type CheckReport } from './engine';
+import { category, categoryName } from './categories';
+import type { CheckReport } from './engine';
 import { formatCents, formatSignedCents } from './money';
-import type { LedgerState, Scenario } from './types';
+import type { LedgerEntry, SkillId } from './types';
 
-/**
- * Human explanations of which invariant is broken. Phrased only in terms the user can see
- * (date, description, amount, statement), never internal ids.
- */
+/** Human explanations, phrased in what the user can see (dates, descriptions, amounts). */
 export interface Explanations {
   integrity: string[];
-  balance: string[];
+  amounts: string[];
+  cleared: string[];
   categories: string[];
+  balance: string[];
 }
+
+export const SKILL_LABEL: Record<SkillId, string> = {
+  duplicates: 'Spotting duplicate entries',
+  genuineRepeats: 'Keeping genuine repeat purchases',
+  missing: 'Recording bank charges missing from the books',
+  transposition: 'Catching transposed amounts',
+  timing: 'Leaving outstanding checks in place',
+  categories: 'Choosing the right expense category',
+  ownerEquity: 'Separating owner money from income',
+};
 
 export function shortDate(iso: string): string {
   const [, m, d] = iso.split('-').map(Number);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${months[m - 1]} ${d}`;
+  return `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1]} ${d}`;
 }
 
-export function explain(scenario: Scenario, state: LedgerState, report: CheckReport): Explanations {
-  const stmtCount = (sig: string) => scenario.statement.filter((l) => signature(l) === sig).length;
-  const ledgerCount = (sig: string) => state.entries.filter((e) => signature(e) === sig).length;
+const q = (e: { description: string; date: string }) => `"${e.description}" (${shortDate(e.date)})`;
+const times = (n: number) => (n === 1 ? 'once' : n === 2 ? 'twice' : `${n} times`);
 
+export function explain(report: CheckReport): Explanations {
   const integrity: string[] = [];
-  const seen = new Set<string>();
-  for (const line of report.integrity.missing) {
-    const sig = signature(line);
-    if (seen.has(sig)) continue;
-    seen.add(sig);
-    const s = stmtCount(sig);
-    const l = ledgerCount(sig);
-    let msg =
-      `Missing record: "${line.description}" on ${shortDate(line.date)} for ${formatCents(line.amountCents)}. ` +
-      `The bank statement shows it ${times(s)}, the ledger ${l === 0 ? 'has none' : `has it ${times(l)}`}. ` +
-      `A real transaction was deleted.`;
-    if (s > 1) msg += ' Identical charges on the same day can both be real — the statement is the source of truth.';
-    integrity.push(msg);
-  }
-  for (const { line, count } of report.integrity.extra) {
+  for (const t of report.integrity.missing) {
     integrity.push(
-      `Duplicate: "${line.description}" on ${shortDate(line.date)} for ${formatCents(line.amountCents)} ` +
-        `is recorded ${times(count)}, but the bank statement shows it once. Keep one copy — either one.`,
+      t.onStatement
+        ? `Missing: the bank shows ${formatCents(t.amountCents)} on ${shortDate(t.date)} ("${t.bankDescription}"), but nothing in the books records it. Record it from the statement.`
+        : `Missing: ${q(t)} for ${formatCents(t.amountCents)} was deleted, but it is real. It hasn't reached the bank yet, so it belongs in the books, unticked, until it clears.`,
     );
   }
-  for (const e of report.integrity.unknown) {
-    integrity.push(`Unknown record: "${e.description}" on ${shortDate(e.date)} is not on the bank statement.`);
+  for (const { txn, count } of report.integrity.extra) {
+    integrity.push(
+      `Duplicate: ${q(txn)} for ${formatCents(txn.amountCents)} is in the books ${times(count)}, but it happened once. Keep one copy (either one) and delete the rest.`,
+    );
   }
+  for (const e of report.integrity.unknown) integrity.push(`Unknown row: ${q(e)} matches no real transaction.`);
 
-  const b = report.balance;
-  const balance: string[] = [];
-  if (!b.ok) {
-    balance.push(
-      `Ledger balance ${formatCents(b.ledgerBalanceCents)} vs. statement closing balance ` +
-        `${formatCents(b.statementBalanceCents)}: difference ${formatSignedCents(b.differenceCents)}.`,
-    );
-    balance.push(
-      b.differenceCents < 0
-        ? 'The ledger shows less money than the bank: look for an extra withdrawal (e.g. a duplicate) or a missing deposit.'
-        : 'The ledger shows more money than the bank: a real withdrawal may have been deleted, or a deposit is recorded twice.',
-    );
-  } else if (!report.integrity.ok) {
-    balance.push(
-      'The balance matches, but that alone does not prove the books are right: errors can cancel out. See the transaction check.',
-    );
-  }
+  const amounts = report.amounts.wrong.map(
+    ({ entry, expectedCents }) =>
+      `${q(entry)} is booked at ${formatCents(Math.abs(entry.amountCents))}, but the source shows ${formatCents(Math.abs(expectedCents))}. Fix the amount to match the bank.`,
+  );
 
-  const categories: string[] = report.categories.wrong.map(({ entry }) => {
-    const rule = CATEGORIES.find((c) => c.id === entry.category)?.rule ?? '';
-    return (
-      `"${entry.description}" (${shortDate(entry.date)}) is filed under ${categoryName(entry.category)} ` +
-      `(${rule.replace(/\.$/, '')}). That rule doesn't fit — check the category guide.`
-    );
+  const cleared = report.cleared.wrong.map(({ entry, onStatement }) =>
+    onStatement
+      ? `${q(entry)} is on this bank statement, so tick it as cleared.`
+      : `${q(entry)} is ticked, but it isn't on this statement. Leave it unticked: it is outstanding and will clear later.`,
+  );
+
+  const categories = report.categories.wrong.map(({ entry }) => {
+    const c = category(entry.category);
+    return `${q(entry)} is filed under ${c.name} (${c.rule.replace(/\.$/, '')}). That doesn't fit. Check the category guide and the client's note.`;
   });
+  const { booked, correct } = report.categories;
+  if (!report.categories.ok && booked.netIncomeCents !== correct.netIncomeCents) {
+    const gap = booked.netIncomeCents - correct.netIncomeCents;
+    categories.push(
+      `Because of this, the books show net profit of ${formatCents(booked.netIncomeCents)} instead of ${formatCents(correct.netIncomeCents)}, ${gap > 0 ? 'overstated' : 'understated'} by ${formatCents(Math.abs(gap))}.`,
+    );
+  }
 
-  return { integrity, balance, categories };
+  const r = report.recon;
+  const balance: string[] = [];
+  if (!report.balanced) {
+    balance.push(
+      `Adjusted bank balance ${formatCents(r.adjustedBankCents)} vs. book balance ${formatCents(r.bookBalanceCents)}: difference ${formatSignedCents(r.differenceCents)}.`,
+    );
+  } else if (!report.ok) {
+    balance.push('The difference is $0.00, but that alone doesn\'t prove the books are right. The other checks show what is still wrong.');
+  }
+  return { integrity, amounts, cleared, categories, balance };
 }
 
-function times(n: number): string {
-  return n === 1 ? 'once' : n === 2 ? 'twice' : `${n} times`;
+export function describeEntry(e: LedgerEntry): string {
+  return `${q(e)} ${formatCents(e.amountCents)} in ${categoryName(e.category)}`;
 }

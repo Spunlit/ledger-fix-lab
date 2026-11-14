@@ -1,38 +1,50 @@
-// Pure domain types. No DOM. Money is always integer cents.
+// Pure domain types. No DOM. Money is always signed integer cents (deposit > 0, withdrawal < 0).
+
+export type CategoryKind = 'income' | 'expense' | 'equity';
 
 export type CategoryId =
   | 'sales'
   | 'rent'
   | 'software'
   | 'office'
+  | 'supplies'
   | 'meals'
   | 'utilities'
+  | 'insurance'
   | 'contract'
   | 'car'
-  | 'bankfees';
+  | 'bankfees'
+  | 'ownerContribution'
+  | 'ownerDraw';
 
 export interface Category {
   id: CategoryId;
   name: string;
+  kind: CategoryKind;
   /** Plain-language rule shown to the user. */
   rule: string;
 }
 
-/** One ledger row (an instance). Several rows may record the same real transaction (a duplicate). */
-export interface LedgerEntry {
-  /** Unique per row. */
-  entryId: string;
-  /** Real-world transaction this row records. Hidden from the user; used only by the checker. */
+export type SkillId = 'duplicates' | 'genuineRepeats' | 'missing' | 'transposition' | 'timing' | 'categories' | 'ownerEquity';
+
+/**
+ * A real-world transaction: the truth the checker grades against. Hidden from the user;
+ * the user sees the bank statement (cleared transactions) and the client's books.
+ */
+export interface Txn {
   txnId: string;
   date: string; // ISO yyyy-mm-dd
+  /** How the business describes it in the books. */
   description: string;
-  /** Signed integer cents: deposit > 0, withdrawal < 0. Immutable. */
+  /** How the bank describes it on the statement (often cryptic). */
+  bankDescription: string;
   amountCents: number;
   category: CategoryId;
-  source: 'Bank feed' | 'Manual entry';
+  /** True if it cleared the bank in this period, i.e. it appears on this statement. */
+  onStatement: boolean;
 }
 
-/** One line of the bank statement (the external source of truth). */
+/** One line of the bank statement, as the user sees it. */
 export interface StatementLine {
   txnId: string;
   date: string;
@@ -40,30 +52,63 @@ export interface StatementLine {
   amountCents: number;
 }
 
+export type EntrySource = 'Bank feed' | 'Manual entry' | 'Added from statement';
+
+/** One row in the client's books (an instance). Several rows may record the same Txn (a duplicate). */
+export interface LedgerEntry {
+  entryId: string;
+  /** Real transaction this row records. Hidden from the user. */
+  txnId: string;
+  date: string;
+  description: string;
+  amountCents: number;
+  category: CategoryId;
+  source: EntrySource;
+  /** Ticked as cleared in the reconciliation (appears on the statement). */
+  cleared: boolean;
+}
+
+export interface ClientNote {
+  from: string;
+  subject: string;
+  paragraphs: string[];
+}
+
 export interface Scenario {
   id: string;
+  number: number;
   title: string;
+  client: string;
   business: string;
+  entity: string;
   account: string;
   currency: 'USD';
   period: string;
+  level: 'Beginner' | 'Intermediate';
+  minutes: number;
+  skills: SkillId[];
+  note: ClientNote;
+  /** Book and bank agreed at the start of the period (prior month reconciled). */
   openingBalanceCents: number;
-  statementClosingBalanceCents: number;
-  statement: StatementLine[];
-  /** Expected category per real transaction. */
-  expectedCategory: Record<string, CategoryId>;
-  /** Initial (messy) ledger the user must clean. */
+  /** As printed on the statement; a validator asserts it equals opening + cleared txns. */
+  statementEndingBalanceCents: number;
+  txns: Txn[];
+  /** The client's books as handed over. */
   ledger: LedgerEntry[];
 }
 
-/** User-editable state: only which rows remain and their categories. */
 export interface LedgerState {
   entries: LedgerEntry[];
+  /** Counter for ids of rows the user records from the statement (deterministic). */
+  nextAddedId: number;
 }
 
 export type Action =
   | { type: 'delete'; entryId: string }
-  | { type: 'recategorize'; entryId: string; category: CategoryId };
+  | { type: 'recategorize'; entryId: string; category: CategoryId }
+  | { type: 'setAmount'; entryId: string; magnitudeCents: number }
+  | { type: 'setCleared'; entryId: string; cleared: boolean }
+  | { type: 'record'; txnId: string; category: CategoryId };
 
 export interface Session {
   scenario: Scenario;
