@@ -1,4 +1,5 @@
 import { checkAll, type CheckReport } from './engine';
+import { formatCents } from './money';
 import { flaggedTxnIds } from './skills';
 import type { LedgerState, Scenario } from './types';
 
@@ -53,6 +54,10 @@ export function actionFeedback(s: Scenario, initial: LedgerState, before: Ledger
   const resolved = [...fb].filter((id) => !fa.has(id));
   if (!resolved.length) return null;
   const p = progress(s, initial, after);
-  if (ra.ok) return { tone: 'good', text: 'All fixed. Press Check the books to confirm.' };
-  return { tone: 'good', text: `Fixed. ${p.fixed} of ${p.total} problems done.` };
+  const db = Math.abs(rb.recon.differenceCents);
+  const da = Math.abs(ra.recon.differenceCents);
+  // Say what the fix did to the number the user is watching; a category fix moves profit, not the difference.
+  const moved = db !== da ? ` Difference ${formatCents(db)} to ${formatCents(da)}.` : rb.categories.booked.netIncomeCents !== ra.categories.booked.netIncomeCents ? ` Profit ${formatCents(rb.categories.booked.netIncomeCents)} to ${formatCents(ra.categories.booked.netIncomeCents)}.` : '';
+  if (ra.ok) return { tone: 'good', text: `Fixed.${moved} That was the last one: press Check the books.` };
+  return { tone: 'good', text: `Fixed.${moved} ${p.fixed} of ${p.total} problems done.` };
 }

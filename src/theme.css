@@ -4,59 +4,66 @@
  * JetBrains Mono for figures, sharp corners (fintech). Night is the default; day is the same system on white.
  */
 :root {
-  --font-ui: 'Reddit Sans', 'Public Sans', system-ui, sans-serif;
-  --font-num: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-ui: 'Geist', system-ui, sans-serif;
+  --font-num: var(--font-ui);
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --r: 4px;
   --r-lg: 6px;
 }
 :root[data-theme='dark'] {
-  --bg: #070a12;
-  --soft: #0f1420;
-  --ink: #eef2f8;
-  --ink-2: #a7b0c2;
-  --ink-3: #737e93;
-  --line: rgb(255 255 255 / 0.08);
-  --blue: #2f6bff;
-  --blue-ink: #ffffff;
-  --blue-soft: rgb(47 107 255 / 0.16);
-  --green: #3ccf8e;
-  --green-soft: rgb(60 207 142 / 0.13);
-  --red: #ff6b6b;
-  --red-soft: rgb(255 107 107 / 0.13);
-  --amber: #ffa36c;
-  --amber-soft: rgb(255 163 108 / 0.14);
-  --mark: rgb(255 163 108 / 0.22);
-  --surface: #0d1220;
-  --surface-2: #131a2c;
-  --shadow: 0 0 0 1px rgb(255 255 255 / 0.07), 0 40px 80px -40px rgb(0 0 0 / 0.9);
+  --bg: #02070A;
+  --soft: #0A1318;
+  --ink: #EAF3F7;
+  --ink-2: #A9BAC3;
+  --ink-3: #758893;
+  --line: #17242B;
+  --blue: #0297DE;
+  --blue-ink: #02070A;
+  --blue-text: #3DB4EE;
+  --action: #0297DE;
+  --action-ink: #02070A;
+  --blue-soft: rgb(2 151 222 / 0.15);
+  --green: #2FD39A;
+  --green-soft: rgb(47 211 154 / 0.13);
+  --red: #FF5C7C;
+  --red-soft: rgb(255 92 124 / 0.13);
+  --amber: #FC734D;
+  --amber-soft: rgb(252 115 77 / 0.14);
+  --mark: rgb(252 115 77 / 0.22);
+  --surface: #071116;
+  --surface-2: #0C1A21;
+  --shadow: 0 0 0 1px #17242B;
   color-scheme: dark;
 }
 :root[data-theme='light'] {
-  --bg: #f5f7fb;
-  --soft: #e8edf6;
-  --ink: #0a0f1c;
-  --ink-2: #485266;
-  --ink-3: #6b7588;
-  --line: rgb(10 15 28 / 0.09);
-  --blue: #1f5bff;
-  --blue-ink: #ffffff;
-  --blue-soft: #e7eeff;
-  --green: #0d8a55;
-  --green-soft: #e3f5ec;
-  --red: #c62f2f;
-  --red-soft: #fbe7e7;
-  --amber: #b35a12;
-  --amber-soft: #fff0e3;
-  --mark: rgb(255 163 108 / 0.35);
-  --surface: #ffffff;
-  --surface-2: #f3f6fb;
-  --shadow: 0 0 0 1px rgb(10 15 28 / 0.08), 0 30px 60px -34px rgb(10 20 50 / 0.35);
+  --bg: #FCFFFF;
+  --soft: #EEF6F9;
+  --ink: #06161D;
+  --ink-2: #445964;
+  --ink-3: #647883;
+  --line: #D9E6EC;
+  --blue: #0593C6;
+  --blue-ink: #FFFFFF;
+  --blue-text: #04739B;
+  --action: #0593C6;
+  --action-ink: #02070A;
+  --blue-soft: #E1F2F9;
+  --green: #087A4F;
+  --green-soft: #E2F5EC;
+  --red: #C4281A;
+  --red-soft: #FDECEA;
+  --amber: #B8286F;
+  --amber-soft: #FBE6F1;
+  --mark: rgb(216 57 149 / 0.18);
+  --surface: #FFFFFF;
+  --surface-2: #F2F8FB;
+  --shadow: 0 0 0 1px #D9E6EC;
   color-scheme: light;
 }
 
 html, body { overflow-x: clip; }
 body { background: var(--bg); font-family: var(--font-ui); }
-.num, .fig .num, .amt, .pw-price { font-family: var(--font-num); letter-spacing: -0.02em; }
+.num, .fig .num, .amt, .pw-price { font-family: var(--font-num); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 h1, h2, h3 { letter-spacing: -0.025em; }
 
 /* the logo: the arc mark of the landing page */
@@ -82,8 +89,10 @@ h1, h2, h3 { letter-spacing: -0.025em; }
 .rows tr.record-row td, .dock .btn.primary { border-radius: var(--r); }
 .pw-card { padding: 24px; }
 
-.btn.primary { background: var(--blue); border-color: var(--blue); color: var(--blue-ink); box-shadow: none; }
-.btn.primary:hover { background: color-mix(in oklab, var(--blue) 86%, var(--ink)); filter: none; }
+.btn.primary { background: var(--action); border-color: var(--action); color: var(--action-ink); box-shadow: none; font-weight: 600; }
+.btn.primary:hover { background: color-mix(in oklab, var(--action) 86%, var(--ink)); filter: none; }
+a, .link { color: var(--blue-text); }
+.step-n, .step.current .step-title::after { color: var(--blue-text); }
 .btn:not(.primary) { background: var(--surface-2); border-color: transparent; }
 
 .theme-btn { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: var(--r); border: 1px solid var(--line); background: transparent; color: var(--ink-2); cursor: pointer; }
@@ -120,4 +129,59 @@ h1, h2, h3 { letter-spacing: -0.025em; }
 @media (max-width: 720px) {
   .desk, .recon { padding: 12px; }
   .desk-page { padding-top: 16px; }
+}
+
+/* ================= type: Geist, 600 headings, tabular money; mono only for raw bank text */
+h1, h2, h3, .next, .step-title, .brand { font-weight: 600; }
+.fig strong.num { font-weight: 600; }
+.pw-price { font-weight: 600; }
+td.st .desc, .rows .st .d, .bankdesc { font-family: var(--font-mono); font-size: 12.5px; }
+:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-radius: var(--r); }
+
+/* ================= the coach (guided cases): one problem, one action, the row it is about */
+.coach { align-items: flex-start; }
+.next { display: grid; gap: 4px; flex: 1; min-width: 240px; padding: 14px 16px; background: var(--surface); box-shadow: var(--shadow); border-left: 2px solid var(--amber); border-radius: var(--r); font-size: inherit; font-weight: 400; letter-spacing: 0; animation: wb-reveal 0.25s ease-out; }
+p.next { display: block; font-size: 17px; font-weight: 600; }
+.next.step-done { border-left-color: var(--green); }
+.next-n { font-size: 12.5px; font-weight: 600; color: var(--amber); letter-spacing: 0.01em; }
+.next.step-done .next-n { color: var(--green); }
+.next-t { font-size: 18px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; text-wrap: balance; }
+.next-a { font-size: 15px; color: var(--ink-2); }
+.next-a .link { margin-left: 6px; font-weight: 600; }
+/* the row the coach is talking about: a quiet marker, and a pulse when "Show me the row" is pressed */
+.rows tr.co-t td:first-child { box-shadow: inset 3px 0 0 var(--amber); }
+.rows tr.co-t td { background: var(--amber-soft); }
+.rows tr.co-t .icon-btn, .rows tr.co-t .add, .rows tr.co-t .amt, .rows tr.co-t select, .rows tr.co-t .tick span { animation: co-pulse 1.8s ease-in-out 3; }
+.rows tr.co-look td { animation: co-look 1.1s ease-out; }
+@keyframes co-pulse { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 4px var(--mark); } }
+@keyframes co-look { 0% { background: var(--mark); } 100% { background: var(--amber-soft); } }
+
+/* ================= motion: every animation answers an action */
+.fig.diff.tick .num { animation: wb-tickdown 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
+@keyframes wb-tickdown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.review, .solved { animation: wb-reveal 0.35s ease-out both; }
+.review .check, .solved .firstcheck li { animation: wb-reveal 0.3s ease-out both; }
+.review .check:nth-child(1) { animation-delay: 0.10s; } .review .check:nth-child(2) { animation-delay: 0.22s; }
+.review .check:nth-child(3) { animation-delay: 0.34s; } .review .check:nth-child(4) { animation-delay: 0.46s; }
+.pbar::after { animation: wb-grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; transform-origin: left; }
+@keyframes wb-grow { from { transform: scaleX(0); } }
+.toast { animation: wb-reveal 0.25s ease-out; }
+.btn { transition: background 0.15s, border-color 0.15s, transform 0.08s; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) {
+  .next, .review, .solved, .review .check, .solved .firstcheck li, .pbar::after, .toast, .fig.diff.tick .num,
+  .rows tr.co-t .icon-btn, .rows tr.co-t .add, .rows tr.co-t .amt, .rows tr.co-t select, .rows tr.co-t .tick span, .rows tr.co-look td { animation: none; }
+}
+
+/* ================= clean-up from the audit */
+.stamp-inline { transform: none; border: 0; padding: 0; letter-spacing: 0; text-transform: none; font-size: 15px; font-weight: 600; animation: none; }
+.solved { background: var(--surface); box-shadow: inset 2px 0 0 var(--green), var(--shadow); }
+.pill { display: inline-block; padding: 4px 10px; border-radius: var(--r); font: 600 13px/1.2 var(--font-ui); }
+.pw-card { border: 0; }
+.dots i.on { background: var(--green); }
+@media (max-width: 960px) {
+  .pairs tr.only-books td.bk:first-child, .pairs tr.only-bank td.c-gap, .rows tr.flag td.bk:first-child, .rows tr.co-t td:first-child { box-shadow: none; }
+  .rows tr.co-t { box-shadow: inset 3px 0 0 var(--amber); background: var(--amber-soft); }
+  .rows tr.co-t td { background: none; }
+  .wb-title h1 { white-space: normal; }
 }

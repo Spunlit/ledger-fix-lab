@@ -21,13 +21,13 @@ export const HERO_ROWS = ['E01', 'E03', 'E06', 'E07', 'E14'];
 
 /** The auditor's margin note when an honest line is checked. */
 const WHY_HONEST: Record<string, string> = {
-  E01: 'real sale, Square deposit on the bank statement',
-  E03: 'real phone bill, right category',
-  E07: 'real fuel for the van, right category',
-  E14: "real check, mailed the 30th, just hasn't cleared",
-  E11: "money out to the owner, booked as a draw",
-  E13: 'real supplies, right category',
-  E04: 'real insurance premium, right category',
+  E01: 'real sale: the Square deposit is on the bank statement',
+  E03: 'real phone bill in the right category',
+  E07: 'real fuel for the van in the right category',
+  E14: "real check, mailed on the 30th. It just hasn't cleared",
+  E11: "transfer out to the owner, booked as Owner's draw",
+  E13: 'real supplies purchase in the right category',
+  E04: 'real insurance premium in the right category',
 };
 
 export function heroBase(): Session {

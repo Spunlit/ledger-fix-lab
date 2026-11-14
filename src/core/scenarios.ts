@@ -45,22 +45,22 @@ function rows(txns: Txn[], specs: [entryId: string, txnId: string, overrides?: P
 // Planted: T09 imported twice by the bank feed (+$412.50 difference); Adobe filed as office supplies;
 // Shell fuel filed as meals.
 // Traps: two real identical Blue Bottle coffees (T05/T06); a second real Upwork payment for the same
-// amount (T13) — deleting it instead of the duplicate makes the difference $0.00 with the books wrong.
+// amount (T13), deleting it instead of the duplicate makes the difference $0.00 with the books wrong.
 
 const C1: Txn[] = [
-  txn('T01', '2026-10-01', 'Client payment — Harbor Dental', 240000, 'sales'),
-  txn('T02', '2026-10-02', 'Oakline Properties — studio rent', -120000, 'rent'),
+  txn('T01', '2026-10-01', 'Client payment, Harbor Dental', 240000, 'sales'),
+  txn('T02', '2026-10-02', 'Oakline Properties, studio rent', -120000, 'rent'),
   txn('T03', '2026-10-03', 'Adobe Creative Cloud', -5999, 'software'),
-  txn('T04', '2026-10-05', 'Staples — printer paper & ink', -8437, 'office'),
-  txn('T05', '2026-10-07', 'Blue Bottle Coffee — client meeting', -1250, 'meals'),
-  txn('T06', '2026-10-07', 'Blue Bottle Coffee — client meeting', -1250, 'meals'),
-  txn('T07', '2026-10-09', 'Comcast Business — internet', -8999, 'utilities'),
-  txn('T08', '2026-10-12', 'Client payment — Fernwood Bakery', 85000, 'sales'),
-  txn('T09', '2026-10-15', 'Upwork — contractor, logo milestone 1', -41250, 'contract'),
-  txn('T10', '2026-10-18', 'Shell — fuel', -4620, 'car'),
+  txn('T04', '2026-10-05', 'Staples, printer paper & ink', -8437, 'office'),
+  txn('T05', '2026-10-07', 'Blue Bottle Coffee, client meeting', -1250, 'meals'),
+  txn('T06', '2026-10-07', 'Blue Bottle Coffee, client meeting', -1250, 'meals'),
+  txn('T07', '2026-10-09', 'Comcast Business, internet', -8999, 'utilities'),
+  txn('T08', '2026-10-12', 'Client payment, Fernwood Bakery', 85000, 'sales'),
+  txn('T09', '2026-10-15', 'Upwork, contractor, logo milestone 1', -41250, 'contract'),
+  txn('T10', '2026-10-18', 'Shell, fuel', -4620, 'car'),
   txn('T11', '2026-10-22', 'Monthly service fee', -1500, 'bankfees'),
-  txn('T12', '2026-10-28', 'Client payment — Lumen Yoga', 60000, 'sales'),
-  txn('T13', '2026-10-29', 'Upwork — contractor, logo milestone 2', -41250, 'contract'),
+  txn('T12', '2026-10-28', 'Client payment, Lumen Yoga', 60000, 'sales'),
+  txn('T13', '2026-10-29', 'Upwork, contractor, logo milestone 2', -41250, 'contract'),
 ];
 
 export const CASE_1: Scenario = {
@@ -121,24 +121,24 @@ export const CASE_1: Scenario = {
 // Planted: R03 Verizon typed by hand as $48.37 instead of $84.37 (transposition, unticked);
 // R08 AutoZone in twice (bank feed + manual copy, manual unticked); R13 bank fee on the statement but
 // not in the books; R06 $5,000 owner transfer from personal savings booked as Sales income.
-// Traps: R14 check #1043 is real but has not cleared (outstanding) — it must stay, unticked;
+// Traps: R14 check #1043 is real but has not cleared (outstanding), it must stay, unticked;
 // R10 transfer to personal checking is correctly an owner's draw, not an expense.
 
 const C2: Txn[] = [
-  txn('R01', '2026-03-02', 'Square payout — customer payments', 128640, 'sales', { bank: 'SQUARE INC DES:SQ260302 DEPOSIT' }),
-  txn('R02', '2026-03-03', 'Chemical Guys — wax & polish', -21285, 'supplies', { bank: 'CHECKCARD 0303 CHEMICAL GUYS CA' }),
-  txn('R03', '2026-03-05', 'Verizon — business phone', -8437, 'utilities', { bank: 'VERIZON WIRELESS DES:PAYMENTS' }),
-  txn('R04', '2026-03-06', 'Progressive — business liability', -31800, 'insurance', { bank: 'PROGRESSIVE INS DES:INS PREM' }),
-  txn('R05', '2026-03-09', 'Square payout — customer payments', 190475, 'sales', { bank: 'SQUARE INC DES:SQ260309 DEPOSIT' }),
+  txn('R01', '2026-03-02', 'Square payout, customer payments', 128640, 'sales', { bank: 'SQUARE INC DES:SQ260302 DEPOSIT' }),
+  txn('R02', '2026-03-03', 'Chemical Guys, wax & polish', -21285, 'supplies', { bank: 'CHECKCARD 0303 CHEMICAL GUYS CA' }),
+  txn('R03', '2026-03-05', 'Verizon, business phone', -8437, 'utilities', { bank: 'VERIZON WIRELESS DES:PAYMENTS' }),
+  txn('R04', '2026-03-06', 'Progressive, business liability', -31800, 'insurance', { bank: 'PROGRESSIVE INS DES:INS PREM' }),
+  txn('R05', '2026-03-09', 'Square payout, customer payments', 190475, 'sales', { bank: 'SQUARE INC DES:SQ260309 DEPOSIT' }),
   txn('R06', '2026-03-10', 'Transfer from savings', 500000, 'ownerContribution', { bank: 'ONLINE TRANSFER FROM SAV ...1188' }),
-  txn('R07', '2026-03-12', 'Shell — van fuel', -7618, 'car', { bank: 'CHECKCARD 0312 SHELL OIL 5744' }),
-  txn('R08', '2026-03-14', 'AutoZone — pressure washer hose', -5499, 'supplies', { bank: 'CHECKCARD 0314 AUTOZONE #3321' }),
-  txn('R09', '2026-03-16', 'Square payout — customer payments', 211830, 'sales', { bank: 'SQUARE INC DES:SQ260316 DEPOSIT' }),
+  txn('R07', '2026-03-12', 'Shell, van fuel', -7618, 'car', { bank: 'CHECKCARD 0312 SHELL OIL 5744' }),
+  txn('R08', '2026-03-14', 'AutoZone, pressure washer hose', -5499, 'supplies', { bank: 'CHECKCARD 0314 AUTOZONE #3321' }),
+  txn('R09', '2026-03-16', 'Square payout, customer payments', 211830, 'sales', { bank: 'SQUARE INC DES:SQ260316 DEPOSIT' }),
   txn('R10', '2026-03-20', 'Transfer to personal checking', -150000, 'ownerDraw', { bank: 'ONLINE TRANSFER TO CHK ...4410' }),
-  txn('R11', '2026-03-23', 'Square payout — customer payments', 164210, 'sales', { bank: 'SQUARE INC DES:SQ260323 DEPOSIT' }),
-  txn('R12', '2026-03-25', 'Detail King — microfiber towels', -12940, 'supplies', { bank: 'CHECKCARD 0325 DETAIL KING PA' }),
+  txn('R11', '2026-03-23', 'Square payout, customer payments', 164210, 'sales', { bank: 'SQUARE INC DES:SQ260323 DEPOSIT' }),
+  txn('R12', '2026-03-25', 'Detail King, microfiber towels', -12940, 'supplies', { bank: 'CHECKCARD 0325 DETAIL KING PA' }),
   txn('R13', '2026-03-31', 'Monthly maintenance fee', -1500, 'bankfees', { bank: 'MONTHLY MAINTENANCE FEE' }),
-  txn('R14', '2026-03-30', 'Check #1043 — Desert Sun Mobile Wash', -65000, 'contract', { bank: 'CHECK 1043', onStatement: false }),
+  txn('R14', '2026-03-30', 'Check #1043, Desert Sun Mobile Wash', -65000, 'contract', { bank: 'CHECK 1043', onStatement: false }),
 ];
 
 export const CASE_2: Scenario = {

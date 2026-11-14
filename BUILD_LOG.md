@@ -128,3 +128,11 @@
 - The trainer moved to app.html (Vite multi-page). app.html#/ is "Your practice desk" (path + skill record).
 - App restyled to match: midnight #070a12, electric blue #2f6bff, cantaloupe #ffa36c for warnings, Reddit Sans + JetBrains Mono, sharp corners. Day/night switch on both pages, shared key.
 - Checked: 94 unit tests, 49 e2e checks, phone 375px without horizontal scroll, copy-lint 0 FAIL.
+
+## v9: founder palettes, Geist, coach in guided cases (Nov 14, ~20:00 UTC)
+- Palettes: night #02070A / #0297DE / #FC734D, day #FCFFFF / #0593C6 / #D83995. Blue = action (dark label, white fails contrast), third colour = attention only.
+- Landing rebuilt after a Fable audit (.taste-skill/fable-audit.md): no fake window chrome, glows or mega-menu; natural section heights; Geist; shorter instructional copy; hero books window with engine-graded picks and profit count-down; workbench demo applies the Verizon fix with real engine figures.
+- Guided cases: new pure module src/core/coach.ts gives the single next step (problem, action, rows to mark) from the same checks that grade the file; "Show me the row"; feedback now states the difference/profit change.
+- Motion: difference tick, staggered check results, coach target pulse; all off under prefers-reduced-motion.
+- Checked: 99 unit tests (5 new coach tests incl. "following the coach solves both cases"), 52 e2e checks.
+- Design gate of the taste skill: fails on section-height rules by decision (forced one-screen sections left dead space).

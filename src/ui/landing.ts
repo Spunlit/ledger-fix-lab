@@ -28,7 +28,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
   return `
   <section class="path-sec" id="practice" aria-labelledby="path-h">
     <h1 id="path-h">Your practice desk</h1>
-    <p class="path-sub">For freelancers and small-business owners who keep their own books, and anyone training to keep them for clients.</p>
+    <p class="path-sub">Two guided cases, then a new file every day. Your skill record appears after the first file without hints.</p>
     <div class="path">
       ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
       ${step('2', `#/case/${CASES[1].id}`, CASES[1].title, 'Guided, 10 min. The full reconciliation.', d2, d1 && !d2)}

@@ -2,6 +2,7 @@ import { CATEGORIES, category } from '../core/categories';
 import { clues } from '../core/clues';
 import { canUndo, checkAll, initialState, isLocked, statementLines, type CheckReport } from '../core/engine';
 import { explain, shortDate, SKILL_LABEL } from '../core/explain';
+import { coachStep, type CoachStep } from '../core/coach';
 import { progress, type Feedback, type Progress } from '../core/feedback';
 import { MATCH_WINDOW_DAYS, matchRows, type RowMatch } from '../core/match';
 import { formatCents, formatSignedCents } from '../core/money';
@@ -136,6 +137,9 @@ interface View {
   /** Rows and bank lines the open hint points at. */
   hintEntries: Set<string>;
   hintLines: Set<string>;
+  /** Rows and bank lines the coach's current step is about (guided cases). */
+  coachEntries: Set<string>;
+  coachLines: Set<string>;
   /** After a check: the cell that fails, per row. Empty before the first check. */
   badAmount: Set<string>;
   badCategory: Set<string>;
@@ -169,6 +173,7 @@ export function renderWorkbench(ui: CaseUI): string {
   const cl = clues(s, state);
   const showHint = guided && ui.hintOpen && cl.length > 0;
   const solved = ui.checked && report.ok;
+  const step: CoachStep | null = guided && !solved ? coachStep(s, state, report) : null;
   const prog = guided ? progress(s, initialState(s), state) : null;
   const hasOutstanding = r.outstandingPaymentsCents !== 0 || r.depositsInTransitCents !== 0;
   const teaser = s.note.paragraphs[1] ?? s.note.paragraphs[0];
@@ -187,6 +192,8 @@ export function renderWorkbench(ui: CaseUI): string {
     bookCols: 4 + (tools.has('cleared') ? 1 : 0),
     hintEntries: new Set(showHint ? cl.flatMap((c) => c.entryIds) : []),
     hintLines: new Set(showHint ? cl.flatMap((c) => c.txnIds) : []),
+    coachEntries: new Set(step?.entryIds ?? []),
+    coachLines: new Set(step?.txnIds ?? []),
     badAmount: failing(report.amounts.wrong),
     badCategory: failing(report.categories.wrong),
     badCleared: failing(report.cleared.wrong),
@@ -215,7 +222,7 @@ export function renderWorkbench(ui: CaseUI): string {
         <span class="op" aria-hidden="true">−</span>
         <div class="fig"><span class="fig-label">Books</span><strong class="num">${formatCents(r.bookBalanceCents)}</strong></div>
         <span class="op" aria-hidden="true">=</span>
-        <div class="fig diff ${report.balanced ? 'zero' : 'off'}" data-testid="difference"><span class="fig-label">Difference</span><strong class="num">${formatSignedCents(r.differenceCents)}</strong></div>
+        <div class="fig diff ${report.balanced ? 'zero' : 'off'} ${before ? 'tick' : ''}" data-testid="difference"><span class="fig-label">Difference</span><strong class="num">${formatSignedCents(r.differenceCents)}</strong></div>
       </div>
       <button type="button" class="math-toggle" data-act="toggle-math" aria-expanded="${ui.mathOpen}" aria-controls="math"><span class="q" aria-hidden="true">?</span><span class="lbl">${ui.mathOpen ? 'Hide the math' : 'How is this calculated?'}</span></button>
     </section>
@@ -226,7 +233,13 @@ export function renderWorkbench(ui: CaseUI): string {
       }
 
     <section class="coach ${solved ? 'is-done' : ''}" aria-live="polite">
-      ${solved ? '' : `<p class="next">${esc(coachText(report, pairs))}</p>`}
+      ${
+        solved
+          ? ''
+          : step && prog
+            ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${esc(step.title)}</p><p class="next-a">${esc(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p></div>`
+            : `<p class="next">${esc(coachText(report, pairs))}</p>`
+      }
       ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}
       ${showHint ? `<p class="hint">${esc(cl[0].text)}</p>` : ''}
     </section>
@@ -278,7 +291,7 @@ function renderPairs(v: View, s: Scenario, pairs: PairRow[], bookBalanceCents: n
 }
 
 function renderPair(v: View, { entry: e, line: l }: PairRow): string {
-  const hint = `${e && v.hintEntries.has(e.entryId) ? 'hl-b' : ''} ${l && v.hintLines.has(l.txnId) ? 'hl-k' : ''}`;
+  const hint = `${e && v.hintEntries.has(e.entryId) ? 'hl-b' : ''} ${l && v.hintLines.has(l.txnId) ? 'hl-k' : ''} ${(e && v.coachEntries.has(e.entryId)) || (l && v.coachLines.has(l.txnId)) ? 'co-t' : ''}`;
   if (e && l) {
     return `<tr class="pair matched ${v.joined.has(e.entryId) ? 'joined' : ''} ${rowState(v, e)} ${hint}" data-entry="${esc(e.entryId)}" data-line="${esc(l.txnId)}" data-amt="${e.amountCents}">
       ${bookCells(v, e)}

@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 49; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 52; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -108,7 +108,7 @@ async function main() {
   await click('[data-hero-pick=E14]');
   ok((await text('[data-hero-pick=E14] small')).includes('checks out') && (await text('[data-hero-task]')).includes("hasn't cleared"), 'checking the uncleared check: it checks out, real but not cleared');
   await click('[data-hero-pick=E06]');
-  await sleep(300);
+  await sleep(1200);
   ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return $('[data-hero-pick=E06]').classList.contains('is-liar')`)), 'catching the owner transfer: line marked, profit corrected to $5,410.76');
   ok((await text('[data-testid=hero-verdict]')).includes("owner's money, not a sale"), 'verdict explains the lesson');
   await click('[data-theme-toggle]');
@@ -122,10 +122,12 @@ async function main() {
   ok((await diff()) === '+$412.50', `case 1 starts at +$412.50 (got ${await diff()})`);
   ok((await js(`return document.querySelectorAll('[data-clear], [data-edit], [data-record]').length`)) === 0, 'case 1 shows only delete and category tools');
   ok((await cls('integrity')) === 'absent', 'review hidden before the first check');
+  ok((await text('[data-testid=coach]')).includes('in the books twice') && (await js(`return document.querySelectorAll('tr.co-t').length`)) === 2, 'coach names the first problem and marks both copies of the doubled row');
   await click('[data-act=toggle-hint]');
   ok((await clue()).includes('3 ticked rows'), 'hint points at the three $412.50 rows');
   await click('[data-del=E14]');
   ok((await diff()) === '$0.00' && (await toast()).includes('real'), 'deleting the real payment: $0.00 and an instant warning');
+  ok((await text('[data-testid=coach]')).includes('Undo'), 'coach asks to undo the deleted real payment');
   await click('[data-act=check]');
   const integ = await text('[data-testid=check-integrity]');
   ok(integ.includes('Missing') && integ.includes('Duplicate'), 'review names the missing payment and the duplicate');
@@ -133,7 +135,8 @@ async function main() {
   await click('[data-act=undo]');
   ok((await diff()) === '+$412.50' && (await js(`return !!$('tr[data-entry=E14]')`)), 'undo restores the deleted row');
   await click('[data-del=E10]');
-  ok((await toast()).includes('1 of 3'), 'deleting the duplicate: instant "Fixed, 1 of 3"');
+  ok((await toast()).includes('1 of 3') && (await toast()).includes('$412.50 to $0.00'), 'deleting the duplicate: "Fixed", the difference change and 1 of 3');
+  ok((await text('[data-testid=coach]')).includes('Problem 2 of 3'), 'coach moves to the next problem');
   await choose('select[data-cat=E03]', 'software');
   await choose('select[data-cat=E11]', 'car');
   ok((await diff()) === '$0.00' && (await js(`return !!$('[data-testid=success]')`)), 'case 1 solved: success panel shown');
@@ -179,7 +182,7 @@ async function main() {
   await go('#/daily');
   ok((await text('.badge')).startsWith('File of the day') && !(await js(`return !!$('[data-act=toggle-hint]')`)), 'file of the day opens in exam mode (no hint button)');
   await js(`$('tr[data-entry] [data-del]').click()`);
-  ok(!(await js(`return !!$('[data-testid=feedback]')`)), 'no instant feedback in exam mode');
+  ok(!(await js(`return !!$('[data-testid=feedback]')`)) && !(await js(`return !!$('[data-testid=coach]') || !!$('tr.co-t')`)), 'no instant feedback and no coach in exam mode');
   await click('[data-act=check]');
   ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
 

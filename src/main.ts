@@ -189,6 +189,16 @@ app.addEventListener('click', (ev) => {
     case 'toggle-math':
       ui.mathOpen = !ui.mathOpen;
       return render();
+    case 'show-target': {
+      const row = app.querySelector<HTMLElement>('tr.co-t');
+      if (row) {
+        row.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
+        row.classList.remove('co-look');
+        void row.offsetWidth; // restart the pulse
+        row.classList.add('co-look');
+      }
+      return;
+    }
     case 'toggle-hint':
       ui.hintOpen = !ui.hintOpen;
       return render();

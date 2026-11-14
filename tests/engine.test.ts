@@ -70,7 +70,7 @@ describe('scenarios', () => {
   });
 });
 
-describe('case 1 — duplicates', () => {
+describe('case 1, duplicates', () => {
   it('reference and equivalent solutions pass', () => {
     expect(report(run(CASE_1, C1_SOLVE)).ok).toBe(true);
     expect(report(run(CASE_1, [...C1_FIX_CATS, { type: 'delete', entryId: 'E09' }])).ok).toBe(true);
@@ -112,7 +112,7 @@ describe('case 1 — duplicates', () => {
   });
 });
 
-describe('case 2 — balanced, but wrong', () => {
+describe('case 2, balanced, but wrong', () => {
   it('reference solution passes with the right numbers', () => {
     const s = run(CASE_2, C2_SOLVE);
     const r = report(s);
@@ -182,7 +182,7 @@ describe('case 2 — balanced, but wrong', () => {
     expect(r.categories.booked.netIncomeCents - r.categories.correct.netIncomeCents).toBe(-150000);
   });
 
-  it('exhaustive: deletes × fee recorded × ticks — only the two equivalent states pass', () => {
+  it('exhaustive: deletes × fee recorded × ticks, only the two equivalent states pass', () => {
     const base = run(CASE_2, [...C2_FIX_VERIZON, C2_FIX_TRANSFER]).state;
     const fee = run(CASE_2, [C2_RECORD_FEE]).state.entries.at(-1)!;
     const toggles = ['E03', 'E08', 'E09', 'E14'];

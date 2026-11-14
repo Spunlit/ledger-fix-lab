@@ -12,7 +12,7 @@ function step(s: Scenario, prior: Action[], action: Action) {
 
 describe('instant feedback in guided cases', () => {
   it('case 1: deleting the duplicate copy is progress', () => {
-    expect(step(CASE_1, [], { type: 'delete', entryId: 'E10' })).toEqual({ tone: 'good', text: 'Fixed. 1 of 3 problems done.' });
+    expect(step(CASE_1, [], { type: 'delete', entryId: 'E10' })).toEqual({ tone: 'good', text: 'Fixed. Difference $412.50 to $0.00. 1 of 3 problems done.' });
   });
 
   it('case 1: deleting the real Oct 29 payment warns immediately', () => {
@@ -32,7 +32,7 @@ describe('instant feedback in guided cases', () => {
 
   it('case 1: the last fix says to confirm with Check', () => {
     const f = step(CASE_1, [{ type: 'delete', entryId: 'E10' }, { type: 'recategorize', entryId: 'E03', category: 'software' }], { type: 'recategorize', entryId: 'E11', category: 'car' });
-    expect(f?.text).toMatch(/All fixed/);
+    expect(f?.text).toMatch(/last one: press Check the books/);
   });
 
   it('case 2: deleting the outstanding check warns that it is real but uncleared', () => {

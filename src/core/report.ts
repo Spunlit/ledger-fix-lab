@@ -6,7 +6,7 @@ import type { LedgerState, Scenario } from './types';
 
 /**
  * The cleanup summary a bookkeeper hands the client. Built by comparing the books as handed over
- * with the books now, transaction by transaction — so it describes the end state, whatever order
+ * with the books now, transaction by transaction, so it describes the end state, whatever order
  * the user worked in.
  */
 export interface CleanupItem {
