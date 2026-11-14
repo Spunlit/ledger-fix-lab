@@ -308,3 +308,19 @@ h2 { font: 400 clamp(36px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing: -0.02
     radial-gradient(52% 70% at 58% 64%, rgb(216 57 149 / .5) 0%, rgb(216 57 149 / 0) 100%),
     linear-gradient(180deg, #2AA7D8 0%, #0593C6 48%, #58C2EA 100%); }
 :root[data-theme="light"] .close-media .sky-glow { background: radial-gradient(34% 40% at 50% 74%, rgb(255 180 130 / .95) 0%, rgb(216 57 149 / .85) 40%, rgb(216 57 149 / 0) 100%), linear-gradient(180deg, #0593C6, #46B7E4); }
+
+/* v16.4 (night): the light is one scene for the whole hero. It starts behind the headline, is brightest
+   under the card, and dissolves at both ends, so the first screen is lit and nothing is cut. */
+:root:not([data-theme="light"]) .hero { position: relative; isolation: isolate; }
+:root:not([data-theme="light"]) .hero-copy { position: relative; z-index: 2; }
+:root:not([data-theme="light"]) .vista { overflow: visible; background: none; --in: 0px !important; --r: 0px !important; z-index: 1; height: clamp(420px, 60vh, 560px); margin-top: clamp(20px, 3vh, 40px); padding-top: clamp(24px, 5vh, 56px); }
+:root:not([data-theme="light"]) .vista-media { inset: -620px 0 -120px 0; z-index: -1; -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 68%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 68%, transparent 100%); }
+:root:not([data-theme="light"]) .vista .sky-glow { transform: none; background:
+    radial-gradient(24% 9% at 50% 66%, rgb(255 236 220 / 1) 0%, rgb(252 115 77 / .98) 42%, rgb(252 115 77 / 0) 100%),
+    radial-gradient(42% 17% at 50% 66%, rgb(252 115 77 / .6) 0%, rgb(252 115 77 / 0) 100%),
+    radial-gradient(58% 62% at 50% 66%, rgb(2 151 222 / .95) 0%, rgb(2 124 187 / .58) 34%, rgb(2 60 110 / .22) 64%, rgb(2 7 10 / 0) 100%); }
+:root:not([data-theme="light"]) .vista .sky-rays { -webkit-mask-image: radial-gradient(52% 58% at 50% 66%, #000 0%, rgb(0 0 0 / .5) 55%, transparent 100%); mask-image: radial-gradient(52% 58% at 50% 66%, #000 0%, rgb(0 0 0 / .5) 55%, transparent 100%); }
+:root:not([data-theme="light"]) .vista .sky-stars { -webkit-mask-image: linear-gradient(#000, transparent 45%); mask-image: linear-gradient(#000, transparent 45%); }
+:root:not([data-theme="light"]) .hero { padding-top: clamp(20px, 4vh, 48px); }
+@media (max-width: 1023px) { :root:not([data-theme="light"]) .vista { height: auto; padding-bottom: 60px; } :root:not([data-theme="light"]) .vista-media { inset: -520px 0 -60px 0; } }
+:root:not([data-theme="light"]) .vista { height: auto; padding-bottom: clamp(120px, 20vh, 200px); }
