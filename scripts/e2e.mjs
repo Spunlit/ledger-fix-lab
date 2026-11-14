@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 65; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 66; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -82,7 +82,7 @@ async function main() {
   // '' is the landing page (index.html); '#/...' is a route in the app (app.html).
   const go = async (hash) => {
     await send('Page.navigate', { url: hash ? `${base}app.html${hash}` : base });
-    const ready = hash ? `!!document.querySelector('#app > *')` : `!!document.querySelector('[data-hero-pick]') && document.documentElement.dataset.ready === '1'`;
+    const ready = hash ? `!!document.querySelector('#app > *')` : `!!document.querySelector('h1') && document.documentElement.classList.contains('is-in')`;
     for (let i = 0; i < 50; i++) { if (await evaluate(ready)) break; await sleep(100); }
     await sleep(150);
   };
@@ -102,23 +102,28 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
   const M = '−';
 
-  // ---------- landing page: the live books window ("one line is wrong"), graded by the engine
+  // ---------- landing page: a calling card (no product tables), both themes, links into the app
   await go('');
-  ok((await text('[data-testid=hero-recon]')).includes('$0.00') && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'landing shows the paradox: difference $0.00, profit $10,410.76');
-  await click('[data-hero-pick=E14]');
-  ok((await text('[data-hero-pick=E14] small')).includes('checks out') && (await text('[data-hero-task]')).includes("hasn't cleared"), 'checking the uncleared check: it checks out, real but not cleared');
-  await click('[data-hero-pick=E06]');
-  await sleep(1200);
-  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return $('[data-hero-pick=E06]').classList.contains('is-liar')`)), 'catching the owner transfer: line marked, profit corrected to $5,410.76');
-  ok((await text('[data-testid=hero-verdict]')).includes("owner's money, not a sale"), 'verdict explains the lesson');
+  ok((await text('h1')).includes('Books that balance') && (await js(`return document.querySelectorAll('main table, main .lf-win').length`)) === 0, 'landing is a calling card: the headline, no tables');
+  await sleep(1700);
+  ok(await js(`return getComputedStyle($('h1 [data-line]')).transform === 'none' || getComputedStyle($('h1 [data-line]')).transform === 'matrix(1, 0, 0, 1, 0, 0)'`), 'the headline has finished its entrance');
   await click('[data-theme-toggle]');
   ok((await evaluate('document.documentElement.dataset.theme')) === 'light' && (await evaluate(`localStorage.getItem('ledger-fix-lab:theme')`)) === 'light', 'landing day/night switch works and is remembered');
   await click('[data-theme-toggle]');
-  ok((await js(`return [...document.querySelectorAll('a[href^="app.html"]')].length`)) >= 6, 'landing links into the app');
+  ok((await js(`return [...document.querySelectorAll('a[href^="app.html"]')].length`)) >= 10, 'landing links into the app');
   await shot('0-home', false);
 
   // ---------- case 1 (guided: instant feedback, delete + category only)
   await go('#/case/maple-pine-oct');
+  await sleep(900);
+  ok((await text('[data-testid=tour] .tour-n')) === '1 of 7' && (await text('[data-testid=tour] .tour-t')).includes('You are the bookkeeper'), 'first visit to a guided case starts the tour');
+  await click('[data-tour=next]');
+  await click('[data-tour=next]');
+  await sleep(900);
+  ok((await text('[data-testid=tour] .tour-t')).includes('next to the bank') && (await js(`const h = $('.tour-hole').getBoundingClientRect(); return h.width > 200 && h.height > 100`)), 'the tour lights the books-and-bank table and explains it');
+  for (let k = 0; k < 5; k++) await click('[data-tour=next]');
+  await sleep(400);
+  ok(!(await js(`return !!$('.tour')`)) && (await evaluate(`localStorage.getItem('ledger-fix-lab:v16:tour-seen')`)) === '1' && (await js(`return !!$('[data-act=tour]')`)), 'the tour ends, is remembered, and can be replayed from the header');
   ok((await diff()) === '+$412.50', `case 1 starts at +$412.50 (got ${await diff()})`);
   ok((await js(`return document.querySelectorAll('[data-clear], [data-edit], [data-record]').length`)) === 0, 'case 1 shows only delete and category tools');
   ok((await cls('integrity')) === 'absent', 'review hidden before the first check');

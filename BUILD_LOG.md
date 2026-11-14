@@ -166,3 +166,10 @@
 - Landing hero rebuilt in that manner: centred serif headline "Books that balance can still be wrong.", honest side figures (7 kinds, 4 checks, 900 generated files tested, $0 to start), the live books window rising out of the burst. Day theme: sky blue, pink bloom, frosted window. Sections and the close carry the same light, quieter.
 - Type: Instrument Serif (display) + Inter (text) + Geist Mono (labels), in the app too (page titles serif, interface Inter).
 - Checked: 112 unit tests, 65 e2e checks.
+
+## v16 (Nov 14, ~22:30 UTC)
+- Landing rebuilt as a calling card (founder: no tables on the start page): headline, one framed light scene, a statement, three steps, seven mistakes, pricing, questions. Self-contained CSS; the design kit (public/kit) is removed.
+- Motion written for the page, after an MIT template the founder liked (ideas only, no code copied, no GSAP): headline lines rise from a mask, the scene frame opens on scroll, words light up, blocks rise, pills roll and lean to the pointer, nav pill slides.
+- Day theme in that template manner: white page, ink text, black pills, the sky-blue and pink scene inside the frame.
+- New: first-visit tour of the workbench (src/ui/tour.ts): 7 steps, lit target, Next/Back/Skip, keys, replay from the header.
+- Checked: 112 unit tests, 66 e2e checks.

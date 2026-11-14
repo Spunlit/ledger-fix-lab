@@ -215,6 +215,7 @@ export function renderWorkbench(ui: CaseUI): string {
       <h1>${esc(s.kind === 'case' ? s.title : s.business)}</h1>
       <span class="wb-sub">${esc(s.kind === 'case' ? `${s.business}, ${s.period}` : s.period)}</span>
     </div>
+    ${guided ? '<button type="button" class="btn ghost small tour-btn" data-act="tour" title="Show the tour again">Tour</button>' : ''}
     <button type="button" class="btn ghost small reset" data-act="reset" ${canUndo(ui.session) ? '' : 'disabled'} aria-label="Start over" title="Start over">${ICON.reset}<span>Start over</span></button>
     ${themeButton(loadTheme())}
   </header>

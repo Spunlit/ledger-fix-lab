@@ -15,6 +15,7 @@ import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
+import { startTour, tourSeen } from './ui/tour';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
 import { saveDrillRun } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
@@ -127,6 +128,8 @@ function route(): void {
     document.title = `${scenario.kind === 'case' ? `${scenario.badge}: ${scenario.title}` : `${scenario.badge}: ${scenario.business}`} | Ledger Fix Lab`;
     render();
     if (changed) window.scrollTo(0, 0);
+    // First time in a guided case: a short tour of the screen (it can be replayed from the header).
+    if (changed && isGuided(scenario) && !tourSeen()) setTimeout(() => startTour(), 350);
   } else {
     currentId = null;
     renderHome();
@@ -234,6 +237,9 @@ app.addEventListener('click', (ev) => {
     case 'toggle-note':
       ui.noteOpen = !ui.noteOpen;
       return render();
+    case 'tour':
+      window.scrollTo(0, 0);
+      return startTour();
     case 'tab-books':
     case 'tab-bank':
       ui.tab = d.act === 'tab-bank' ? 'bank' : 'books';

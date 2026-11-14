@@ -12,9 +12,8 @@ Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have 
 but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
 
 ## For judges: a 2-minute tour
-1. **Landing page:** in the books window, click the line that is booked wrong. The books match the bank to $0.00, yet
-   profit is $5,000 too high; catch it and the profit counts down to the true figure. Graded by the real engine on
-   case 2's books.
+1. **Landing page:** a calling card: what it is, three steps, the seven mistakes, pricing. Day/night switch.
+   **Start the free case** opens case 1 with a 30-second tour that lights each part of the screen and explains it.
 2. **Warm-up drill** (`app.html#/drill`, best on a phone): five one-tap rounds, "tap the line that is wrong". Rounds are
    cut from generated files and answered by the same checks that grade full files.
 3. **Case 2 ("Balanced, but wrong"):** a coach names one problem at a time, the row it is about and what to click;
@@ -76,7 +75,7 @@ npm install
 npm run dev                 # local dev server
 npm test                    # 112 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 65 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 66 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.
@@ -85,7 +84,7 @@ CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub 
 - `src/core/` — pure engine, no DOM: `engine.ts` (actions, undo, reconciliation, checks, validation),
   `scenarios.ts` (the two cases), `generator.ts` (generated files), `skills.ts` (skill record), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
   `coach.ts` (next step for guided cases), `drill.ts` (warm-up rounds), `feedback.ts`, `match.ts`.
-- `index.html`, `src/landing.*` — the landing page (static, on the MIT design kit in `public/kit`).
+- `index.html`, `src/landing.*` — the landing page (static, self-contained CSS and a small script).
 - `app.html`, `src/main.ts`, `src/ui/`, `src/*.css` — the trainer (vanilla TypeScript, hash routes). Fonts: Manrope + Inter via Google Fonts. `guide.ts` is the field guide (also the coach's "Why?").
 - `tests/` — Vitest; `scripts/e2e.mjs` — browser checks.
 - `pitch/` — pitch deck source and PDF.

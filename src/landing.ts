@@ -1,22 +1,20 @@
 /**
- * The landing page's scripts: the hero's "which line is booked wrong" check, graded by the real engine
- * (heroVerdict runs the category check on case 2), the day/night switch shared with the app, and two
- * small motions: the profit counting to its corrected value, and the workbench demo applying one fix.
+ * The landing page's script: the day/night switch shared with the app, tappable glossary words, and
+ * the page's motion (written here, no animation library): the headline's lines rise out of a mask on
+ * load, the scene's frame opens to full width as it scrolls, the statement's words light up as they
+ * pass, blocks rise once when they enter, pills lean toward the pointer. All of it rests under
+ * prefers-reduced-motion.
  */
-import { formatCents } from './core/money';
-import { heroVerdict } from './ui/hero';
 import { glossElement, initTerms } from './ui/terms';
 
-initTerms('app.html#/guide/words');
-document.querySelectorAll<HTMLElement>('[data-gloss]').forEach(glossElement);
-
-const THEME_KEY = 'ledger-fix-lab:theme';
 const root = document.documentElement;
-const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+// ---------- theme
+const THEME_KEY = 'ledger-fix-lab:theme';
 function setTheme(t: 'dark' | 'light') {
   root.dataset.theme = t;
-  root.dataset.tone = t;
   try { localStorage.setItem(THEME_KEY, t); } catch { /* storage blocked: the switch still works for this visit */ }
   document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((b) => b.setAttribute('aria-label', t === 'dark' ? 'Switch to day mode' : 'Switch to night mode'));
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', t === 'dark' ? '#02070A' : '#FCFFFF');
@@ -26,143 +24,118 @@ document.addEventListener('click', (e) => {
   if ((e.target as Element).closest('[data-theme-toggle]')) setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 });
 
-/** Count a money figure from one value to another; the final text is always the exact target. */
-function countTo(el: HTMLElement, from: number, to: number, ms = 700) {
-  if (calm()) { el.textContent = formatCents(to); return; }
-  const t0 = performance.now();
-  const step = (now: number) => {
-    const k = Math.min(1, (now - t0) / ms);
-    el.textContent = formatCents(k === 1 ? to : Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))));
-    if (k < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
+// ---------- plain words
+initTerms('app.html#/guide/words');
+document.querySelectorAll<HTMLElement>('[data-gloss]').forEach(glossElement);
 
-const tried = new Set<string>();
-let caught = false;
+// ---------- intro: one orchestrated entrance
+document.querySelectorAll<HTMLElement>('[data-intro]').forEach((el, i) => el.style.setProperty('--i', String(i)));
+requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-in')));
 
-function pick(btn: HTMLButtonElement) {
-  if (caught) return;
-  const id = btn.dataset.heroPick!;
-  if (tried.has(id)) return;
-  tried.add(id);
-  const v = heroVerdict(id);
-  const small = btn.querySelector('.lf-desc small')!;
-  const cat = small.textContent ?? '';
-  const task = document.querySelector<HTMLElement>('[data-hero-task]')!;
-  if (!v.caught) {
-    btn.classList.add('is-honest');
-    btn.disabled = true;
-    small.innerHTML = `${cat}, <em>checks out</em>`;
-    task.innerHTML = `<b>Not that one.</b> It is a ${v.why}. Try another line.`;
-    task.classList.add('is-miss');
-    return;
+// ---------- the statement: split into words that light up with the scroll
+const say = document.querySelector<HTMLElement>('[data-words]');
+const words: HTMLElement[] = [];
+if (say) {
+  const text = say.textContent ?? '';
+  say.setAttribute('aria-label', text);
+  say.textContent = '';
+  for (const w of text.split(/\s+/).filter(Boolean)) {
+    const s = document.createElement('span');
+    s.className = 'w';
+    s.setAttribute('aria-hidden', 'true');
+    s.textContent = `${w} `;
+    say.append(s);
+    words.push(s);
   }
-  caught = true;
-  btn.classList.add('is-liar');
-  small.innerHTML = `<s>${cat}</s> <em>Owner's contribution</em>`;
-  document.querySelectorAll<HTMLButtonElement>('[data-hero-pick]').forEach((b) => (b.disabled = true));
-  task.classList.add('is-caught');
-  task.setAttribute('data-testid', 'hero-verdict');
-  task.innerHTML = `<b>That is the one.</b> Dani moved her own savings in: owner's money, not a sale. Moved to Owner's contribution, and profit drops by $5,000. Matching the bank never shows this.`;
-  const total = document.querySelector<HTMLElement>('[data-hero-card]')!;
-  total.classList.add('is-caught');
-  total.querySelector<HTMLElement>('[data-hero-was]')!.hidden = false;
-  countTo(total.querySelector<HTMLElement>('[data-testid=hero-profit]')!, v.before, v.after);
+  if (calm) words.forEach((w) => w.classList.add('on'));
 }
 
-document.addEventListener('click', (e) => {
-  const btn = (e.target as Element).closest<HTMLButtonElement>('[data-hero-pick]');
-  if (btn) pick(btn);
-});
-
-/* The workbench demo: applies the Verizon fix once when it scrolls into view, with the engine's real
-   figures (before: bank $17,022.00, books $17,121.37; after fixing the amount and marking it cleared:
-   bank $17,070.37, books $17,085.37, difference $15.00). */
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-async function fixDemo(box: HTMLElement) {
-  const q = (s: string) => box.querySelector<HTMLElement>(s)!;
-  const instant = calm();
-  if (!instant) await sleep(900);
-  const b1 = q('[data-fix-btn]');
-  b1.classList.add('is-pressed');
-  if (!instant) await sleep(180);
-  b1.classList.remove('is-pressed');
-  b1.classList.add('is-done');
-  q('[data-fix-amount]').textContent = '−$84.37';
-  q('[data-fix-books]').classList.add('is-fixed');
-  countTo(q('[data-fix-booksbal]'), 1712137, 1708537, 500);
-  if (!instant) await sleep(800);
-  const b2 = q('[data-fix-btn2]');
-  b2.classList.add('is-pressed');
-  if (!instant) await sleep(180);
-  b2.classList.remove('is-pressed');
-  b2.classList.add('is-done');
-  countTo(q('[data-fix-bank]'), 1702200, 1707037, 500);
-  countTo(q('[data-fix-diff]'), 9937, 1500, 600);
-  const chip = q('[data-fix-chip]');
-  chip.textContent = 'Matched';
-  chip.className = 'chip chip--ok';
-  const lc = document.querySelector<HTMLElement>('[data-fix-listchip]');
-  if (lc) { lc.textContent = 'Matched'; lc.className = 'lf-ok'; }
-}
-
-const io: IntersectionObserver | null = 'IntersectionObserver' in window
-  ? new IntersectionObserver((entries, obs) => {
-      for (const en of entries) {
-        if (!en.isIntersecting) continue;
-        obs.unobserve(en.target);
-        en.target.classList.add('lf-in');
-        const demo = (en.target as HTMLElement).querySelector<HTMLElement>('[data-fix-demo]');
-        if (demo) void fixDemo(demo);
-      }
-    }, { threshold: 0.45 })
-  : null;
-document.querySelectorAll<HTMLElement>('.lf-app, .lf-card--wide').forEach((el) => {
-  if (!io) { el.classList.add('lf-in'); return; }
-  el.classList.add('lf-reveal');
-  io.observe(el);
-});
-
-/* ---------- light and depth (landing-fx.css): pointer-lit surfaces, a slight tilt on the books window,
-   and one reveal per block as it scrolls into view */
-const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-if (fine) {
-  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    }, { passive: true });
-  });
-  const tryBox = document.querySelector<HTMLElement>('.lf-try');
-  const win = tryBox?.querySelector<HTMLElement>('.lf-win');
-  if (tryBox && win && !calm()) {
-    tryBox.addEventListener('pointermove', (e) => {
-      const r = tryBox.getBoundingClientRect();
-      win.style.setProperty('--ry', `${(((e.clientX - r.left) / r.width) - 0.5) * 3}deg`);
-      win.style.setProperty('--rx', `${(0.5 - ((e.clientY - r.top) / r.height)) * 2}deg`);
-    }, { passive: true });
-    tryBox.addEventListener('pointerleave', () => { win.style.setProperty('--ry', '0deg'); win.style.setProperty('--rx', '0deg'); });
+// ---------- scroll: nav state, the frame opening, the words
+const nav = document.querySelector<HTMLElement>('[data-nav]');
+const vista = document.querySelector<HTMLElement>('[data-vista]');
+const media = document.querySelector<HTMLElement>('[data-vista-media]');
+let ticking = false;
+function onScroll() {
+  ticking = false;
+  const vh = window.innerHeight;
+  nav?.classList.toggle('is-scrolled', window.scrollY > 12);
+  if (vista && media && !calm) {
+    const r = vista.getBoundingClientRect();
+    // 0 while the frame's top is low on the screen, 1 when it has reached the top third
+    const p = Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (vh * 0.62)));
+    const inset = window.innerWidth < 640 ? 12 : 24;
+    vista.style.setProperty('--in', `${(inset * (1 - p)).toFixed(1)}px`);
+    vista.style.setProperty('--r', `${(20 * (1 - p)).toFixed(1)}px`);
+    media.style.setProperty('--sc', (1.16 - 0.16 * p).toFixed(3));
+  }
+  if (say && words.length && !calm) {
+    const r = say.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (vh * 0.82 - r.top) / (r.height + vh * 0.32)));
+    const lit = Math.round(p * words.length);
+    words.forEach((w, i) => w.classList.toggle('on', i < lit));
   }
 }
+window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+window.addEventListener('resize', onScroll);
+onScroll();
+
+// ---------- blocks rise once when they enter
 const rv = [...document.querySelectorAll<HTMLElement>('[data-rv]')];
-if ('IntersectionObserver' in window) {
-  const seen = new IntersectionObserver((entries, obs) => {
+if ('IntersectionObserver' in window && !calm) {
+  const io = new IntersectionObserver((entries, obs) => {
     for (const en of entries) {
       if (!en.isIntersecting) continue;
       obs.unobserve(en.target);
       en.target.classList.add('is-seen');
     }
-  }, { threshold: 0.25 });
+  }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
   rv.forEach((el) => {
     const sibs = [...(el.parentElement?.children ?? [])].filter((c) => c.hasAttribute('data-rv'));
-    el.style.setProperty('--rv-d', `${sibs.indexOf(el) * 0.08}s`);
-    seen.observe(el);
+    el.style.setProperty('--d', `${Math.min(sibs.indexOf(el), 6) * 0.08}s`);
+    io.observe(el);
   });
 } else rv.forEach((el) => el.classList.add('is-seen'));
 
-/* The bar is clear over the hero's sky and turns solid once the page scrolls. */
-const onScroll = () => root.classList.toggle('is-scrolled', window.scrollY > 24);
-window.addEventListener('scroll', onScroll, { passive: true });
-onScroll();
+// ---------- pointer: the sliding pill under nav links, magnetic pills, a drift in the scene, lit cards
+if (fine && !calm) {
+  const links = document.querySelector<HTMLElement>('[data-links]');
+  if (links) {
+    links.querySelectorAll<HTMLElement>('a').forEach((a) => {
+      a.addEventListener('pointerenter', () => {
+        links.style.setProperty('--lx', `${a.offsetLeft}px`);
+        links.style.setProperty('--lw', `${a.offsetWidth}px`);
+        links.style.setProperty('--lo', '1');
+      });
+    });
+    links.addEventListener('pointerleave', () => links.style.setProperty('--lo', '0'));
+  }
+  document.querySelectorAll<HTMLElement>('[data-magnet]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${((e.clientX - r.left - r.width / 2) * 0.22).toFixed(1)}px`);
+      el.style.setProperty('--my', `${((e.clientY - r.top - r.height / 2) * 0.3).toFixed(1)}px`);
+    });
+    el.addEventListener('pointerleave', () => { el.style.setProperty('--mx', '0px'); el.style.setProperty('--my', '0px'); });
+  });
+  if (vista) {
+    const floats = [...vista.querySelectorAll<HTMLElement>('[data-float]')];
+    vista.addEventListener('pointermove', (e) => {
+      const r = vista.getBoundingClientRect();
+      const nx = (e.clientX - r.left) / r.width - 0.5;
+      const ny = (e.clientY - r.top) / r.height - 0.5;
+      floats.forEach((f) => {
+        const d = Number(f.dataset.float) || 1;
+        f.style.setProperty('--fx', `${(nx * d * 14).toFixed(1)}px`);
+        f.style.setProperty('--fy', `${(ny * d * 10).toFixed(1)}px`);
+      });
+    });
+    vista.addEventListener('pointerleave', () => floats.forEach((f) => { f.style.setProperty('--fx', '0px'); f.style.setProperty('--fy', '0px'); }));
+  }
+  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--px', `${e.clientX - r.left}px`);
+      el.style.setProperty('--py', `${e.clientY - r.top}px`);
+    }, { passive: true });
+  });
+}
