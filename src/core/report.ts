@@ -28,7 +28,7 @@ export function cleanupReport(s: Scenario, final: LedgerState): CleanupReport {
     const after = final.entries.filter((e) => e.txnId === t.txnId);
     const label = `${t.description}, ${shortDate(t.date)}`;
     if (before.length > after.length && after.length > 0) {
-      items.push({ kind: 'duplicate', text: `Removed a duplicate entry for ${label} (${formatCents(t.amountCents)}). It was recorded ${before.length} times.` });
+      items.push({ kind: 'duplicate', text: `Removed a duplicate entry for ${label} (${formatCents(t.amountCents)}). It was recorded ${before.length === 2 ? "twice" : `${before.length} times`}.` });
     }
     if (before.length === 0 && after.length > 0) {
       items.push({ kind: 'recorded', text: `Recorded ${label} (${formatCents(t.amountCents)}) from the bank statement. It was missing from the books.` });

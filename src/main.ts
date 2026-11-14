@@ -1,173 +1,178 @@
 import './style.css';
-import { CATEGORIES, isCategoryId } from './core/categories';
-import { applyAction, canUndo, checkAll, createSession, reset, undo, type CheckReport } from './core/engine';
-import { explain, shortDate } from './core/explain';
-import { formatCents, formatSignedCents } from './core/money';
-import { SCENARIO_1 } from './core/scenario';
-import type { Action, Session } from './core/types';
-
-// UI state lives here; all ledger logic lives in ./core (pure, unit-tested).
-let session: Session = createSession(SCENARIO_1);
-/** Detailed check results are revealed after the first "Check my books", then stay live. */
-let checked = false;
+import { isCategoryId } from './core/categories';
+import { applyAction, checkAll, createSession, reset, undo } from './core/engine';
+import { cleanupReport, reportText } from './core/report';
+import { caseById } from './core/scenarios';
+import type { Action } from './core/types';
+import { renderLanding } from './ui/landing';
+import { loadCompleted, parseDollarsToCents, saveCompleted } from './ui/util';
+import { newCaseUI, renderWorkbench, type CaseUI } from './ui/workbench';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+const cases = new Map<string, CaseUI>();
+let completed = loadCompleted();
+let currentId: string | null = null;
 
-const esc = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+function current(): CaseUI | null {
+  return currentId ? cases.get(currentId) ?? null : null;
+}
 
-function dispatch(action: Action): void {
-  session = applyAction(session, action);
-  render();
+function route(): void {
+  const m = /^#\/case\/([\w-]+)/.exec(location.hash);
+  const scenario = m ? caseById(m[1]) : undefined;
+  if (scenario) {
+    if (!cases.has(scenario.id)) cases.set(scenario.id, newCaseUI(createSession(scenario)));
+    const changed = currentId !== scenario.id;
+    currentId = scenario.id;
+    document.title = `Case ${scenario.number}: ${scenario.title} · Ledger Fix Lab`;
+    render();
+    if (changed) window.scrollTo(0, 0);
+  } else {
+    currentId = null;
+    document.title = 'Ledger Fix Lab: practice bookkeeping cleanups';
+    app.innerHTML = renderLanding(completed);
+    // In-page anchors (#cases) are handled by the browser; only reset scroll for the home route.
+    if (location.hash === '' || location.hash === '#/') window.scrollTo(0, 0);
+  }
+}
+
+/** Remember a case as completed whenever a checked case is fully correct (also when fixed after a check). */
+function persistIfSolved(ui: CaseUI): void {
+  const s = ui.session.scenario;
+  if (ui.checked && !completed[s.id] && checkAll(s, ui.session.state).ok) {
+    completed = { ...completed, [s.id]: { at: new Date().toISOString(), checksRun: ui.checksRun } };
+    saveCompleted(completed);
+  }
 }
 
 function render(): void {
-  const { scenario, state } = session;
-  const report = checkAll(scenario, state);
-  const diff = report.balance.differenceCents;
-  const wrongCat = new Set(checked ? report.categories.wrong.map((w) => w.entry.entryId) : []);
-
-  app.innerHTML = `
-  <header class="top">
-    <div class="brand">
-      <span class="logo" aria-hidden="true">✓</span>
-      <div>
-        <h1>Ledger Fix Lab</h1>
-        <p class="tag">Practice fixing the books before you touch real ones.</p>
-      </div>
-    </div>
-    <span class="pill">Synthetic practice data</span>
-  </header>
-
-  <section class="brief card">
-    <h2>${esc(scenario.title)}</h2>
-    <p class="meta">${esc(scenario.business)} · ${esc(scenario.account)} · ${esc(scenario.period)} · ${scenario.currency}</p>
-    <p>The ledger doesn't agree with the bank statement. Clean it up so the books are right, not just balanced.
-    You can <b>delete a row</b> or <b>change its category</b>. Amounts and dates can't be edited.
-    When you think you're done, press <b>Check my books</b>.</p>
-    <p class="note">Simplified reconciliation: one account, no timing differences, no missing entries to add.</p>
-  </section>
-
-  <section class="recon card" aria-live="polite">
-    <div class="figures">
-      <div><span class="label">Statement closing balance</span><span class="num">${formatCents(report.balance.statementBalanceCents)}</span></div>
-      <div><span class="label">Ledger balance</span><span class="num">${formatCents(report.balance.ledgerBalanceCents)}</span></div>
-      <div class="diff ${diff === 0 ? 'zero' : 'off'}" data-testid="difference">
-        <span class="label">Difference</span><span class="num big">${formatSignedCents(diff)}</span>
-      </div>
-    </div>
-    <div class="actions">
-      <button type="button" data-act="undo" ${canUndo(session) ? '' : 'disabled'}>Undo${canUndo(session) ? ` (${session.history.length})` : ''}</button>
-      <button type="button" data-act="reset" ${canUndo(session) ? '' : 'disabled'}>Reset</button>
-      <button type="button" class="primary" data-act="check">Check my books</button>
-    </div>
-  </section>
-
-  ${checked ? renderResults(report) : ''}
-
-  <div class="grid">
-    <section class="card">
-      <h2>Ledger <span class="count">${state.entries.length} rows</span></h2>
-      <div class="scroll">
-        <table class="ledger">
-          <thead><tr><th>Date</th><th>Description</th><th>Source</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Delete</span></th></tr></thead>
-          <tbody>
-          ${state.entries
-            .map(
-              (e) => `
-            <tr data-entry="${esc(e.entryId)}" class="${wrongCat.has(e.entryId) ? 'flag' : ''}">
-              <td class="nowrap c-date">${shortDate(e.date)}</td>
-              <td class="c-desc">${esc(e.description)}</td>
-              <td class="muted nowrap c-src">${esc(e.source)}</td>
-              <td class="r num c-amt ${e.amountCents > 0 ? 'in' : ''}">${formatSignedCents(e.amountCents)}</td>
-              <td class="c-cat">
-                <select data-cat="${esc(e.entryId)}" aria-label="Category for ${esc(e.description)}, ${shortDate(e.date)}">
-                  ${CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === e.category ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
-                </select>
-              </td>
-              <td class="c-del"><button type="button" class="del" data-del="${esc(e.entryId)}" aria-label="Delete ${esc(e.description)}, ${shortDate(e.date)}">Delete</button></td>
-            </tr>`,
-            )
-            .join('')}
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <aside class="side">
-      <section class="card">
-        <h2>Bank statement <span class="count">source of truth</span></h2>
-        <div class="scroll">
-          <table class="stmt">
-            <tbody>
-              <tr class="muted"><td colspan="2">Opening balance</td><td class="r num">${formatCents(scenario.openingBalanceCents)}</td></tr>
-              ${scenario.statement
-                .map(
-                  (l) => `<tr><td class="nowrap">${shortDate(l.date)}</td><td>${esc(l.description)}</td><td class="r num ${l.amountCents > 0 ? 'in' : ''}">${formatSignedCents(l.amountCents)}</td></tr>`,
-                )
-                .join('')}
-              <tr class="total"><td colspan="2">Closing balance</td><td class="r num">${formatCents(scenario.statementClosingBalanceCents)}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <section class="card">
-        <h2>Category guide</h2>
-        <dl class="guide">
-          ${CATEGORIES.map((c) => `<div><dt>${esc(c.name)}</dt><dd>${esc(c.rule)}</dd></div>`).join('')}
-        </dl>
-      </section>
-    </aside>
-  </div>
-
-  <footer class="foot">
-    All data is synthetic and fictional. Not connected to QuickBooks or any bank. Progress is not saved.
-  </footer>`;
+  const ui = current();
+  if (!ui) return;
+  persistIfSolved(ui);
+  app.innerHTML = renderWorkbench(ui);
+  const input = app.querySelector<HTMLInputElement>('.amt-form input');
+  if (input) {
+    input.focus();
+    input.select();
+  }
 }
 
-function renderResults(report: CheckReport): string {
-  const ex = explain(session.scenario, session.state, report);
-  const card = (key: string, title: string, ok: boolean, okText: string, lines: string[], badText: string) => `
-    <div class="check ${ok ? 'pass' : 'fail'}" data-testid="check-${key}">
-      <div class="check-head"><span class="dot" aria-hidden="true">${ok ? '✓' : '!'}</span><h3>${title}</h3><span class="status">${ok ? 'Pass' : badText}</span></div>
-      ${ok && lines.length === 0 ? `<p>${okText}</p>` : `<ul>${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}
-    </div>`;
-  const i = report.integrity;
-  const issues = i.missing.length + i.extra.length + i.unknown.length;
-  return `
-  <section class="results" aria-live="polite">
-    ${report.ok ? `<div class="banner" data-testid="success">Books reconciled. Every transaction is recorded exactly once, the ledger matches the statement, and every category fits its rule.</div>` : ''}
-    <div class="checks">
-      ${card('integrity', '1 · Transactions', i.ok, 'Every statement transaction is in the ledger exactly once.', ex.integrity, `${issues} issue${issues === 1 ? '' : 's'}`)}
-      ${card('balance', '2 · Matches statement', report.balance.ok, 'Ledger balance equals the statement closing balance.', ex.balance, formatSignedCents(report.balance.differenceCents))}
-      ${card('categories', '3 · Categories', report.categories.ok, 'Every row is in the category its rule calls for.', ex.categories, `${report.categories.wrong.length} wrong`)}
-    </div>
-  </section>`;
+function dispatch(action: Action): void {
+  const ui = current()!;
+  ui.session = applyAction(ui.session, action);
+  ui.editing = null;
+  ui.editError = null;
+  ui.recording = null;
+  render();
 }
 
 app.addEventListener('click', (ev) => {
-  const t = (ev.target as HTMLElement).closest('button');
-  if (!t || t.disabled) return;
-  if (t.dataset.del) return dispatch({ type: 'delete', entryId: t.dataset.del });
-  switch (t.dataset.act) {
+  const ui = current();
+  if (!ui) return;
+  const t = (ev.target as HTMLElement).closest<HTMLElement>('button, [data-act]');
+  if (!t || (t as HTMLButtonElement).disabled) return;
+  const d = t.dataset;
+  if (d.del) return dispatch({ type: 'delete', entryId: d.del });
+  if (d.edit) {
+    ui.editing = d.edit;
+    ui.editError = null;
+    return render();
+  }
+  if (d.record) {
+    ui.recording = ui.recording === d.record ? null : d.record;
+    return render();
+  }
+  switch (d.act) {
     case 'undo':
-      session = undo(session);
+      ui.session = undo(ui.session);
+      ui.editing = ui.recording = null;
       return render();
     case 'reset':
-      session = reset(session);
-      checked = false;
+      cases.set(currentId!, { ...newCaseUI(reset(ui.session)), noteOpen: ui.noteOpen });
       return render();
-    case 'check':
-      checked = true;
+    case 'toggle-note':
+      ui.noteOpen = !ui.noteOpen;
+      return render();
+    case 'toggle-matches':
+      ui.showMatches = !ui.showMatches;
+      return render();
+    case 'cancel-edit':
+      ui.editing = null;
+      ui.editError = null;
+      return render();
+    case 'cancel-record':
+      ui.recording = null;
+      return render();
+    case 'check': {
+      ui.checked = true;
+      ui.checksRun += 1;
       render();
-      document.querySelector('.results')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      app.querySelector('.review, .solved')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
       return;
+    }
+    case 'copy-report': {
+      const s = ui.session.scenario;
+      const text = reportText(s, cleanupReport(s, ui.session.state));
+      navigator.clipboard?.writeText(text).then(
+        () => (t.textContent = 'Copied'),
+        () => (t.textContent = 'Copy failed: select the text instead'),
+      );
+      return;
+    }
   }
 });
 
 app.addEventListener('change', (ev) => {
-  const t = ev.target as HTMLSelectElement;
-  if (t.dataset.cat && isCategoryId(t.value)) dispatch({ type: 'recategorize', entryId: t.dataset.cat, category: t.value });
+  const ui = current();
+  if (!ui) return;
+  const t = ev.target as HTMLInputElement | HTMLSelectElement;
+  if (t instanceof HTMLSelectElement && t.dataset.cat && isCategoryId(t.value)) {
+    return dispatch({ type: 'recategorize', entryId: t.dataset.cat, category: t.value });
+  }
+  if (t instanceof HTMLInputElement && t.dataset.clear) {
+    return dispatch({ type: 'setCleared', entryId: t.dataset.clear, cleared: t.checked });
+  }
 });
 
-render();
+app.addEventListener('submit', (ev) => {
+  const ui = current();
+  if (!ui) return;
+  ev.preventDefault();
+  const form = ev.target as HTMLFormElement;
+  if (form.dataset.amtForm) {
+    const raw = (form.elements.namedItem('amt') as HTMLInputElement).value;
+    const cents = parseDollarsToCents(raw);
+    if (cents === null) {
+      ui.editError = 'Enter an amount like 84.37';
+      return render();
+    }
+    return dispatch({ type: 'setAmount', entryId: form.dataset.amtForm, magnitudeCents: cents });
+  }
+  if (form.dataset.recordForm) {
+    const cat = (form.elements.namedItem('cat') as HTMLSelectElement).value;
+    if (!isCategoryId(cat)) return;
+    return dispatch({ type: 'record', txnId: form.dataset.recordForm, category: cat });
+  }
+});
+
+app.addEventListener('keydown', (ev) => {
+  const ui = current();
+  if (ui?.editing && ev.key === 'Escape') {
+    ui.editing = null;
+    ui.editError = null;
+    render();
+  }
+});
+
+// Highlighter: hovering an amount marks every row and bank line with the same amount.
+let lit: Element[] = [];
+app.addEventListener('mouseover', (ev) => {
+  const row = (ev.target as HTMLElement).closest<HTMLElement>('tr[data-amt]');
+  const amt = row?.dataset.amt;
+  lit.forEach((el) => el.classList.remove('peer'));
+  lit = amt ? [...app.querySelectorAll(`tr[data-amt="${CSS.escape(amt)}"]`)] : [];
+  if (lit.length > 1) lit.forEach((el) => el.classList.add('peer'));
+});
+
+window.addEventListener('hashchange', route);
+route();

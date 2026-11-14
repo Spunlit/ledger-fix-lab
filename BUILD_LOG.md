@@ -45,3 +45,16 @@
   by page count + per-slide screenshots; no overflow). Only facts from code/tests/brief; unvalidated items marked UNKNOWN.
 - Skills check (user request): no frontend-design/UI-UX skill installed; available relevant ones: artifact-design,
   dataviz, run, code-review, simplify, security-review, pptx/pdf/docx. Nothing installed.
+
+## 2026-11-14 ~16:05–16:35 Astana — product reinvention (v2)
+- Rollback point: tag `v1-baseline` + branch `baseline-v1` pushed.
+- Research (~30 min, Reddit blocked for fetching): PRODUCT_STRATEGY.md — evidence, prices, unknowns, A/B/C scored.
+  Decision: Strategy A inside the approved concept (client-file cleanup simulator for new freelance bookkeepers).
+- Fable 5.2 challenge adopted: separate truth model, cleared ticks, four independent checks, fake-pass tests,
+  client note states entity/no-loan/check mailed, no "experience/certificate" claims.
+- Skills: anthropics/skills @2c5958ecac7c `frontend-design` and `webapp-testing` copied to .claude/skills
+  (Apache-2.0, project-local, gitignored). frontend-design guidance applied (token plan, defaults avoided, two
+  visual passes). webapp-testing's method applied via the existing CDP harness (no Python Playwright install).
+- Engine v2 + Case 2 + clues + cleanup report + new UI (landing, workbench, review, completion).
+- Verified: npm test 47/47 (incl. ~524k-state exhaustive case-2 test); build OK; e2e 31/31 locally
+  (found & fixed: completion not saved when solved after a check; mobile statement wrapping; worksheet height).
