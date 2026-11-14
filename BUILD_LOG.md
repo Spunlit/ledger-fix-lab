@@ -121,3 +121,10 @@
   circled in red, BUT WRONG is stamped over RECONCILED, profit struck and corrected by hand. Engine-graded as before.
 - Day theme = same paper on a light desk. Books/statement on the case page and reviews render as paper (scoped tokens).
 - Caveat (OFL) bundled for margin notes only. npm test 94/94; e2e 47/47.
+
+## v8: landing page rebuilt on a design system (Nov 14, ~18:30 UTC)
+- Installed and audited design skills (design-taste-frontend, frontend-design, webapp-testing, ui-ux-pro-max); the taste-skill Stop hook was removed, its install.sh not run.
+- index.html is now a static landing page on the skill's kit (public/kit, MIT): collage hero with a live books window graded by the engine (click the wrong line), workbench app frame, 3 steps, daily file + skill record, pricing, FAQ, close.
+- The trainer moved to app.html (Vite multi-page). app.html#/ is "Your practice desk" (path + skill record).
+- App restyled to match: midnight #070a12, electric blue #2f6bff, cantaloupe #ffa36c for warnings, Reddit Sans + JetBrains Mono, sharp corners. Day/night switch on both pages, shared key.
+- Checked: 94 unit tests, 49 e2e checks, phone 375px without horizontal scroll, copy-lint 0 FAIL.

@@ -25,6 +25,9 @@ const WHY_HONEST: Record<string, string> = {
   E03: 'real phone bill, right category',
   E07: 'real fuel for the van, right category',
   E14: "real check, mailed the 30th, just hasn't cleared",
+  E11: "money out to the owner, booked as a draw",
+  E13: 'real supplies, right category',
+  E04: 'real insurance premium, right category',
 };
 
 export function heroBase(): Session {

@@ -1,22 +1,342 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Practice bookkeeping cleanups on realistic synthetic client books. Reconcile to the bank and find out whether the books are right, not just balanced." />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Ledger Fix Lab: the books balance. One line is lying." />
-    <meta property="og:description" content="A bookkeeping trainer that grades the books, not your clicks. Find the mistake a $0.00 reconciliation hides. Free, no sign-up." />
-    <meta property="og:image" content="https://spunlit.github.io/ledger-fix-lab/og.png" />
-    <meta property="og:url" content="https://spunlit.github.io/ledger-fix-lab/" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <title>Ledger Fix Lab: practice bookkeeping cleanups</title>
-    <link rel="preload" href="/ledger-fix-lab/fonts/public-sans-latin-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='3' width='26' height='26' rx='5' fill='white' stroke='%2314233c' stroke-width='3'/><path d='M10 16l4 4 8-9' stroke='%230e7a4b' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
-  </head>
-  <body>
-    <div id="app"></div>
-    <noscript>Ledger Fix Lab needs JavaScript to run the practice books.</noscript>
-    <script type="module" src="./src/main.ts"></script>
-  </body>
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sky" data-buttons="tonal" data-motion data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledger Fix Lab: reconciliation practice for new bookkeepers</title>
+<meta name="description" content="Clean up synthetic small-business books against the bank statement. The grader checks the books you end with, so balanced-but-wrong still fails. Two cases free, no sign-up.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ledger Fix Lab: reconciliation practice for new bookkeepers">
+<meta property="og:description" content="The books balance to $0.00 and the profit is still $5,000 too high. Find the line. Free, no sign-up.">
+<meta property="og:image" content="https://spunlit.github.io/ledger-fix-lab/og.png">
+<meta property="og:url" content="https://spunlit.github.io/ledger-fix-lab/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23070a12'/><path d='M7 24A13 13 0 0 1 25 8' fill='none' stroke='%232f6bff' stroke-width='4'/><circle cx='24' cy='23' r='3.4' fill='%23ffa36c'/></svg>">
+<meta name="theme-color" content="#070a12">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<script>try{var t=localStorage.getItem('ledger-fix-lab:theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/kit/system.css">
+<link rel="stylesheet" href="/kit/ui/cards.css">
+<link rel="stylesheet" href="/kit/motion/motion.css">
+<link rel="stylesheet" href="/kit/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="/kit/layout/layout.css">
+<style>
+:root {
+  --p-bg: #070a12; --p-surface: #0f1420; --p-ink: #eef2f8; --p-muted: #97a1b4;
+  --p-accent: #2f6bff; --p-accent-ink: #ffffff; --p-action: #2f6bff; --p-action-ink: #ffffff;
+  --p-inv-bg: #eef2f8; --p-inv-surface: #dbdfe6; --p-inv-ink: #070a12; --p-inv-muted: #53575f;
+  --p-inv-accent: #2f6bff; --p-inv-accent-ink: #ffffff; --p-inv-action: #2f6bff; --p-inv-action-ink: #ffffff;
+  --font-display: "Reddit Sans", system-ui, sans-serif;
+  --font-text: "Reddit Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.03em;
+  --display-tracking-xl: -0.04em;
+}
+</style>
+<link rel="stylesheet" href="/src/landing.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="/kit/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+</head>
+<body>
+<!-- type: software (fintech education: bookkeeping practice)
+     deal: hero collage, nav-cards, close-word, footer-columns, rhythm surface-pairs, buttons tonal, mark arc,
+     palette: the founder's own (start.mjs brand: midnight #070a12, electric blue #2f6bff, cantaloupe #ffa36c for warnings),
+     type reddit (Reddit Sans + JetBrains Mono), radius sharp (fintech)
+     moments: cursor-spotlight on the hero frame -->
+
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>Ledger Fix Lab</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#steps">Practice <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <a class="menu-card span-4" href="app.html#/case/maple-pine-oct">
+              <div class="panel"><div class="mini"><span class="mini__row"><b>Shopify payout</b><span class="chip chip--ok">Matched</span></span><span class="mini__row"><b>Adobe, twice</b><span class="chip chip--warn">Double</span></span></div></div>
+              <span class="t-card">Case 1: Maple &amp; Pine</span>
+              <span class="t-small muted">A doubled charge and two lookalikes, 6 minutes</span>
+            </a>
+            <a class="menu-card span-4" href="app.html#/case/rivera-mar">
+              <div class="panel"><div class="mini"><span class="mini__row"><b>Verizon $48.37</b><span class="chip chip--warn">$84.37 at bank</span></span><span class="mini__row"><b>Difference</b><span class="chip">$99.37</span></span></div></div>
+              <span class="t-card">Case 2: Rivera Detailing</span>
+              <span class="t-small muted">Five problems, one of them balances to zero</span>
+            </a>
+            <a class="menu-card span-4" href="app.html#/daily">
+              <div class="panel"><div class="mini"><span class="mini__row"><b>Today's file</b><span class="chip chip--ok">New</span></span><span class="mini__row"><b>Exam mode</b><span class="chip">No hints</span></span></div></div>
+              <span class="t-card">Today's file</span>
+              <span class="t-small muted">A new client file each day, graded with no hints</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="#workbench">Workbench</a></div>
+      <div class="nav__item"><a class="nav__link" href="#pricing">Pricing</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+      <div class="nav__item lf-theme-item"><button class="nav__link" type="button" data-theme-toggle>Day or night mode</button></div>
+    </nav>
+    <div class="nav__actions">
+      <button class="theme-btn" type="button" data-theme-toggle aria-label="Switch to day mode"><svg class="i-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7"/></svg><svg class="i-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 12.6A7 7 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1z"/></svg></button>
+      <a class="nav__link" href="app.html#/">Your desk</a>
+      <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--collage" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text grid hero__grid">
+      <div class="hero__text span-5">
+        <h1 id="hero-h">Reconciliation practice for new bookkeepers</h1>
+        <p class="hero__lead">Clean up a small business's books against its bank statement. The grader checks the books you end with, so a file that balances to $0.00 with the owner's savings booked as sales still fails.</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <a class="btn btn--secondary" href="app.html#/daily">Open today's file</a>
+        </div>
+        <p class="hero__proof">Two full cases free, no sign-up. About 6 minutes each.</p>
+      </div>
+
+      <div class="hero__art span-6 start-7" data-moment="cursor-spotlight" data-moment-opts='{"rest": [0.78, 0.2], "radius": 460}'>
+        <div class="ly-piece ly-piece--main lf-win" data-hero>
+          <div class="lf-win__bar"><span class="lf-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Rivera Mobile Detailing <i>/</i> <b>March books</b></span></div>
+          <div class="lf-win__body">
+            <div class="lf-side" aria-hidden="true">
+              <span class="is-on"><i></i>Books</span><span><i></i>Bank feed</span><span><i></i>Reconcile</span><span><i></i>Reports</span>
+            </div>
+            <div class="lf-main">
+              <div class="lf-main__head"><h2 class="lf-h">Books, March 2026</h2><span class="chip chip--ok" data-testid="hero-recon">Difference $0.00</span></div>
+              <p class="lf-task" data-hero-task aria-live="polite">Balanced to the cent, yet profit is <b>$5,000 too high</b>. Click the line that's wrong.</p>
+              <ol class="lf-rows" aria-label="Book entries, March 2026">
+                <li><button type="button" class="lf-row" data-hero-pick="E01"><span class="lf-date">Mar 2</span><span class="lf-desc"><b>Square payout, customer payments</b><small>Sales income</small></span><span class="lf-amt">+$1,286.40</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E03"><span class="lf-date">Mar 5</span><span class="lf-desc"><b>Verizon, business phone</b><small>Phone &amp; internet</small></span><span class="lf-amt">−$84.37</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E06"><span class="lf-date">Mar 10</span><span class="lf-desc"><b>Transfer from savings</b><small>Sales income</small></span><span class="lf-amt">+$5,000.00</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E07"><span class="lf-date">Mar 12</span><span class="lf-desc"><b>Shell, van fuel</b><small>Car &amp; truck</small></span><span class="lf-amt">−$76.18</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E11"><span class="lf-date">Mar 20</span><span class="lf-desc"><b>Transfer to personal checking</b><small>Owner's draw</small></span><span class="lf-amt">−$1,500.00</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E13"><span class="lf-date">Mar 25</span><span class="lf-desc"><b>Detail King, microfiber towels</b><small>Job supplies</small></span><span class="lf-amt">−$129.40</span><span class="lf-st"></span></button></li>
+                <li><button type="button" class="lf-row" data-hero-pick="E14"><span class="lf-date">Mar 30</span><span class="lf-desc"><b>Check #1043, Desert Sun Mobile Wash</b><small>Contract labor</small></span><span class="lf-amt">−$650.00</span><span class="lf-st"></span></button></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="ly-piece ly-piece--note lf-card" data-hero-card data-ly-steps="800" aria-live="polite">
+          <div class="lf-card__row"><h3 class="lf-h5">Net profit, March</h3><span class="lf-profit" data-testid="hero-profit">$10,410.76</span></div>
+          <div class="lf-line" data-step><i class="ok">✓</i><span>Bank and books agree, <b>$0.00</b> apart</span></div>
+          <div class="lf-line" data-step><i class="warn">!</i><span>Profit is <b>$5,000.00</b> too high</span></div>
+          <div class="lf-line" data-step><i class="q">?</i><span>One line is booked to the wrong category</span></div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section" id="workbench" aria-labelledby="workbench-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 id="workbench-h" class="span-5">Every bank line beside the entry it should match</h2>
+        <p class="span-6 start-7 muted lf-para">Lines that pair up are done. What's missing, doubled or mistyped is left over, and you fix it with a bookkeeper's tools: delete, recategorize, fix the amount, mark cleared, record from the statement. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera file</a></p>
+      </div>
+      <div class="app lf-app fill" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
+        <div class="app__pane app__pane--list">
+          <div class="lf-win lf-win--flat">
+            <div class="lf-win__bar"><span class="lf-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Rivera <i>/</i> <b>Bank statement, March</b></span></div>
+            <div class="lf-list">
+              <div class="lf-list__head"><span>Date</span><span>Bank says</span><span>Amount</span><span>Books</span></div>
+              <div class="lf-li"><span>Mar 2</span><b>SQUARE INC DEPOSIT</b><span class="lf-amt">+1,286.40</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 3</span><b>CHEMICAL GUYS CA</b><span class="lf-amt">−212.85</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li is-open"><span>Mar 5</span><b>VERIZON WIRELESS</b><span class="lf-amt">−84.37</span><span class="chip chip--warn">Amount differs</span></div>
+              <div class="lf-li"><span>Mar 6</span><b>PROGRESSIVE INS</b><span class="lf-amt">−318.00</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 9</span><b>SQUARE INC DEPOSIT</b><span class="lf-amt">+1,904.75</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 10</span><b>TRANSFER FROM SAV</b><span class="lf-amt">+5,000.00</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 14</span><b>AUTOZONE #3321</b><span class="lf-amt">−54.99</span><span class="chip chip--warn">Booked twice</span></div>
+              <div class="lf-li"><span>Mar 16</span><b>SQUARE INC DEPOSIT</b><span class="lf-amt">+2,118.30</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 20</span><b>TRANSFER TO CHK</b><span class="lf-amt">−1,500.00</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 25</span><b>DETAIL KING PA</b><span class="lf-amt">−129.40</span><span class="chip chip--ok">Matched</span></div>
+              <div class="lf-li"><span>Mar 31</span><b>MONTHLY MAINTENANCE FEE</b><span class="lf-amt">−15.00</span><span class="chip chip--bad">Not in books</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open">
+          <div class="lf-open" data-ly-steps="900">
+            <div class="lf-open__head"><h3 class="lf-h">Verizon, business phone</h3><span class="chip chip--warn">Amount differs</span></div>
+            <div class="lf-pair">
+              <div><small>Bank statement, Mar 5</small><b class="lf-big">−$84.37</b><span>VERIZON WIRELESS DES:PAYMENTS</span></div>
+              <div><small>Your books, Mar 5</small><b class="lf-big">−$48.37</b><span>Manual entry, Phone &amp; internet</span></div>
+            </div>
+            <div class="lf-clue" data-step><i class="warn">!</i><span>Off by <b>$36.00</b>. A gap that divides evenly by 9 usually means two digits were swapped: 48 and 84.</span></div>
+            <div class="lf-fix" data-step><span class="lf-input">84.37</span><span class="lf-btn">Fix amount</span><span class="lf-btn lf-btn--ghost">Mark cleared</span></div>
+            <div class="lf-line lf-done" data-step><i class="ok">✓</i><span>Matched and cleared. Difference down from $99.37 to <b>$15.00</b>, the bank fee</span></div>
+            <div class="lf-recon">
+              <div><small>Adjusted bank</small><b>$17,022.00</b></div>
+              <div><small>Books</small><b>$17,121.37</b></div>
+              <div><small>Difference</small><b class="t-warn">$99.37</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="steps" aria-labelledby="steps-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="steps-h">Clean up a client file in 3 steps</h2>
+      </div>
+      <div class="grid">
+        <article class="card card--row span-4">
+          <span class="step-num">1</span>
+          <h3>Match the bank feed</h3>
+          <p>Each statement line pairs with its book entry. What doesn't pair is your list of problems.</p>
+          <div class="panel panel--inset"><div class="stage"><div class="lf-card lf-card--in">
+            <div class="lf-line"><i class="ok">✓</i><span><b>11 of 13</b> bank lines matched</span></div>
+            <div class="lf-line"><i class="warn">!</i><span>AutoZone hose in the books <b>twice</b></span></div>
+            <div class="lf-line"><i class="bad">×</i><span>$15.00 bank fee <b>not in books</b></span></div>
+          </div></div></div>
+        </article>
+        <article class="card card--row span-4">
+          <span class="step-num">2</span>
+          <h3>Fix what's wrong</h3>
+          <p>Delete the double, fix swapped digits, record the fee, move a transfer out of sales.</p>
+          <div class="panel panel--inset"><div class="stage"><div class="lf-card lf-card--in">
+            <div class="lf-act"><span>Delete</span><b>AutoZone, second copy</b></div>
+            <div class="lf-act"><span>Fix amount</span><b>Verizon to $84.37</b></div>
+            <div class="lf-act"><span>Record</span><b>Monthly fee, Bank fees</b></div>
+            <div class="lf-act"><span>Category</span><b>Savings transfer to Owner contribution</b></div>
+          </div></div></div>
+        </article>
+        <article class="card card--row span-4">
+          <span class="step-num">3</span>
+          <h3>Get graded on four checks</h3>
+          <p>The grader reads the books you end with, not the clicks, and says what each check missed.</p>
+          <div class="panel panel--inset"><div class="stage"><div class="lf-card lf-card--in">
+            <div class="lf-line"><i class="ok">✓</i><span>Nothing missing, nothing extra</span></div>
+            <div class="lf-line"><i class="ok">✓</i><span>Amounts match the statement</span></div>
+            <div class="lf-line"><i class="ok">✓</i><span>Cleared status is right</span></div>
+            <div class="lf-line"><i class="bad">×</i><span>Categories: <b>$5,000</b> still in sales</span></div>
+          </div></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="daily" aria-labelledby="daily-h">
+    <div class="wrap">
+      <div class="grid lf-split">
+        <div class="span-5 lf-split__text">
+          <h2 id="daily-h">A new client file every day</h2>
+          <p class="muted lf-para">Today's file is a fresh business with fresh mistakes, graded in exam mode with no hints. Practice files aim at the problems you miss most. Each one is generated from a seed and solved by a reference solution before you see it.</p>
+          <ul class="lf-facts">
+            <li><b>900</b><span>generated files checked by the test suite on every build</span></li>
+            <li><b>4</b><span>separate checks, so you see exactly which part is wrong</span></li>
+          </ul>
+          <a class="link" href="app.html#/daily">Open today's file</a>
+        </div>
+        <div class="span-6 start-7 lf-panel" role="img" aria-label="A skill record: which problem types you caught and missed across recent files">
+          <div class="lf-card lf-card--wide">
+            <div class="lf-card__row"><h3 class="lf-h5">Your skill record</h3><span class="chip">Example</span></div>
+            <div class="lf-skill"><span>Duplicate charges</span><span class="lf-bar"><i style="--v:100%"></i></span><b>3 of 3</b></div>
+            <div class="lf-skill"><span>Missing bank fees</span><span class="lf-bar"><i style="--v:67%"></i></span><b>2 of 3</b></div>
+            <div class="lf-skill"><span>Swapped digits</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
+            <div class="lf-skill"><span>Uncleared checks</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
+            <div class="lf-skill is-weak"><span>Owner money as income</span><span class="lf-bar"><i style="--v:0%"></i></span><b>0 of 2</b></div>
+            <div class="lf-line lf-next"><i class="warn">!</i><span>Next practice file drills <b>owner money</b></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing" aria-labelledby="pricing-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <h2 id="pricing-h">Pricing</h2>
+          <p class="muted">Every plan includes the full workbench, the four-check grader and today's file. Practice client files sold elsewhere cost $49 to $119 each and are self-graded against an answer sheet (qbodojo.com, Nov 2026).</p>
+          <a class="link" href="app.html#/upgrade">See the Practice plan</a>
+        </div>
+        <article class="card card--plan span-4 start-5">
+          <h3>Free</h3>
+          <p class="muted">For trying a real cleanup today</p>
+          <p class="lf-price">$0</p>
+          <a class="btn btn--secondary" href="app.html#/case/maple-pine-oct">Start the free case</a>
+          <ul class="checks">
+            <li>Both full client cases</li>
+            <li>Today's file, every day</li>
+            <li>One generated practice file</li>
+            <li>Instant feedback in guided mode</li>
+          </ul>
+        </article>
+        <article class="card card--plan is-featured span-4 start-9">
+          <h3>Practice</h3>
+          <p class="muted">For building the habit before a first client</p>
+          <p class="lf-price">$12<small>a month, or $96 a year</small></p>
+          <a class="btn btn--primary" href="app.html#/upgrade">Start the 7-day trial</a>
+          <ul class="checks">
+            <li>Unlimited practice files</li>
+            <li>Files aimed at your weak spots</li>
+            <li>Your full skill history</li>
+            <li>Checkout is a demo for now: no card is charged</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-5 stack-4">
+          <h2 id="faq-h">Questions</h2>
+          <p class="muted">Something else? The project's code and notes are public.</p>
+          <a class="link" href="https://github.com/Spunlit/ledger-fix-lab">Read the code on GitHub</a>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Who is it for?</h3><p>New bookkeepers and students before their first client, and owners who do their own books and want to check their work.</p></div>
+          <div class="faq__item"><h3>Is this real client data?</h3><p>No. Every business, bank line and name is made up for practice. The mistakes are the common real ones.</p></div>
+          <div class="faq__item"><h3>Do I need QuickBooks or Xero?</h3><p>No. It runs in the browser and teaches the cleanup itself, which is the same in any accounting software.</p></div>
+          <div class="faq__item"><h3>How is it graded?</h3><p>On the books you end with: nothing missing or extra, amounts matching the statement, cleared status, and categories. Any correct fix passes.</p></div>
+          <div class="faq__item"><h3>What does balanced but wrong mean?</h3><p>The bank and books agree to the cent, but a line sits in the wrong category, so profit and taxes come out wrong.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Start the free case</h2><p class="t-lead">Maple &amp; Pine's October books. No sign-up, about 6 minutes.</p></div>
+        <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">Ledger Fix Lab</p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <p class="footer__lede">Practice books, graded like a reviewer would.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Practice</h3><ul><li><a href="app.html#/case/maple-pine-oct">Case 1</a></li><li><a href="app.html#/case/rivera-mar">Case 2</a></li><li><a href="app.html#/daily">Today's file</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Workbench</h3><ul><li><a href="#workbench">How it looks</a></li><li><a href="#steps">How a case works</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Pricing</h3><ul><li><a href="#pricing">Plans</a></li><li><a href="app.html#/upgrade">Practice plan</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Questions</h3><ul><li><a href="#faq">FAQ</a></li><li><a href="https://github.com/Spunlit/ledger-fix-lab">GitHub</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Ledger Fix Lab, a Business Cup 2.0 project. All businesses, people and numbers are made up. Nothing you do leaves your browser.</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+<script type="module" src="/kit/system.js"></script>
+<script type="module" src="/kit/motion/motion.js"></script>
+<script type="module" src="/kit/layout/layout.js"></script>
+<script type="module" src="/src/landing.ts"></script>
+</body>
 </html>

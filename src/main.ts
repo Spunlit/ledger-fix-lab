@@ -6,12 +6,10 @@ import { initWorkbenchEvents } from './ui/workbench-events';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
 import { actionFeedback } from './core/feedback';
-import { formatCents } from './core/money';
-import { heroVerdict, type HeroState } from './ui/hero';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
-import { renderLanding } from './ui/landing';
+import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
@@ -39,8 +37,6 @@ function current(): CaseUI | null {
   return currentId ? cases.get(currentId) ?? null : null;
 }
 
-/** Home-page 30-second case: lines the visitor has tried, and whether the lie was caught. */
-let hero: HeroState = { tried: [], caught: false };
 let plan = loadPlan();
 let openedPractice = loadOpenedPractice();
 let paywall: PaywallState = { returnTo: null, step: 'plans', billing: 'monthly' };
@@ -53,24 +49,11 @@ function renderUpgrade(): void {
 }
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function renderHome(animate = false): void {
+/** The app's home (app.html#/): the practice path and skill record. The marketing page is index.html. */
+function renderHome(): void {
   document.body.dataset.page = 'home';
-  app.innerHTML = renderLanding(completed, history, hero);
-  const el = app.querySelector<HTMLElement>('[data-testid=hero-profit]');
-  const box = app.querySelector<HTMLElement>('.case');
-  if (!animate || !el || !box || !el.dataset.from || reducedMotion()) return;
-  // Roll the profit down to the corrected figure, then reveal the verdict.
-  const from = Number(el.dataset.from);
-  const to = Number(el.dataset.to);
-  box.classList.add('counting');
-  const t0 = performance.now();
-  const step = (now: number) => {
-    const k = Math.min(1, (now - t0) / 900);
-    el.textContent = formatCents(Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))));
-    if (k < 1) requestAnimationFrame(step);
-    else box.classList.remove('counting');
-  };
-  requestAnimationFrame(step);
+  document.title = 'Your practice desk | Ledger Fix Lab';
+  app.innerHTML = renderDesk(completed, history);
 }
 
 function route(): void {
@@ -109,9 +92,7 @@ function route(): void {
     if (changed) window.scrollTo(0, 0);
   } else {
     currentId = null;
-    document.title = 'Ledger Fix Lab: practice bookkeeping cleanups';
     renderHome();
-    // In-page anchors (#cases) are handled by the browser; only reset scroll for the home route.
     if (location.hash === '' || location.hash === '#/') window.scrollTo(0, 0);
   }
 }
@@ -178,12 +159,6 @@ app.addEventListener('click', (ev) => {
       renderUpgrade();
       return;
     }
-    const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-hero-pick]');
-    if (!b || b.disabled) return;
-    const id = b.dataset.heroPick!;
-    const v = heroVerdict(id);
-    hero = v.caught ? { ...hero, caught: true } : { ...hero, tried: [...hero.tried, id] };
-    renderHome(v.caught);
     return;
   }
   const t = (ev.target as HTMLElement).closest<HTMLElement>('button, [data-act]');

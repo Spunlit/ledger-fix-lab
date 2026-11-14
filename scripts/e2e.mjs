@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 47; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 49; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -79,9 +79,11 @@ async function main() {
     const res = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: full });
     writeFileSync(join(shotDir, `${name}.png`), Buffer.from(res.result.data, 'base64'));
   };
+  // '' is the landing page (index.html); '#/...' is a route in the app (app.html).
   const go = async (hash) => {
-    await send('Page.navigate', { url: base + hash });
-    for (let i = 0; i < 50; i++) { if (await evaluate(`!!document.querySelector('#app > *')`)) break; await sleep(100); }
+    await send('Page.navigate', { url: hash ? `${base}app.html${hash}` : base });
+    const ready = hash ? `!!document.querySelector('#app > *')` : `!!document.querySelector('[data-hero-pick]') && document.documentElement.dataset.ready === '1'`;
+    for (let i = 0; i < 50; i++) { if (await evaluate(ready)) break; await sleep(100); }
     await sleep(150);
   };
   const js = (code) => evaluate(`(async () => { const $ = (s) => document.querySelector(s); ${code} })()`);
@@ -100,15 +102,19 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
   const M = '−';
 
-  // ---------- home: the ledger page on the auditor's desk ("one line is lying")
+  // ---------- landing page: the live books window ("one line is wrong"), graded by the engine
   await go('');
-  ok((await text('.rstamp.ok')).includes('Reconciled') && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'home shows the paradox: stamped reconciled, profit $10,410.76');
+  ok((await text('[data-testid=hero-recon]')).includes('$0.00') && (await text('[data-testid=hero-profit]')) === '$10,410.76', 'landing shows the paradox: difference $0.00, profit $10,410.76');
   await click('[data-hero-pick=E14]');
-  ok((await text('.line.tried .note')).includes("hasn't cleared"), 'checking the uncleared check leaves a pencil note: real, just not cleared');
+  ok((await text('[data-hero-pick=E14] small')).includes('checks out') && (await text('[data-hero-task]')).includes("hasn't cleared"), 'checking the uncleared check: it checks out, real but not cleared');
   await click('[data-hero-pick=E06]');
-  await sleep(1500);
-  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return !!$('[data-testid=hero-stamp]') && !!$('.line.liar .loop')`)), 'catching the owner transfer: line circled, BUT WRONG stamp, profit corrected to $5,410.76');
+  await sleep(300);
+  ok((await text('[data-testid=hero-profit]')) === '$5,410.76' && (await js(`return $('[data-hero-pick=E06]').classList.contains('is-liar')`)), 'catching the owner transfer: line marked, profit corrected to $5,410.76');
   ok((await text('[data-testid=hero-verdict]')).includes("owner's money, not a sale"), 'verdict explains the lesson');
+  await click('[data-theme-toggle]');
+  ok((await evaluate('document.documentElement.dataset.theme')) === 'light' && (await evaluate(`localStorage.getItem('ledger-fix-lab:theme')`)) === 'light', 'landing day/night switch works and is remembered');
+  await click('[data-theme-toggle]');
+  ok((await js(`return [...document.querySelectorAll('a[href^="app.html"]')].length`)) >= 6, 'landing links into the app');
   await shot('0-home', false);
 
   // ---------- case 1 (guided: instant feedback, delete + category only)
@@ -177,7 +183,7 @@ async function main() {
   await click('[data-act=check]');
   ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
 
-  await go('');
+  await go('#/');
   ok((await js(`return document.querySelectorAll('.step.done').length`)) === 2, 'home path marks both guided cases completed');
   ok((await js(`return document.querySelectorAll('.record li').length`)) >= 2, 'skill record appears after the first unguided file');
   const practice = await js(`return $('.record a.btn').getAttribute('href')`);
@@ -201,7 +207,7 @@ async function main() {
   // ---------- phone width
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
   await go('');
-  ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'home: no horizontal scroll at 375px');
+  ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'landing: no horizontal scroll at 375px');
   await shot('4-home-mobile', false);
   await go('#/case/rivera-mar');
   ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'case 2: no horizontal scroll at 375px');

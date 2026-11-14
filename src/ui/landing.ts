@@ -2,7 +2,6 @@ import { SKILL_LABEL } from '../core/explain';
 import { generateFile, todaySeed } from '../core/generator';
 import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
-import { renderHero, type HeroState } from './hero';
 import { dailyHref, practiceHref } from './routes';
 import { dailyStreak, esc, loadTheme, newSeed, themeButton, type Completed } from './util';
 
@@ -28,7 +27,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
   const stats = skillStats(history).filter((st) => st.attempts > 0);
   return `
   <section class="path-sec" id="practice" aria-labelledby="path-h">
-    <h2 id="path-h">Three steps to client-ready</h2>
+    <h1 id="path-h">Your practice desk</h1>
     <p class="path-sub">For freelancers and small-business owners who keep their own books, and anyone training to keep them for clients.</p>
     <div class="path">
       ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
@@ -47,28 +46,14 @@ function path(done: Completed, history: SkillAttempt[]): string {
   </section>`;
 }
 
-export function renderLanding(done: Completed, history: SkillAttempt[], hero: HeroState): string {
+/** The app's own home (app.html#/): your path through the cases, today's file and your skill record. */
+export function renderDesk(done: Completed, history: SkillAttempt[]): string {
   return `
   <header class="nav">
-    <a class="brand" href="#/" aria-label="Ledger Fix Lab home"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
-    <div class="nav-right"><a class="nav-link" href="#practice">Practice</a>${themeButton(loadTheme())}</div>
+    <a class="brand" href="./" aria-label="Ledger Fix Lab, back to the main page"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
+    <div class="nav-right"><a class="nav-link" href="#/upgrade">Practice plan</a>${themeButton(loadTheme())}</div>
   </header>
-
-  <main class="home">
-    ${renderHero(hero)}
+  <main class="home desk-page">
     ${path(done, history)}
-
-    <section class="compare" aria-labelledby="compare-h">
-      <h2 id="compare-h" class="sr">Compared with other practice</h2>
-      <div class="cmp">
-        <div class="cmp-col"><span class="cmp-label">Practice clients elsewhere</span><p><b>$49–$119 per file.</b> You grade yourself against an answer sheet, inside your own paid QuickBooks.</p></div>
-        <div class="cmp-col us"><span class="cmp-label">Ledger Fix Lab</span><p><b>Graded instantly, in the browser.</b> A new file free every day. Unlimited weak-spot practice for $12 a month.</p><a class="link small" href="#/upgrade">See the Practice plan</a></div>
-      </div>
-      <p class="fine">Competitor prices from <a href="https://qbodojo.com/">qbodojo.com</a>, Nov 2026. Checkout is simulated in this build.</p>
-    </section>
-  </main>
-
-  <footer class="foot">
-    <p>All businesses, people and numbers are synthetic. Simplified one-account model, not connected to any bank or accounting software. Nothing you do leaves your browser. <a href="https://github.com/Spunlit/ledger-fix-lab">Source on GitHub</a></p>
-  </footer>`;
+  </main>`;
 }
