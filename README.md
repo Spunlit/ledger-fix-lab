@@ -52,7 +52,7 @@ demand and retention are unmeasured.
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 58 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 68 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
 node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 39 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
