@@ -24,7 +24,12 @@ function heroNumbers() {
 
 function dailyBand(done: Completed, history: SkillAttempt[]): string {
   const day = todaySeed();
-  const f = generateFile(day, { kind: 'daily' }).scenario;
+  let f;
+  try {
+    f = generateFile(day, { kind: 'daily' }).scenario;
+  } catch {
+    return ''; // never let a generator failure blank the home page
+  }
   const finished = done[f.id];
   const problems = f.planted.length;
   const stats = skillStats(history).filter((st) => st.attempts > 0);

@@ -9,7 +9,7 @@ export const CATEGORIES: Category[] = [
   { id: 'supplies', name: 'Job supplies', kind: 'expense', rule: 'Materials used to do the work for customers.' },
   { id: 'meals', name: 'Business meals', kind: 'expense', rule: 'Food and coffee with clients.' },
   { id: 'utilities', name: 'Phone & internet', kind: 'expense', rule: 'Phone, internet and similar services.' },
-  { id: 'insurance', name: 'Insurance', kind: 'expense', rule: 'Business and vehicle insurance premiums.' },
+  { id: 'insurance', name: 'Insurance', kind: 'expense', rule: 'Business liability and equipment insurance.' },
   { id: 'contract', name: 'Contract labor', kind: 'expense', rule: 'Payments to freelancers and subcontractors.' },
   { id: 'car', name: 'Car & truck', kind: 'expense', rule: 'Fuel, parking, tolls for business driving.' },
   { id: 'bankfees', name: 'Bank fees', kind: 'expense', rule: 'Fees the bank charges the account.' },

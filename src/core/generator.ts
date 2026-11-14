@@ -92,7 +92,7 @@ const ARCHETYPES: Archetype[] = [
       { desc: 'WebstaurantStore — pastry boxes', bank: 'WEBSTAURANTSTORE DES:ORDER', category: 'supplies', min: 50, max: 180, wrong: 'office' },
       { desc: 'Shopify — online store', bank: 'SHOPIFY DES:SUBSCRIPTION', category: 'software', min: 39, max: 79, wrong: 'office' },
       { desc: 'Comcast — internet', bank: 'COMCAST DES:CABLE PMT', category: 'utilities', min: 60, max: 110, wrong: 'software' },
-      { desc: 'State Farm — van insurance', bank: 'STATE FARM DES:INS PREM', category: 'insurance', min: 90, max: 180 },
+      { desc: 'State Farm — business liability', bank: 'STATE FARM DES:INS PREM', category: 'insurance', min: 90, max: 180 },
       { desc: 'Shell — van fuel', bank: 'CHECKCARD {md} SHELL OIL {n}', category: 'car', min: 40, max: 95, wrong: 'meals' },
       { desc: "Dunkin' — supplier meeting", bank: 'CHECKCARD {md} DUNKIN #{n}', category: 'meals', min: 5, max: 16, repeatable: true },
     ],
@@ -105,7 +105,7 @@ const ARCHETYPES: Archetype[] = [
     income: { desc: 'Square payout — repairs', bank: 'SQUARE INC DES:SQ{ymd} DEPOSIT', min: 900, max: 2400 },
     vendors: [
       { desc: 'Quality Bicycle Products — parts', bank: 'QBP DES:INVOICE PMT', category: 'supplies', min: 150, max: 600, wrong: 'office' },
-      { desc: 'Park Tool — truing stand', bank: 'CHECKCARD {md} PARKTOOL.COM', category: 'supplies', min: 40, max: 200, wrong: 'office' },
+      { desc: 'Park Tool — truing stand', bank: 'CHECKCARD {md} PARKTOOL.COM', category: 'supplies', min: 40, max: 200 },
       { desc: 'Verizon — business phone', bank: 'VERIZON WIRELESS DES:PAYMENTS', category: 'utilities', min: 55, max: 95, wrong: 'software' },
       { desc: 'Hiscox — shop insurance', bank: 'HISCOX INC DES:PREMIUM', category: 'insurance', min: 70, max: 160 },
       { desc: 'Lightspeed — POS software', bank: 'LIGHTSPEED DES:SUBSCR', category: 'software', min: 69, max: 119, wrong: 'office' },
@@ -121,11 +121,11 @@ const ARCHETYPES: Archetype[] = [
     income: { desc: 'Stripe payout — session bookings', bank: 'STRIPE DES:TRANSFER ST-{ymd}', min: 800, max: 2500 },
     vendors: [
       { desc: 'Adobe Creative Cloud', bank: 'ADOBE DES:CREATIVE CLD', category: 'software', min: 55, max: 60, wrong: 'office' },
-      { desc: 'B&H Photo — memory cards', bank: 'CHECKCARD {md} B&H PHOTO', category: 'supplies', min: 40, max: 220, wrong: 'office' },
+      { desc: 'B&H Photo — memory cards', bank: 'CHECKCARD {md} B&H PHOTO', category: 'supplies', min: 40, max: 220 },
       { desc: 'Squarespace — portfolio site', bank: 'SQUARESPACE DES:WEBSITE', category: 'software', min: 23, max: 49, wrong: 'office' },
       { desc: 'AT&T — business phone', bank: 'AT&T DES:PAYMENT', category: 'utilities', min: 60, max: 100, wrong: 'software' },
       { desc: 'Hiscox — equipment insurance', bank: 'HISCOX INC DES:PREMIUM', category: 'insurance', min: 40, max: 110 },
-      { desc: 'Lyft — shoot travel', bank: 'LYFT DES:RIDE {md}', category: 'car', min: 14, max: 45, wrong: 'meals' },
+      { desc: 'Shell — car fuel for shoots', bank: 'CHECKCARD {md} SHELL OIL {n}', category: 'car', min: 30, max: 70, wrong: 'meals' },
       { desc: 'Blue Bottle — client meeting', bank: 'CHECKCARD {md} BLUE BOTTLE', category: 'meals', min: 7, max: 19, repeatable: true },
     ],
     helper: { name: 'Leo Grant', work: 'second-shooter work' },
@@ -177,6 +177,10 @@ export function transpositions(cents: number): number[] {
 
 // ---------------------------------------------------------------- generation
 
+function focusKindsCount(opts: GenOptions): number {
+  return new Set((opts.focus ?? []).map((k) => KIND_OF_SKILL[k]).filter(Boolean)).size;
+}
+
 export function generateFile(seed: string, opts: GenOptions): Generated {
   for (let attempt = 0; attempt < 40; attempt++) {
     const g = tryGenerate(`${seed}#${attempt}`, seed, opts);
@@ -208,7 +212,7 @@ function tryGenerate(rseed: string, seed: string, opts: GenOptions): Generated |
   };
 
   // Problems to plant.
-  const n = Math.min(5, Math.max(3, opts.problems ?? 4));
+  const n = Math.max(focusKindsCount(opts), Math.min(5, Math.max(3, opts.problems ?? 4)));
   const focusKinds = (opts.focus ?? []).map((k) => KIND_OF_SKILL[k]).filter((k): k is ProblemKind => !!k);
   const rest = shuffle(r, (Object.keys(SKILL_OF) as ProblemKind[]).filter((k) => !focusKinds.includes(k)));
   const kinds = [...new Set([...focusKinds, ...rest])].slice(0, n);
@@ -229,6 +233,7 @@ function tryGenerate(rseed: string, seed: string, opts: GenOptions): Generated |
     add({ date: date(d), description: arch.income.desc, bankDescription: fill(arch.income.bank, d), amountCents: c, category: 'sales', onStatement: true });
   }
   const vendors = shuffle(r, arch.vendors).slice(0, int(r, 6, 7));
+  if (genuineRepeat && !vendors.some((v) => v.repeatable)) vendors[vendors.length - 1] = arch.vendors.find((v) => v.repeatable)!;
   const vendorTxns: { txn: Txn; v: Vendor }[] = [];
   for (const v of vendors) {
     const d = int(r, 2, 26);
@@ -254,7 +259,7 @@ function tryGenerate(rseed: string, seed: string, opts: GenOptions): Generated |
       const twin = add({ date: o.date, description: o.description, bankDescription: o.bankDescription, amountCents: o.amountCents, category: o.category, onStatement: true });
       taken.add(rep.txn.txnId);
       taken.add(twin.txnId);
-      planted.push({ skill: 'genuineRepeats', txnId: twin.txnId });
+      planted.push({ skill: 'genuineRepeats', txnId: rep.txn.txnId }, { skill: 'genuineRepeats', txnId: twin.txnId });
     }
   }
 
@@ -263,7 +268,7 @@ function tryGenerate(rseed: string, seed: string, opts: GenOptions): Generated |
   for (const kind of kinds) {
     switch (kind) {
       case 'duplicate': {
-        const c = pick(r, expenseCandidates());
+        const c = pick(r, expenseCandidates().filter((x) => !x.v.repeatable));
         if (!c) return null;
         taken.add(c.txn.txnId);
         const reimport = r() < 0.5;
@@ -303,7 +308,6 @@ function tryGenerate(rseed: string, seed: string, opts: GenOptions): Generated |
       case 'missing': {
         const fee = pick(r, [
           { desc: 'Monthly maintenance fee', bank: 'MONTHLY MAINTENANCE FEE', cents: pick(r, [1200, 1500, 995, 1000]) },
-          { desc: 'Incoming wire fee', bank: 'INCOMING WIRE FEE', cents: pick(r, [1500, 1800, 2000]) },
           { desc: 'Paper statement fee', bank: 'PAPER STATEMENT FEE', cents: pick(r, [300, 500]) },
         ]);
         if (used.has(fee.cents)) return null;

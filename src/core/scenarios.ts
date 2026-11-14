@@ -108,6 +108,7 @@ export const CASE_1: Scenario = {
   ]),
   planted: [
     { skill: 'duplicates', txnId: 'T09' },
+    { skill: 'genuineRepeats', txnId: 'T05' },
     { skill: 'genuineRepeats', txnId: 'T06' },
     { skill: 'categories', txnId: 'T03' },
     { skill: 'categories', txnId: 'T10' },
@@ -126,7 +127,7 @@ const C2: Txn[] = [
   txn('R01', '2026-03-02', 'Square payout — customer payments', 128640, 'sales', { bank: 'SQUARE INC DES:SQ260302 DEPOSIT' }),
   txn('R02', '2026-03-03', 'Chemical Guys — wax & polish', -21285, 'supplies', { bank: 'CHECKCARD 0303 CHEMICAL GUYS CA' }),
   txn('R03', '2026-03-05', 'Verizon — business phone', -8437, 'utilities', { bank: 'VERIZON WIRELESS DES:PAYMENTS' }),
-  txn('R04', '2026-03-06', 'Progressive — van insurance', -31800, 'insurance', { bank: 'PROGRESSIVE INS DES:INS PREM' }),
+  txn('R04', '2026-03-06', 'Progressive — business liability', -31800, 'insurance', { bank: 'PROGRESSIVE INS DES:INS PREM' }),
   txn('R05', '2026-03-09', 'Square payout — customer payments', 190475, 'sales', { bank: 'SQUARE INC DES:SQ260309 DEPOSIT' }),
   txn('R06', '2026-03-10', 'Transfer from savings', 500000, 'ownerContribution', { bank: 'ONLINE TRANSFER FROM SAV ...1188' }),
   txn('R07', '2026-03-12', 'Shell — van fuel', -7618, 'car', { bank: 'CHECKCARD 0312 SHELL OIL 5744' }),

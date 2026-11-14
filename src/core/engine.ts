@@ -50,8 +50,13 @@ export function applyAction(session: Session, action: Action): Session {
   let nextAddedId = state.nextAddedId;
 
   if (action.type === 'record') {
-    const txn = txnMap(scenario).get(action.txnId);
-    if (!txn || !txn.onStatement) throw new Error(`Not a statement line: ${action.txnId}`);
+    const chosen = txnMap(scenario).get(action.txnId);
+    if (!chosen || !chosen.onStatement) throw new Error(`Not a statement line: ${action.txnId}`);
+    // Identical bank lines (same date, text, amount) are indistinguishable to the user, so recording one
+    // records whichever of them is not yet in the books.
+    const same = (t: Txn) => t.onStatement && t.date === chosen.date && t.bankDescription === chosen.bankDescription && t.amountCents === chosen.amountCents;
+    const inBooks = new Set(state.entries.map((e) => e.txnId));
+    const txn = inBooks.has(chosen.txnId) ? scenario.txns.find((t) => same(t) && !inBooks.has(t.txnId)) ?? chosen : chosen;
     const entry: LedgerEntry = {
       entryId: `ADD${nextAddedId}`,
       txnId: txn.txnId,

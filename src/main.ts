@@ -116,7 +116,7 @@ app.addEventListener('click', (ev) => {
       const s = ui.session.scenario;
       if (!ui.firstCheck) {
         // The skill record keeps the outcome of the first check on each file only.
-        ui.firstCheck = skillOutcomes(s, checkAll(s, ui.session.state));
+        ui.firstCheck = skillOutcomes(s, checkAll(s, ui.session.state), { worked: ui.session.history.length > 0 });
         if (!history.some((h) => h.fileId === s.id)) {
           history = [...history, { fileId: s.id, at: new Date().toISOString(), firstCheck: ui.firstCheck }];
           saveHistory(history);

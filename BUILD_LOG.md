@@ -74,3 +74,8 @@
 - Verified: npm test 58/58 (900 generated files valid/broken/solved; trap, transposition, exhaustive-delete properties);
   e2e 39/39 locally and against the live site after deploy (c9aaf33).
 - Pitch slides 6–10 rebuilt for v3; rendered PDF pages inspected (fixed slide 6 crop twice).
+- Fable audit of generator/skill record (read-only, 4000+ generated files): fixed all findings —
+  identical bank lines now interchangeable when recording (also fixes case 1 coffee twins); both twins planted;
+  traps credited only after the user worked the file; genuine-repeat focus always planted; no wire fee without a
+  wire; no rideshare-as-car or vehicle insurance; no defensible "wrong" categories; no duplicates on small repeatable
+  purchases; home page guarded against generator errors. Regression tests added: npm test 68/68; e2e 39/39.

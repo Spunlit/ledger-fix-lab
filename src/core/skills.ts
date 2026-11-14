@@ -20,10 +20,17 @@ export function plantedOutcomes(s: Scenario, report: CheckReport): { planted: Pl
   return s.planted.map((p) => ({ planted: p, handled: !flagged.has(p.txnId) }));
 }
 
-/** Per skill: true only if every planted problem of that skill was handled. */
-export function skillOutcomes(s: Scenario, report: CheckReport): Partial<Record<SkillId, boolean>> {
+/** Traps are correct as handed over; they only test whether the user leaves them alone. */
+export const TRAP_SKILLS: SkillId[] = ['timing', 'genuineRepeats'];
+
+/**
+ * Per skill: true only if every planted problem of that skill was handled. Traps count only when the
+ * user actually changed the books before checking (pressing Check on an untouched file proves nothing).
+ */
+export function skillOutcomes(s: Scenario, report: CheckReport, opts: { worked: boolean } = { worked: true }): Partial<Record<SkillId, boolean>> {
   const out: Partial<Record<SkillId, boolean>> = {};
   for (const { planted, handled } of plantedOutcomes(s, report)) {
+    if (!opts.worked && TRAP_SKILLS.includes(planted.skill)) continue;
     out[planted.skill] = (out[planted.skill] ?? true) && handled;
   }
   return out;
