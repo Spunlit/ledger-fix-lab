@@ -66,6 +66,8 @@ const C1: Txn[] = [
 export const CASE_1: Scenario = {
   id: 'maple-pine-oct',
   number: 1,
+  kind: 'case',
+  badge: 'Case 1',
   title: 'The doubled import',
   client: 'Jordan Pike',
   business: 'Maple & Pine Design Studio',
@@ -104,6 +106,12 @@ export const CASE_1: Scenario = {
     ['E13', 'T12'],
     ['E14', 'T13'],
   ]),
+  planted: [
+    { skill: 'duplicates', txnId: 'T09' },
+    { skill: 'genuineRepeats', txnId: 'T06' },
+    { skill: 'categories', txnId: 'T03' },
+    { skill: 'categories', txnId: 'T10' },
+  ],
 };
 
 // ---------------------------------------------------------------- Case 2 (intermediate)
@@ -134,6 +142,8 @@ const C2: Txn[] = [
 export const CASE_2: Scenario = {
   id: 'rivera-mar',
   number: 2,
+  kind: 'case',
+  badge: 'Case 2',
   title: 'Balanced, but wrong',
   client: 'Dani Rivera',
   business: 'Rivera Mobile Detailing',
@@ -173,6 +183,13 @@ export const CASE_2: Scenario = {
     ['E13', 'R12'],
     ['E14', 'R14', { source: 'Manual entry' }],
   ]),
+  planted: [
+    { skill: 'missing', txnId: 'R13' },
+    { skill: 'transposition', txnId: 'R03' },
+    { skill: 'timing', txnId: 'R14' },
+    { skill: 'duplicates', txnId: 'R08' },
+    { skill: 'ownerEquity', txnId: 'R06' },
+  ],
 };
 
 export const CASES: Scenario[] = [CASE_1, CASE_2];

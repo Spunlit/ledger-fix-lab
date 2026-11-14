@@ -40,3 +40,33 @@ export function saveCompleted(c: Completed): void {
     /* storage blocked: progress simply isn't remembered */
   }
 }
+
+const HISTORY_KEY = 'ledger-fix-lab:v3:skill-history';
+
+/** First-check outcomes per file. Per-viewer convenience only; works without storage. */
+export function loadHistory(): import('../core/skills').SkillAttempt[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]');
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveHistory(h: import('../core/skills').SkillAttempt[]): void {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-200)));
+  } catch {
+    /* storage blocked */
+  }
+}
+
+/** A short random seed for a new practice file (UI only; the file itself is deterministic per seed). */
+export function newSeed(): string {
+  return Math.random().toString(36).slice(2, 8);
+}
+
+export function longDate(isoDay: string): string {
+  const [y, m, d] = isoDay.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+}

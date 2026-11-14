@@ -5,8 +5,10 @@ import { explain, shortDate, SKILL_LABEL } from '../core/explain';
 import { formatCents, formatSignedCents } from '../core/money';
 import { cleanupReport } from '../core/report';
 import { CASES } from '../core/scenarios';
-import type { CategoryId, LedgerEntry, Session } from '../core/types';
-import { centsToPlain, esc } from './util';
+import { weakestSkills } from '../core/skills';
+import type { CategoryId, LedgerEntry, Session, SkillId } from '../core/types';
+import { dailyHref, practiceHref } from './routes';
+import { centsToPlain, esc, loadHistory, newSeed } from './util';
 
 /** Per-case UI state. All ledger logic lives in ../core. */
 export interface CaseUI {
@@ -18,10 +20,31 @@ export interface CaseUI {
   editing: string | null;
   editError: string | null;
   recording: string | null;
+  /** UTC day for a file of the day. */
+  day?: string;
+  /** Skill outcomes of the first check on this file (what the skill record keeps). */
+  firstCheck: Partial<Record<SkillId, boolean>> | null;
 }
 
-export function newCaseUI(session: Session): CaseUI {
-  return { session, checked: false, checksRun: 0, noteOpen: true, showMatches: false, editing: null, editError: null, recording: null };
+export function newCaseUI(session: Session, day?: string): CaseUI {
+  return { session, checked: false, checksRun: 0, noteOpen: true, showMatches: false, editing: null, editError: null, recording: null, day, firstCheck: null };
+}
+
+function badgeText(ui: CaseUI): string {
+  const s = ui.session.scenario;
+  return s.kind === 'daily' && ui.day ? `File of the day, ${shortDate(ui.day)}` : s.badge;
+}
+
+/** Plain-text result to share (no answers in it). */
+export function shareText(ui: CaseUI, url: string): string {
+  const s = ui.session.scenario;
+  const fc = Object.values(ui.firstCheck ?? {});
+  const caught = fc.filter(Boolean).length;
+  return [
+    `Ledger Fix Lab: ${badgeText(ui)} (${s.business}, ${s.period})`,
+    `Reconciled and right after ${ui.checksRun} ${ui.checksRun === 1 ? 'check' : 'checks'}. First check: ${caught} of ${fc.length} skills clean.`,
+    url,
+  ].join('\n');
 }
 
 const sourceTag = (e: LedgerEntry) =>
@@ -55,9 +78,9 @@ export function renderWorkbench(ui: CaseUI): string {
   <header class="site compact">
     <a class="brand" href="#/" aria-label="All cases"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
     <div class="case-title">
-      <span class="case-badge">Case ${s.number}</span>
-      <h1>${esc(s.title)}</h1>
-      <span class="case-sub">${esc(s.business)}, ${esc(s.period)}</span>
+      <span class="case-badge">${esc(badgeText(ui))}</span>
+      <h1>${esc(s.kind === 'case' ? s.title : s.business)}</h1>
+      <span class="case-sub">${s.kind === 'case' ? `${esc(s.business)}, ${esc(s.period)}` : `${esc(s.period)} books, generated for practice`}</span>
     </div>
     <div class="top-actions">
       <button type="button" class="btn" data-act="undo" ${canUndo(ui.session) ? '' : 'disabled'}>Undo</button>
@@ -230,7 +253,7 @@ function renderSolved(ui: CaseUI, report: CheckReport, nextId: string | undefine
   <section class="solved" data-testid="success" aria-live="polite" aria-labelledby="solved-h">
     <div class="solved-head">
       <h2 id="solved-h">Books reconciled, and right.</h2>
-      <p>All four checks pass after ${ui.checksRun} ${ui.checksRun === 1 ? 'check' : 'checks'}. Here's the summary you'd send ${esc(s.client.split(' ')[0])}.</p>
+      <p>All four checks pass (checks run: ${ui.checksRun}). Here's the summary you'd send ${esc(s.client.split(' ')[0])}.</p>
     </div>
     <div class="beforeafter">
       <div><span>Difference</span><span class="num"><s>${formatSignedCents(rep.before.recon.differenceCents)}</s> ${formatSignedCents(report.recon.differenceCents)}</span></div>
@@ -241,12 +264,32 @@ function renderSolved(ui: CaseUI, report: CheckReport, nextId: string | undefine
       <h3>${esc(s.business)}: ${esc(s.period)} cleanup summary</h3>
       <ul>${rep.items.map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>
     </article>
+    ${renderFirstCheck(ui)}
     <div class="solved-actions">
-      <button type="button" class="btn" data-act="copy-report">Copy summary</button>
-      ${nextId ? `<a class="btn primary" href="#/case/${nextId}">Next case</a>` : '<a class="btn primary" href="#/">All cases</a>'}
+      <button type="button" class="btn" data-act="copy-report">Copy client summary</button>
+      <button type="button" class="btn" data-act="copy-result">Copy my result</button>
+      ${nextAction(s, nextId)}
     </div>
-    <p class="practiced">Practiced: ${s.skills.map((k) => esc(SKILL_LABEL[k].toLowerCase())).join(', ')}.</p>
   </section>`;
+}
+
+function renderFirstCheck(ui: CaseUI): string {
+  const fc = ui.firstCheck;
+  if (!fc) return '';
+  const entries = Object.entries(fc) as [SkillId, boolean][];
+  const clean = entries.filter(([, ok]) => ok).length;
+  return `<div class="firstcheck">
+    <h3>Your first check: ${clean} of ${entries.length} skills clean</h3>
+    <ul>${entries.map(([k, ok]) => `<li class="${ok ? 'ok' : 'miss'}"><span aria-hidden="true">${ok ? '✓' : '✗'}</span> ${esc(SKILL_LABEL[k])}${ok ? '' : ' <small>(fixed after feedback)</small>'}</li>`).join('')}</ul>
+    <p class="practiced">Saved to your skill record in this browser. Practice files target the skills you miss most.</p>
+  </div>`;
+}
+
+function nextAction(s: Session['scenario'], nextId: string | undefined): string {
+  if (s.kind === 'case' && nextId) return `<a class="btn primary" href="#/case/${nextId}">Next case</a>`;
+  if (s.kind === 'case') return `<a class="btn primary" href="${dailyHref()}">Start today's file</a>`;
+  const focus = weakestSkills(loadHistory(), 2);
+  return `<a class="btn primary" href="${practiceHref(newSeed(), focus)}">Practice my weak spots</a><a class="btn" href="#/">Home</a>`;
 }
 
 export function categoryLabel(id: CategoryId): string {

@@ -342,3 +342,42 @@ tr.flag td:first-child { box-shadow: inset 3px 0 0 var(--red); }
   .stmt tr.record-row { display: block; }
   .stmt tr.hl, .stmt tr.peer { background: var(--marker-soft); }
 }
+
+/* ---------- v3: daily file, skill record, pricing, first-check */
+.daily { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0; margin: 0 0 40px; background: var(--surface); border: 1px solid var(--rule); border-top: 4px solid var(--pencil); border-radius: 4px; }
+.daily-file { padding: 22px 26px; }
+.daily-file h2 { font-size: 24px; margin-bottom: 8px; }
+.daily-file p { color: var(--ink-2); max-width: 60ch; }
+.daily-date { font-weight: 700; color: var(--pencil) !important; margin-bottom: 4px; font-size: 14px; }
+.record { padding: 22px 26px; border-left: 1px solid var(--rule); background: var(--paper); }
+.record h3 { font-size: 17px; margin-bottom: 10px; }
+.record-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.record-table th { text-align: left; font-weight: 500; font-size: 13.5px; color: var(--ink); padding: 4px 8px 4px 0; border: 0; white-space: normal; }
+.record-table td { padding: 4px 0 4px 8px; border: 0; font-size: 13.5px; }
+.meter { display: block; width: 90px; height: 8px; border-radius: 4px; background: var(--rule); position: relative; overflow: hidden; }
+.meter::after { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--green); }
+.pricing { border-top: 2px solid var(--ink); padding: 26px 0 8px; margin-bottom: 36px; }
+.pricing h2 { font-size: 24px; margin-bottom: 18px; }
+.plans { display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 20px; }
+.plan { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 18px 22px; }
+.plan.pro { border-color: var(--pencil); }
+.plan h3 { font-size: 17px; }
+.price { font-size: 30px; font-weight: 800; margin: 4px 0 8px; }
+.price small { font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.plan ul { margin: 0; padding-left: 18px; font-size: 14.5px; }
+.plan li { margin-bottom: 4px; }
+.firstcheck { margin-top: 16px; }
+.firstcheck h3 { font-size: 15px; margin-bottom: 6px; }
+.firstcheck ul { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.firstcheck li { font-size: 14px; padding: 3px 10px; border-radius: 4px; border: 1px solid var(--rule); background: var(--paper); }
+.firstcheck li.ok span { color: var(--green); font-weight: 800; }
+.firstcheck li.miss span { color: var(--red); font-weight: 800; }
+.firstcheck small { color: var(--ink-2); }
+@media (max-width: 1000px) {
+  .daily { grid-template-columns: minmax(0, 1fr); }
+  .record { border-left: 0; border-top: 1px solid var(--rule); }
+}
+@media (max-width: 720px) {
+  .plans { grid-template-columns: minmax(0, 1fr); }
+  .daily-file, .record { padding: 18px; }
+}

@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 31; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 39; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -156,12 +156,25 @@ async function main() {
   const sum = await text('.summary');
   ok(sum.includes("Owner's contribution") && sum.includes('outstanding'), 'summary covers the reclassification and the outstanding check');
   ok((await text('.beforeafter')).includes('$5,410.76'), 'before/after shows corrected net profit');
+  const fc = await text('.firstcheck');
+  ok(fc.includes('Your first check') && fc.includes('Separating owner money from income'), 'completion shows first-check results per skill (owner money missed on first check)');
+  ok(await js(`return !!$('.solved-actions a[href^="#/daily/"]')`), "case 2 completion offers today's file");
   await shot('4-case2-solved', false);
   await click('[data-act=reset]');
   ok((await diff()) === `${M}$99.37` && (await cls('integrity')) === 'absent', 'start over returns to the handed-over books');
 
   await go('');
-  ok((await js(`return document.querySelectorAll('.done-tag').length`)) === 2, 'landing marks both cases completed');
+  ok((await js(`return document.querySelectorAll('.case-go .done-tag').length`)) === 2, 'landing marks both cases completed');
+  ok((await js(`return $('.hero .btn.primary').getAttribute('href')`)).startsWith('#/daily/'), "returning visitor's main call to action is today's file");
+  ok((await js(`return document.querySelectorAll('.record-table tr').length`)) >= 4, 'skill record shows first-check results from both cases');
+  const practice = await js(`return $('.record a.btn').getAttribute('href')`);
+  ok(/^#\/practice\/[a-z0-9]+\//.test(practice) && practice.includes('ownerEquity') && practice.includes('categories'), `weak-spot practice targets the skills missed on first checks (${practice})`);
+  await go(practice);
+  ok((await text('.case-badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
+  await go('#/daily');
+  ok((await text('.case-badge')).startsWith('File of the day'), 'file of the day opens');
+  await click('[data-act=check]');
+  ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
 
   // ---------- phone width
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });

@@ -2,15 +2,17 @@ import './style.css';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, reset, undo } from './core/engine';
 import { cleanupReport, reportText } from './core/report';
-import { caseById } from './core/scenarios';
+import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { renderLanding } from './ui/landing';
-import { loadCompleted, parseDollarsToCents, saveCompleted } from './ui/util';
-import { newCaseUI, renderWorkbench, type CaseUI } from './ui/workbench';
+import { resolve } from './ui/routes';
+import { loadCompleted, loadHistory, parseDollarsToCents, saveCompleted, saveHistory } from './ui/util';
+import { newCaseUI, renderWorkbench, shareText, type CaseUI } from './ui/workbench';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const cases = new Map<string, CaseUI>();
 let completed = loadCompleted();
+let history = loadHistory();
 let currentId: string | null = null;
 
 function current(): CaseUI | null {
@@ -18,19 +20,24 @@ function current(): CaseUI | null {
 }
 
 function route(): void {
-  const m = /^#\/case\/([\w-]+)/.exec(location.hash);
-  const scenario = m ? caseById(m[1]) : undefined;
-  if (scenario) {
-    if (!cases.has(scenario.id)) cases.set(scenario.id, newCaseUI(createSession(scenario)));
+  let resolved = null;
+  try {
+    resolved = resolve(location.hash);
+  } catch {
+    resolved = null; // an unusable seed falls back to the home page
+  }
+  if (resolved) {
+    const { scenario, day } = resolved;
+    if (!cases.has(scenario.id)) cases.set(scenario.id, newCaseUI(createSession(scenario), day));
     const changed = currentId !== scenario.id;
     currentId = scenario.id;
-    document.title = `Case ${scenario.number}: ${scenario.title} · Ledger Fix Lab`;
+    document.title = `${scenario.kind === 'case' ? `${scenario.badge}: ${scenario.title}` : `${scenario.badge}: ${scenario.business}`} | Ledger Fix Lab`;
     render();
     if (changed) window.scrollTo(0, 0);
   } else {
     currentId = null;
     document.title = 'Ledger Fix Lab: practice bookkeeping cleanups';
-    app.innerHTML = renderLanding(completed);
+    app.innerHTML = renderLanding(completed, history);
     // In-page anchors (#cases) are handled by the browser; only reset scroll for the home route.
     if (location.hash === '' || location.hash === '#/') window.scrollTo(0, 0);
   }
@@ -88,7 +95,7 @@ app.addEventListener('click', (ev) => {
       ui.editing = ui.recording = null;
       return render();
     case 'reset':
-      cases.set(currentId!, { ...newCaseUI(reset(ui.session)), noteOpen: ui.noteOpen });
+      cases.set(currentId!, { ...newCaseUI(reset(ui.session), ui.day), noteOpen: ui.noteOpen, firstCheck: ui.firstCheck });
       return render();
     case 'toggle-note':
       ui.noteOpen = !ui.noteOpen;
@@ -106,8 +113,24 @@ app.addEventListener('click', (ev) => {
     case 'check': {
       ui.checked = true;
       ui.checksRun += 1;
+      const s = ui.session.scenario;
+      if (!ui.firstCheck) {
+        // The skill record keeps the outcome of the first check on each file only.
+        ui.firstCheck = skillOutcomes(s, checkAll(s, ui.session.state));
+        if (!history.some((h) => h.fileId === s.id)) {
+          history = [...history, { fileId: s.id, at: new Date().toISOString(), firstCheck: ui.firstCheck }];
+          saveHistory(history);
+        }
+      }
       render();
       app.querySelector('.review, .solved')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
+    case 'copy-result': {
+      navigator.clipboard?.writeText(shareText(ui, location.href)).then(
+        () => (t.textContent = 'Copied'),
+        () => (t.textContent = 'Copy failed'),
+      );
       return;
     }
     case 'copy-report': {

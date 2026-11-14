@@ -74,9 +74,19 @@ export interface ClientNote {
   paragraphs: string[];
 }
 
+/** A problem deliberately planted in a scenario, tied to the transaction a check would flag. */
+export interface Planted {
+  skill: SkillId;
+  txnId: string;
+}
+
 export interface Scenario {
   id: string;
+  /** Guided cases are numbered; generated files have number 0. */
   number: number;
+  kind: 'case' | 'daily' | 'practice';
+  /** Short label shown in the header, e.g. "Case 2" or "File of the day". */
+  badge: string;
   title: string;
   client: string;
   business: string;
@@ -95,6 +105,8 @@ export interface Scenario {
   txns: Txn[];
   /** The client's books as handed over. */
   ledger: LedgerEntry[];
+  /** What was planted, for the skill record. */
+  planted: Planted[];
 }
 
 export interface LedgerState {
