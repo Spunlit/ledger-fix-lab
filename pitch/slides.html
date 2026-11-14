@@ -4,202 +4,222 @@
 <meta charset="utf-8">
 <title>Ledger Fix Lab — pitch</title>
 <style>
+  @font-face { font-family: 'Public Sans'; font-weight: 400 800; src: url('../public/fonts/public-sans-latin-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Public Sans'; font-style: italic; font-weight: 400; src: url('../public/fonts/public-sans-latin-italic.woff2') format('woff2'); }
   @page { size: 1280px 720px; margin: 0; }
-  :root { --ink:#1d2320; --muted:#5f6964; --line:#dedcd3; --bg:#f5f4ef; --accent:#1f6f54; --bad:#b3261e; --badbg:#fcebea; --good:#1f7a4d; --goodbg:#e7f4ec; --warn:#fff4d6; }
+  :root { --paper:#f2f5f8; --surface:#fff; --ink:#14233c; --ink2:#4a5a72; --rule:#d3dbe5; --pencil:#2153c6; --red:#b42318; --green:#0e7a4b; --marker:#ffe36e; --markersoft:#fff6c7; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #888; }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .s { width: 1280px; height: 720px; background: var(--bg); position: relative; overflow: hidden; padding: 56px 72px; page-break-after: always; break-after: page; }
-  .s:last-child { page-break-after: auto; break-after: auto; }
-  .k { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
-  h1 { font-size: 64px; line-height: 1.05; margin: 0 0 18px; letter-spacing: -.02em; }
-  h2 { font-size: 40px; line-height: 1.15; margin: 0 0 26px; letter-spacing: -.01em; }
-  p, li { font-size: 22px; line-height: 1.45; }
-  ul { margin: 0; padding-left: 26px; }
-  li + li { margin-top: 10px; }
-  .muted { color: var(--muted); }
-  .foot { position: absolute; left: 72px; right: 72px; bottom: 26px; display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
-  .logo { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 14px; background: var(--accent); color: #fff; font-size: 38px; font-weight: 800; margin-bottom: 26px; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-  .box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; }
-  .box h3 { margin: 0 0 8px; font-size: 22px; }
-  .box p { margin: 0; font-size: 19px; }
-  .unk { background: var(--warn); border: 1px solid #e8d9a6; border-radius: 12px; padding: 14px 20px; font-size: 18px; }
-  .unk b { color: #7a5a00; }
-  .shot { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 24px rgb(0 0 0 / .10); }
-  .shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
-  .crop { border: 1px solid var(--line); border-radius: 12px; background-color: #fff; background-repeat: no-repeat; box-shadow: 0 6px 24px rgb(0 0 0 / .10); }
-  .cap { font-size: 20px; line-height: 1.4; }
-  .big { font-size: 30px; font-weight: 700; }
-  .neg { color: var(--bad); } .pos { color: var(--good); }
-  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 30px; }
-  .flow div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 18px; line-height: 1.35; position: relative; }
-  .flow div b { display: block; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-  .checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .chk { background: #fff; border-left: 6px solid var(--accent); border-radius: 10px; padding: 16px 20px; }
-  .chk h3 { margin: 0 0 6px; font-size: 21px; }
-  .chk p { margin: 0; font-size: 18px; }
-  .tag { display: inline-block; font-size: 14px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
-  .tag.real { background: var(--goodbg); color: var(--good); }
-  .tag.mock { background: var(--badbg); color: var(--bad); }
-  .tag.hyp { background: var(--warn); color: #7a5a00; }
-  .links { font-size: 22px; line-height: 1.7; }
-  .links b { display: inline-block; width: 90px; color: var(--muted); font-weight: 600; }
-  table { border-collapse: collapse; width: 100%; font-size: 19px; }
-  td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  td:first-child { font-weight: 700; width: 300px; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Public Sans', system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .s { width: 1280px; height: 720px; background: var(--paper); position: relative; overflow: hidden; padding: 60px 76px 56px; break-after: page; page-break-after: always; }
+  .s:last-child { break-after: auto; page-break-after: auto; }
+  h1 { font-size: 72px; line-height: 1; letter-spacing: -0.03em; margin: 0 0 22px; font-weight: 800; }
+  h2 { font-size: 42px; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 30px; font-weight: 800; max-width: 22ch; text-wrap: balance; }
+  h3 { font-size: 21px; margin: 0 0 8px; font-weight: 750; }
+  p, li { font-size: 20px; line-height: 1.45; margin: 0 0 10px; }
+  ul { margin: 0; padding-left: 24px; }
+  .muted { color: var(--ink2); }
+  .foot { position: absolute; left: 76px; right: 76px; bottom: 22px; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink2); border-top: 1px solid var(--rule); padding-top: 8px; }
+  .mark { display: inline-block; width: 44px; height: 44px; border: 3px solid var(--ink); border-radius: 8px; position: relative; vertical-align: middle; margin-right: 14px; }
+  .mark::after { content: ''; position: absolute; left: 12px; top: 3px; width: 12px; height: 22px; border: solid var(--green); border-width: 0 5px 5px 0; transform: rotate(45deg); }
+  .brand { font-size: 26px; font-weight: 800; display: flex; align-items: center; margin-bottom: 70px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--ink); }
+  .grid3 > div { padding: 18px 26px 0 0; }
+  .grid3 > div + div { padding-left: 26px; border-left: 1px solid var(--rule); }
+  .label { font-size: 15px; font-weight: 700; color: var(--pencil); margin-bottom: 6px; }
+  .sheet { background: var(--surface); border: 1px solid var(--rule); border-top: 5px solid var(--ink); padding: 14px 26px; }
+  .sheet .row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 21px; }
+  .sheet .row:last-child { border-bottom: 0; }
+  .sheet .num { font-size: 30px; font-weight: 800; }
+  .ok { color: var(--green); } .bad { color: var(--red); }
+  .dbl { border-bottom: 5px double currentColor; }
+  .quote { border-left: 4px solid var(--pencil); padding: 6px 0 6px 22px; margin-top: 30px; }
+  .quote p { font-size: 26px; font-style: italic; margin: 0 0 6px; }
+  .quote span { font-size: 15px; color: var(--ink2); }
+  .shot { position: relative; background-repeat: no-repeat; background-color: #fff; border: 1px solid var(--rule); box-shadow: 0 10px 30px rgb(20 35 60 / 0.14); }
+  .shot.fade::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: linear-gradient(rgb(255 255 255 / 0), #fff); }
+  .grid3 p { font-size: 23px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { font-size: 19px; padding: 13px 14px 13px 0; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.4; }
+  td:first-child { font-weight: 750; width: 300px; }
+  tr:first-child td { border-top: 2px solid var(--ink); }
+  .angle { margin-top: 26px; background: var(--markersoft); border-left: 4px solid var(--marker); padding: 14px 22px; }
+  .angle p { margin: 0; font-size: 21px; }
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 2px solid var(--ink); margin-bottom: 26px; }
+  .flow div { padding: 14px 16px 0 0; font-size: 17px; line-height: 1.35; }
+  .flow div + div { padding-left: 16px; border-left: 1px solid var(--rule); }
+  .flow b { display: block; font-size: 15px; color: var(--pencil); margin-bottom: 4px; }
+  .big { font-size: 84px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  ul[style*='21px'] li { font-size: 21px; margin-bottom: 12px; }
+  .biz p { font-size: 23px; } .biz h3 { font-size: 24px; color: var(--pencil); }
+  .ev h3 { font-size: 19px; }
+  .ev li { font-size: 18.5px; margin-bottom: 10px; line-height: 1.38; }
+  .tag { display: inline-block; font-size: 14px; font-weight: 700; padding: 2px 10px; border-radius: 3px; margin-bottom: 10px; }
+  .t-obs { background: #e9f6ef; color: var(--green); } .t-inf { background: #e8eefc; color: var(--pencil); } .t-unk { background: #fdf0ee; color: var(--red); }
+  .links { font-size: 21px; line-height: 1.8; }
+  .links b { display: inline-block; width: 70px; color: var(--ink2); font-weight: 600; }
 </style>
 </head>
 <body>
 
-<!-- 1 -->
+<!-- 1. Title -->
 <section class="s">
-  <div class="logo">✓</div>
-  <p class="k">Business Cup 2.0 · Track: Money</p>
-  <h1>Ledger Fix Lab</h1>
-  <p style="font-size:28px;max-width:960px;margin:0 0 40px">A practice range for fixing small-business books. You clean up a messy ledger; a deterministic engine grades the <b>final state of the books</b>, not a text answer.</p>
-  <div class="links">
-    <div><b>Live</b>spunlit.github.io/ledger-fix-lab</div>
-    <div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div>
+  <div class="brand"><span class="mark"></span>Ledger Fix Lab</div>
+  <div class="grid2" style="grid-template-columns: 1.15fr 0.85fr; align-items: center;">
+    <div>
+      <h1 style="font-size:60px; max-width: 15ch;">Practice your first bookkeeping cleanup before a client pays for it.</h1>
+      <p class="muted" style="font-size:22px; max-width: 34ch;">Realistic client books, graded on whether they end up right, not just balanced.</p>
+    </div>
+    <div>
+      <div class="sheet">
+        <div class="row"><span>Reconciliation difference</span><span class="num ok">$0.00</span></div>
+        <div class="row"><span>Net profit, as booked</span><span class="num bad">$10,410.76</span></div>
+        <div class="row"><span>Net profit, actually</span><span class="num">$5,410.76</span></div>
+      </div>
+      <p class="muted" style="font-size:15px; margin-top:12px;">Both lines at once, from case 2 in the live product.</p>
+    </div>
   </div>
-  <p class="muted" style="font-size:18px;margin-top:30px">Web-only · no sign-up · works on phones · synthetic practice data</p>
-  <div class="foot"><span>Ledger Fix Lab</span><span>1 / 10</span></div>
+  <div class="links" style="margin-top:44px;"><div><b>Live</b>spunlit.github.io/ledger-fix-lab</div><div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div></div>
+  <div class="foot"><span>Business Cup 2.0, Skills track. Web, free, no sign-up.</span><span>1</span></div>
 </section>
 
-<!-- 2 -->
+<!-- 2. Person and problem -->
 <section class="s">
-  <p class="k">Problem &amp; user</p>
-  <h2>Fixing the books is scary when every click hits live data</h2>
-  <div class="cols" style="margin-bottom:26px">
-    <div class="box"><h3>Who</h3><p>A beginner freelance bookkeeper or small-business owner in the US, 25–45, who keeps their own books in QuickBooks Online.</p></div>
-    <div class="box"><h3>When</h3><p>The monthly bank reconciliation turns up duplicates, wrong categories and a balance that doesn't match the statement.</p></div>
+  <h2>A new bookkeeper's first cleanup happens on a paying client's books</h2>
+  <div class="grid3">
+    <div><div class="label">Who</div><p>A new US freelance bookkeeper, 25–45, who has finished a course or the free QuickBooks certification.</p></div>
+    <div><div class="label">When</div><p>The first cleanup job: months of messy books, bank-feed duplicates, entries typed in by hand.</p></div>
+    <div><div class="label">What goes wrong</div><p>They force the reconciliation to $0.00 by deleting the wrong thing, or leave owner money booked as income. The client's profit figure is wrong.</p></div>
   </div>
-  <div class="box" style="margin-bottom:26px"><h3>The trap</h3><p>Deleting the <i>wrong</i> row can make the balance match while the books are still wrong. A matching number feels like success, and that is exactly the mistake people need to practice catching.</p></div>
-  <div class="unk"><b>Not validated (UNKNOWN):</b> how many such users exist, their ages, willingness to pay, how often they would come back.</div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>2 / 10</span></div>
+  <div class="quote">
+    <p>“I don't have any hands-on experience yet.”</p>
+    <span>A newly certified ProAdvisor asking how to start paid bookkeeping, Intuit community, June 2023</span>
+  </div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>2</span></div>
 </section>
 
-<!-- 3 -->
+<!-- 3. Evidence -->
+<section class="s ev">
+  <h2>What we know, what we infer, and what we don't</h2>
+  <div class="grid3" style="border-top:0;">
+    <div><span class="tag t-obs">Observed</span>
+      <ul>
+        <li>Newly certified bookkeepers ask how to get hands-on experience (Intuit community, 2023 and 2024).</li>
+        <li>A paid product (QBO Gym, now in Akadian) sells "hands-on experience before taking on real clients".</li>
+        <li>Personal training spend on offer: ProAdvisor free; Intuit cert on Coursera $59/mo; Akadian bundle $847; Bookkeeper Launch $2,999.</li>
+        <li>Cleanup is sold as freelance work on Upwork and Fiverr.</li>
+      </ul></div>
+    <div><span class="tag t-inf">Inferred</span>
+      <ul>
+        <li>New freelancers already pay out of pocket to become client-ready.</li>
+        <li>The gap between a certificate and a first paid cleanup is real, and someone already charges to fill it.</li>
+        <li>Recurring forum errors (duplicates, transfers booked as income, deleted reconciled items) are teachable patterns.</li>
+      </ul></div>
+    <div><span class="tag t-unk">Unknown</span>
+      <ul>
+        <li>Willingness to pay for this simulator.</li>
+        <li>Retention after the first cases.</li>
+        <li>Buyer age mix; competitor sales volumes.</li>
+        <li>Our evidence base is small: forum posts and price pages. Reddit could not be fetched.</li>
+      </ul></div>
+  </div>
+  <div class="foot"><span>Prices are list offers, not verified sales. Sources in PRODUCT_STRATEGY.md in the repo.</span><span>3</span></div>
+</section>
+
+<!-- 4. Alternatives -->
 <section class="s">
-  <p class="k">Existing options</p>
-  <h2>People already learn this elsewhere</h2>
-  <table style="margin-bottom:28px">
-    <tr><td>ChatGPT, forums</td><td>Explain what to do, but don't check what you actually did to the ledger.</td></tr>
-    <tr><td>YouTube courses</td><td>Passive: no feedback on your own fix.</td></tr>
-    <tr><td>QuickBooks Online Test Drive</td><td>Free sample company to click around in safely.</td></tr>
-    <tr><td>Akadian ClickStudy</td><td>QuickBooks training product, a direct competitor.</td></tr>
+  <h2>Free practice exists. Feedback on your actual books doesn't.</h2>
+  <table>
+    <tr><td>QuickBooks Online Test Drive</td><td>Free sample company. Nothing tells you when you're wrong.</td></tr>
+    <tr><td>Courses and certification</td><td>Teach the software and the theory, not a messy client file.</td></tr>
+    <tr><td>ChatGPT, YouTube</td><td>Explain what to do. Can't see what you actually did to the books.</td></tr>
+    <tr><td>Paid practice (Akadian / QBO Gym)</td><td>Closest competitor. Its format and grading we could not verify.</td></tr>
   </table>
-  <div class="box"><h3>Our angle (not a proven advantage)</h3><p>One narrow, checkable cleanup task: the engine verifies the end state with three separate checks and names the rule you broke, including when the balance matches but the books are wrong.</p></div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>3 / 10</span></div>
+  <div class="angle"><p><b>Our angle:</b> one realistic client file at a time, graded on the end state, catching "balanced but wrong", ending with a summary you'd send the client. An advantage we have not yet proven with users.</p></div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>4</span></div>
 </section>
 
-<!-- 4 -->
-<section class="s">
-  <p class="k">How it works</p>
-  <h2>Graded on the state of the books</h2>
+<!-- 5. Key interaction -->
+<section class="s" style="padding-top:44px;">
+  <h2 style="margin-bottom:20px; max-width:none;">The reconciliation says $0.00. The books are still wrong by $5,000.</h2>
+  <div class="shot" style="width:1060px; height:445px; background-image:url(img/trap.png); background-size:1120px auto; background-position:-22px -322px;"></div>
+  <p class="muted" style="font-size:18px; margin-top:14px;">Case 2: the owner's own $5,000 transfer was booked as sales. Three checks pass; the fourth names the row and the profit effect.</p>
+  <div class="foot"><span>Screenshot of the live site. Synthetic client data.</span><span>5</span></div>
+</section>
+
+<!-- 6. Loop -->
+<section class="s" style="padding-top:44px;">
+  <h2 style="margin-bottom:22px; max-width:none;">Every move is checked against the bank and explained</h2>
   <div class="flow">
-    <div><b>1 · Given</b>A messy ledger and the bank statement (source of truth)</div>
-    <div><b>2 · You</b>Delete rows or change categories. Undo any time</div>
-    <div><b>3 · Engine</b>Runs three independent checks on the result</div>
-    <div><b>4 · Feedback</b>Plain-language explanation of each broken rule</div>
+    <div><b>Brief</b>Read the client's note: context, not answers.</div>
+    <div><b>Reconcile</b>Tick, edit, re-categorize, delete, record a missing bank line.</div>
+    <div><b>Clues</b>Bookkeeper heuristics on the live difference, like ÷9 for swapped digits.</div>
+    <div><b>Check</b>Four checks say which rule broke, in plain words.</div>
+    <div><b>Deliver</b>A cleanup summary generated from what you changed.</div>
   </div>
-  <div class="checks" style="margin-bottom:26px">
-    <div class="chk"><h3>1 · Transactions</h3><p>Every statement transaction is in the ledger exactly once: nothing real deleted, no duplicate left.</p></div>
-    <div class="chk"><h3>2 · Matches statement</h3><p>Opening balance + ledger rows = statement closing balance, computed in integer cents.</p></div>
-    <div class="chk"><h3>3 · Categories</h3><p>Every row fits its category rule. Independent of money: recategorizing never moves the balance.</p></div>
-  </div>
-  <p style="margin:0">Success only when <b>all three</b> pass. Any correct end state passes: either copy of a duplicate may be deleted; two real identical purchases are not a duplicate.</p>
-  <div class="foot"><span>Ledger Fix Lab</span><span>4 / 10</span></div>
+  <div class="shot fade" style="width:1060px; height:350px; background-image:url(img/solved.png); background-size:1120px auto; background-position:-22px -215px;"></div>
+  <div class="foot"><span>Screenshot of the live site. Synthetic client data.</span><span>6</span></div>
 </section>
 
-<!-- 5 -->
-<section class="s" style="display:grid;grid-template-columns:330px 1fr;gap:36px;align-items:start">
-  <div>
-    <p class="k">Demo · start</p>
-    <h2 style="font-size:34px">October books don't reconcile</h2>
-    <p class="cap">Difference: <span class="big neg">−$412.50</span></p>
-    <p class="cap">Three planted problems: one payment recorded twice (bank feed + manual entry), two rows in the wrong category.</p>
-    <p class="cap">Two traps: two real identical coffees on the same day, and a second real payment of the same $412.50.</p>
-  </div>
-  <div class="crop" style="height:590px;background-image:url(img/1-initial.png);background-size:819px auto;background-position:-35px -160px"></div>
-  <div class="foot"><span>Screenshot of the live site · synthetic data</span><span>5 / 10</span></div>
-</section>
-
-<!-- 6 -->
+<!-- 7. Engineering -->
 <section class="s">
-  <p class="k">Demo · the trap</p>
-  <h2 style="font-size:34px;margin-bottom:18px">$0.00 and still wrong</h2>
-  <div class="crop" style="height:340px;background-image:url(img/2-compensating-error.png);background-size:1215px auto;background-position:-52px -237px;margin-bottom:22px"></div>
-  <div class="cols" style="gap:36px">
-    <p class="cap" style="margin:0">Delete the <b>real</b> Oct 29 payment instead of the Oct 15 duplicate: the difference shows <b class="pos">$0.00</b>, which looks done.</p>
-    <p class="cap" style="margin:0">The engine still fails it: a real transaction is missing and the duplicate remains, so the errors cancel out. Undo restores the exact previous state.</p>
-  </div>
-  <div class="foot"><span>Screenshot of the live site · synthetic data (categories not fixed yet at this point)</span><span>6 / 10</span></div>
-</section>
-
-<!-- 7 -->
-<section class="s">
-  <p class="k">Demo · solved</p>
-  <h2 style="font-size:34px;margin-bottom:18px">All three checks green</h2>
-  <div class="crop" style="height:236px;background-image:url(img/3-solved.png);background-size:1215px auto;background-position:-52px -237px;margin-bottom:24px"></div>
-  <p class="cap" style="margin-top:0">Fix: delete one copy of the duplicate (either one), move Adobe to Software &amp; Subscriptions and Shell fuel to Car &amp; Truck.</p>
-  <p class="cap">Recategorizing never changes the difference: money and categories are checked separately.</p>
-  <p class="cap">The same flow works on a phone: ledger rows become stacked cards (tested at 375&nbsp;px).</p>
-  <div class="foot"><span>Screenshots of the live site · synthetic data</span><span>7 / 10</span></div>
-</section>
-
-<!-- 8 -->
-<section class="s">
-  <p class="k">Engineering</p>
-  <h2>The core loop is tested, not just shown</h2>
-  <ul>
-    <li>Pure TypeScript engine with no UI code; money as integer cents; immutable state; undo restores the exact previous state.</li>
-    <li><b>18 unit tests</b> (Vitest): correct, equivalent, deleting a needed row, compensating errors, wrong category at $0.00, identical purchases ≠ duplicate, exact undo.</li>
-    <li><b>Exhaustive test:</b> all 16,384 keep/delete combinations of the 14 rows: exactly 2 pass (delete either duplicate copy).</li>
-    <li><b>16-step end-to-end check</b> in headless Chrome against the live URL, desktop and 375&nbsp;px phone.</li>
-    <li>CI: every push runs tests and build before deploying to GitHub Pages.</li>
-    <li>Static site: no backend, no accounts, no data collected; an offline build is ready for the demo.</li>
-  </ul>
-  <div class="foot"><span>Ledger Fix Lab</span><span>8 / 10</span></div>
-</section>
-
-<!-- 9 -->
-<section class="s">
-  <p class="k">Honest scope &amp; business hypothesis</p>
-  <h2>What is real, what is not</h2>
-  <div class="cols" style="grid-template-columns:1fr 1fr 1fr;gap:20px">
-    <div class="box"><span class="tag real">REAL</span><p>Interactive ledger: delete, recategorize, undo, reset. Three independent checks and explanations, running in the browser. Tests and CI.</p></div>
-    <div class="box"><span class="tag mock">MOCK / NOT BUILT</span><p>One fixed synthetic scenario. No QuickBooks or bank connection. No accounts, saved progress or payments.</p></div>
-    <div class="box"><span class="tag hyp">HYPOTHESIS</span><p>First scenario free; paid packs of harder cleanup scenarios. Return reason: new practice cases for the monthly close. Prices, demand and retention: UNKNOWN.</p></div>
-  </div>
-  <p class="muted" style="margin-top:28px;font-size:19px">No revenue, user or retention numbers are claimed: none have been measured.</p>
-  <div class="foot"><span>Ledger Fix Lab</span><span>9 / 10</span></div>
-</section>
-
-<!-- 10 -->
-<section class="s">
-  <p class="k">Risks &amp; next step</p>
-  <h2>What could kill it, and the cheapest test</h2>
-  <div class="cols">
-    <div class="box">
-      <h3>Risks</h3>
-      <ul style="padding-left:22px">
-        <li style="font-size:19px">Free QBO Test Drive and Akadian may already cover the need.</li>
-        <li style="font-size:19px">After mastering cleanup, users may not come back.</li>
-        <li style="font-size:19px">Target buyers and their ages are unconfirmed.</li>
-        <li style="font-size:19px">Each new scenario costs authoring time.</li>
-      </ul>
+  <h2>The grading is exhaustively tested</h2>
+  <div class="grid2" style="grid-template-columns: 0.9fr 1.1fr; gap: 56px;">
+    <div>
+      <div class="big"><span class="dbl">2</span> <span class="muted" style="font-size:40px; font-weight:600;">of 524,288</span></div>
+      <p style="margin-top:22px; font-size:22px;">Case 2 states tried in the test suite: every combination of deletions, ticks and recording the bank fee. Exactly the two valid solutions pass. Many others reach $0.00 and still fail, by design.</p>
     </div>
-    <div class="box">
-      <h3>Next cheapest test (not done yet)</h3>
-      <p>Share the live link with people learning bookkeeping. Measure who finishes the scenario, which trap catches them, and who asks for another scenario.</p>
+    <ul style="font-size:21px;">
+      <li>A truth model per transaction; four independent checks; money in integer cents.</li>
+      <li>Any correct end state passes, whatever order you work in.</li>
+      <li>Every shortcut has a test: plugging an amount, unticking a duplicate, deleting the uncleared check, recording a line twice.</li>
+      <li>47 unit tests, plus a 31-step browser test run against the live URL at desktop and phone widths.</li>
+      <li>CI runs the tests before every deploy. Static site: nothing leaves the browser; works offline.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Open source: tests/engine.test.ts, scripts/e2e.mjs</span><span>7</span></div>
+</section>
+
+<!-- 8. Business -->
+<section class="s biz">
+  <h2>Who pays, and why they would</h2>
+  <div class="grid2" style="gap:56px;">
+    <div>
+      <h3>Buyer</h3><p>The new freelance bookkeeper, paying personally, in the weeks before quoting a first cleanup.</p>
+      <h3 style="margin-top:22px;">Offer (hypothesis)</h3><p>First two cases free. A one-time pack of harder client files: credit cards, payroll, sales tax, a catch-up year. Priced well below the courses they already buy; a starting point of $29–$49 to test.</p>
+    </div>
+    <div>
+      <h3>Reason to return (hypothesis)</h3><p>A new client file each month that mirrors a real month-end close. Retention is unknown.</p>
+      <h3 style="margin-top:22px;">First customers</h3><p>Where learners already ask: the Intuit ProAdvisor community, r/Bookkeeping, course alumni groups. Later, course creators who want graded practice for their students.</p>
     </div>
   </div>
-  <div class="links" style="margin-top:34px">
-    <div><b>Live</b>spunlit.github.io/ledger-fix-lab</div>
-    <div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div>
+  <div class="foot"><span>No revenue, users or retention exist yet. Nothing on this slide is measured.</span><span>8</span></div>
+</section>
+
+<!-- 9. Risks -->
+<section class="s">
+  <h2>What could kill it</h2>
+  <table>
+    <tr><td>Free is good enough</td><td>Test Drive plus YouTube may satisfy most learners. We have to show the check is worth paying for.</td></tr>
+    <tr><td>One and done</td><td>After a few cases, people may not come back. The case-pack model has to prove itself.</td></tr>
+    <tr><td>Authoring cost</td><td>Every realistic, provably solvable case takes expert time to build and test.</td></tr>
+    <tr><td>A shrinking field</td><td>BLS projects bookkeeping clerk jobs down 6% from 2024 to 2034, still with about 170k openings a year.</td></tr>
+    <tr><td>An incumbent</td><td>Akadian already sells practice to the same people, with an audience.</td></tr>
+  </table>
+  <div class="foot"><span>Ledger Fix Lab</span><span>9</span></div>
+</section>
+
+<!-- 10. Today vs next -->
+<section class="s">
+  <h2>Working today, and the next test</h2>
+  <div class="grid3">
+    <div><div class="label">Working today</div><p>Live site, two cases, four checks, clues, P&amp;L before and after, cleanup summary, undo, phone layout. Tests and CI. Open source.</p></div>
+    <div><div class="label">Not built</div><p>Accounts, payments, more cases, any QuickBooks or bank connection. Both clients are synthetic.</p></div>
+    <div><div class="label">Next experiment (not run)</div><p>Share case 1 in learner communities for two weeks. Measure completion, which trap catches people, and sign-ups for the next pack, against a bar set in advance.</p></div>
   </div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>10 / 10</span></div>
+  <div class="links" style="margin-top:46px;"><div><b>Live</b>spunlit.github.io/ledger-fix-lab</div><div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div></div>
+  <div class="foot"><span>Ledger Fix Lab</span><span>10</span></div>
 </section>
 
 </body>

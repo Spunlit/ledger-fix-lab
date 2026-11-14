@@ -58,3 +58,10 @@
 - Engine v2 + Case 2 + clues + cleanup report + new UI (landing, workbench, review, completion).
 - Verified: npm test 47/47 (incl. ~524k-state exhaustive case-2 test); build OK; e2e 31/31 locally
   (found & fixed: completion not saved when solved after a check; mobile statement wrapping; worksheet height).
+
+## 2026-11-14 ~17:00 Astana — v2 live + new pitch
+- v2 merged to main and deployed; e2e 31/31 against https://spunlit.github.io/ledger-fix-lab/ (fresh profile).
+- Pitch rebuilt (pitch/slides.html → LedgerFixLab_pitch.pdf, 10 pages) from live screenshots; every number from
+  the engine, tests or a cited source; observed / inferred / unknown separated. Rendered PDF pages inspected with
+  pypdfium2 (already installed); fixed caption/footer collision, screenshot scrollbars, sparse type.
+- UX: edit hint on amounts; note that deleting is only acceptable in an unreconciled month.

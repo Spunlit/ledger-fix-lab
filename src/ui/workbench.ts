@@ -74,11 +74,12 @@ export function renderWorkbench(ui: CaseUI): string {
         </header>
         ${ui.noteOpen ? s.note.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('') : ''}
       </article>
-      <ol class="job">
+      <div class="jobwrap"><ol class="job">
         <li>Compare the books with the bank statement, line by line.</li>
-        <li>Fix what's wrong: delete, correct an amount, change a category, tick what's on the statement, or record a bank line that's missing.</li>
+        <li>Fix what's wrong: delete, correct an amount (click it), change a category, tick what's on the statement, or record a bank line that's missing.</li>
         <li>When the difference reads $0.00, press <b>Check the books</b>.</li>
       </ol>
+      <p class="job-note">This month hasn't been reconciled yet, so deleting a wrong row is fine here. In real books, never delete a row from a month that's already reconciled.</p></div>
     </section>
 
     <section class="worksheet" aria-label="Bank reconciliation worksheet" aria-live="polite">
