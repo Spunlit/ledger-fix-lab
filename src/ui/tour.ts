@@ -34,6 +34,16 @@ let root: HTMLElement | null = null;
 let steps: TourStep[] = [];
 let at = 0;
 let raf = 0;
+let opts: TourOptions = {};
+
+export interface TourOptions {
+  /** Label of the last button. */
+  finish?: string;
+  /** Called when the last step is confirmed (not when the tour is skipped). */
+  onDone?: () => void;
+  /** The first-visit tour is remembered and returns to the top; a demonstration does neither. */
+  demo?: boolean;
+}
 
 const visible = (el: Element | null): el is HTMLElement => !!el && (el as HTMLElement).getClientRects().length > 0;
 function find(sel?: string): HTMLElement | null {
@@ -92,7 +102,7 @@ function show(i: number): void {
   card.querySelector('.tour-t')!.textContent = s.title;
   card.querySelector('.tour-d')!.textContent = s.text;
   card.querySelector<HTMLElement>('[data-tour=back]')!.hidden = at === 0;
-  card.querySelector('[data-tour=next]')!.textContent = at === steps.length - 1 ? 'Start working' : 'Next';
+  card.querySelector('[data-tour=next]')!.textContent = at === steps.length - 1 ? (opts.finish ?? 'Start working') : 'Next';
   root.querySelector<HTMLElement>('.tour-bar i')!.style.transform = `scaleX(${(at + 1) / steps.length})`;
   const el = find(s.target);
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -113,9 +123,9 @@ function show(i: number): void {
   card.querySelector<HTMLElement>('[data-tour=next]')!.focus({ preventScroll: true });
 }
 
-export function endTour(): void {
+export function endTour(completed = false): void {
   if (!root) return;
-  markSeen();
+  if (!opts.demo) markSeen();
   cancelAnimationFrame(raf);
   window.removeEventListener('resize', place);
   window.removeEventListener('scroll', place, true);
@@ -124,24 +134,28 @@ export function endTour(): void {
   root = null;
   el.classList.add('is-out');
   setTimeout(() => el.remove(), 260);
-  window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  if (!opts.demo) window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  const done = completed ? opts.onDone : undefined;
+  opts = {};
+  done?.();
 }
 
 function onKey(e: KeyboardEvent): void {
   if (!root) return;
   if (e.key === 'Escape') endTour();
-  else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); at === steps.length - 1 ? endTour() : show(at + 1); }
+  else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); at === steps.length - 1 ? endTour(true) : show(at + 1); }
   else if (e.key === 'ArrowLeft') show(at - 1);
 }
 
-export function startTour(list: TourStep[] = CASE_TOUR): void {
+export function startTour(list: TourStep[] = CASE_TOUR, options: TourOptions = {}): void {
   if (root) return;
   steps = list;
+  opts = options;
   root = document.createElement('div');
   root.className = 'tour';
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-modal', 'true');
-  root.setAttribute('aria-label', 'A short tour of the workbench');
+  root.setAttribute('aria-label', options.demo ? 'A demonstration of one fix' : 'A short tour of the workbench');
   root.innerHTML = `
     <div class="tour-hole" aria-hidden="true"></div>
     <div class="tour-card" data-testid="tour">
@@ -150,7 +164,7 @@ export function startTour(list: TourStep[] = CASE_TOUR): void {
       <h2 class="tour-t"></h2>
       <p class="tour-d"></p>
       <div class="tour-acts">
-        <button type="button" class="tour-skip" data-tour="skip">Skip the tour</button>
+        <button type="button" class="tour-skip" data-tour="skip">${options.demo ? 'I will do it myself' : 'Skip the tour'}</button>
         <button type="button" class="btn" data-tour="back">Back</button>
         <button type="button" class="btn primary" data-tour="next">Next</button>
       </div>
@@ -160,7 +174,7 @@ export function startTour(list: TourStep[] = CASE_TOUR): void {
     if (!b) return;
     if (b.dataset.tour === 'skip') endTour();
     else if (b.dataset.tour === 'back') show(at - 1);
-    else at === steps.length - 1 ? endTour() : show(at + 1);
+    else at === steps.length - 1 ? endTour(true) : show(at + 1);
   });
   document.body.append(root);
   window.addEventListener('resize', place);

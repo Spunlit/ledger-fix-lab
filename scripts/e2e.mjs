@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 71; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 75; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -155,6 +155,19 @@ async function main() {
 
   // ---------- case 2 (guided, all tools)
   await go('#/case/rivera-mar');
+  ok((await text('[data-testid=help]')) === 'Hint', 'guided case offers a hint');
+  await click('[data-testid=help]');
+  await click('[data-testid=help]');
+  ok((await text('[data-testid=help]')) === 'Show me how' && (await js(`return !!$('tr.co-look')`)), 'second press: "More help" points at the row, the button now offers a demonstration');
+  await click('[data-testid=help]');
+  await sleep(700);
+  ok((await text('[data-testid=tour] .tour-t')) === 'First, find the line' && (await text('[data-testid=tour] .tour-n')) === '1 of 3', 'third press starts a three-step demonstration');
+  await click('[data-tour=next]');
+  await click('[data-tour=next]');
+  await click('[data-tour=next]');
+  await sleep(500);
+  ok((await diff()) === `${M}$84.37` && (await toast()).includes('1 of 4') && (await text('[data-testid=help]')) === 'Hint', 'the demonstration makes the move (bank fee recorded), with the usual feedback; help resets');
+  await click('[data-act=undo]');
   ok((await diff()) === `${M}$99.37`, `case 2 starts at −$99.37 (got ${await diff()})`);
   await click('[data-act=toggle-hint]');
   ok((await clue()).includes("doesn't match any single item"), 'first hint: more than one thing is off');

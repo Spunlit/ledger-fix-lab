@@ -3,7 +3,7 @@ import { checkAll, type CheckReport } from './engine';
 import { shortDate } from './explain';
 import type { GuideId } from './guide';
 import { formatCents } from './money';
-import type { LedgerState, Scenario } from './types';
+import type { Action, LedgerState, Scenario } from './types';
 
 /**
  * The coach for guided cases: the single next thing to do, in plain words, and the rows it is about.
@@ -117,4 +117,37 @@ export function coachStep(s: Scenario, state: LedgerState, report: CheckReport =
 /** True when the handed-over books contained this transaction (so its absence means the user deleted it). */
 function wasHandedOver(s: Scenario, txnId: string): boolean {
   return s.ledger.some((e) => e.txnId === txnId);
+}
+
+/**
+ * The move that resolves the coach's current step, for the "show me how" demonstration. 'undo' when the
+ * step is to put a deleted line back; null when there is nothing to fix.
+ */
+export function coachAction(s: Scenario, state: LedgerState, report: CheckReport = checkAll(s, state)): Action | 'undo' | null {
+  const step = coachStep(s, state, report);
+  switch (step.kind) {
+    case 'restore':
+      return 'undo';
+    case 'record': {
+      const t = s.txns.find((x) => x.txnId === step.txnIds[0]);
+      return t ? { type: 'record', txnId: t.txnId, category: t.category } : null;
+    }
+    case 'duplicate':
+      // prefer the copy that is not ticked as cleared: the one without a bank line
+      return { type: 'delete', entryId: (state.entries.find((e) => step.entryIds.includes(e.entryId) && !e.cleared) ?? state.entries.find((e) => step.entryIds.includes(e.entryId))!).entryId };
+    case 'amount': {
+      const w = report.amounts.wrong.find((x) => x.entry.entryId === step.entryIds[0]);
+      return w ? { type: 'setAmount', entryId: w.entry.entryId, magnitudeCents: Math.abs(w.expectedCents) } : null;
+    }
+    case 'tick':
+      return { type: 'setCleared', entryId: step.entryIds[0], cleared: true };
+    case 'untick':
+      return { type: 'setCleared', entryId: step.entryIds[0], cleared: false };
+    case 'category': {
+      const w = report.categories.wrong.find((x) => x.entry.entryId === step.entryIds[0]);
+      return w ? { type: 'recategorize', entryId: w.entry.entryId, category: w.expected } : null;
+    }
+    default:
+      return null;
+  }
 }

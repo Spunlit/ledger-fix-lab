@@ -75,9 +75,9 @@ file), but checkout is simulated: no card data is collected and nothing is charg
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 115 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 117 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 71 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 75 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.

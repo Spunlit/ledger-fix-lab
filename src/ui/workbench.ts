@@ -23,6 +23,10 @@ export interface CaseUI {
   noteOpen: boolean;
   mathOpen: boolean;
   hintOpen: boolean;
+  /** How many times help was asked on the current problem: 1 a clue, 2 the row, 3 a demonstration. */
+  helpLevel: number;
+  /** The demonstration is given once per file. */
+  demoUsed: boolean;
   guideOpen: boolean;
   editing: string | null;
   editError: string | null;
@@ -39,7 +43,7 @@ export interface CaseUI {
 
 export function newCaseUI(session: Session, day?: string): CaseUI {
   return {
-    session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, guideOpen: false,
+    session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, helpLevel: 0, demoUsed: false, guideOpen: false,
     editing: null, editError: null, recording: null, tab: 'books', day, firstCheck: null, feedback: null,
   };
 }
@@ -176,6 +180,7 @@ export function renderWorkbench(ui: CaseUI): string {
   const lines = statementLines(s);
   const cl = clues(s, state);
   const showHint = guided && ui.hintOpen && cl.length > 0;
+  const noClueHint = guided && ui.hintOpen && cl.length === 0 && !report.ok;
   const solved = ui.checked && report.ok;
   const step: CoachStep | null = guided && !solved ? coachStep(s, state, report) : null;
   const prog = guided ? progress(s, initialState(s), state) : null;
@@ -245,8 +250,8 @@ export function renderWorkbench(ui: CaseUI): string {
             ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${gloss(step.title)}</p><p class="next-a">${gloss(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p>${step.topic ? `<details class="why"><summary>Why?</summary><p>${gloss(guideTopic(step.topic).why)}</p><p><b>How to tell:</b> ${gloss(guideTopic(step.topic).tell)} <a href="#/guide/${step.topic}">Open the guide</a></p></details>` : ''}</div>`
             : `<p class="next">${esc(coachText(report, pairs))}</p>`
       }
-      ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}
-      ${showHint ? `<p class="hint">${gloss(cl[0].text)}</p>` : ''}
+      ${guided && !solved && step && step.kind !== 'done' ? `<button type="button" class="btn small help-btn level-${Math.min(ui.helpLevel, 2)}" data-act="toggle-hint" data-testid="help" aria-expanded="${ui.hintOpen}">${ui.helpLevel === 0 ? 'Hint' : ui.helpLevel === 1 ? 'More help' : ui.demoUsed ? 'Show me the row' : 'Show me how'}</button>` : ''}
+      ${showHint ? `<p class="hint">${gloss(cl[0].text)}</p>` : noClueHint ? `<p class="hint">${gloss("The difference is $0.00, so the amounts are fine. What is left is a category: read the client's note, then look at where each transfer is filed.")}</p>` : ''}
     </section>
 
     <aside class="note-strip ${ui.noteOpen ? 'open' : ''}" aria-label="Note from the client">

@@ -184,3 +184,7 @@
 - Landing answers "will AI not do this": a short block and an FAQ item (automation enters the lines and makes exactly these mistakes; review is the job that stays). No AI is built in, and the page does not claim one.
 - Phone pass at 390px: landing, basics, desk, guide, plan, drill; no horizontal scroll.
 - Checked: 115 unit tests, 71 e2e checks.
+
+## v19 (Nov 15, ~00:15 UTC)
+- Help in guided cases climbs with each press on the same problem: Hint (a clue), More help (scrolls to the row), Show me how (a three-step demonstration that lights the line, the tool, then makes the move through the normal dispatch). The demonstration is given once per file; skipping it changes nothing. coachAction() in src/core/coach.ts, tested to solve both cases.
+- Checked: 117 unit tests, 75 e2e checks.

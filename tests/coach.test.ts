@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coachStep } from '../src/core/coach';
+import { coachAction, coachStep } from '../src/core/coach';
 import { GUIDE, guideTopic } from '../src/core/guide';
 import { ALL_SKILLS } from '../src/core/skills';
 import { applyAction, checkAll, createSession } from '../src/core/engine';
@@ -115,5 +115,28 @@ describe('the coach for guided cases', () => {
       session = follow(CASE_2, session);
     }
     expect(last.topic).toBe('owner');
+  });
+
+  it('the demonstration move always fixes the step it demonstrates, to the end of both cases', () => {
+    for (const scenario of [CASE_1, CASE_2]) {
+      let session = createSession(scenario);
+      for (let i = 0; i < 12; i++) {
+        const before = coachStep(scenario, session.state);
+        if (before.kind === 'done') break;
+        const action = coachAction(scenario, session.state);
+        expect(action).not.toBeNull();
+        expect(action).not.toBe('undo');
+        session = applyAction(session, action as Action);
+        const after = coachStep(scenario, session.state);
+        // the same problem is gone: either done, or the coach has moved to another row or kind
+        expect(`${after.kind}:${after.entryIds.join()}:${after.txnIds.join()}`).not.toBe(`${before.kind}:${before.entryIds.join()}:${before.txnIds.join()}`);
+      }
+      expect(checkAll(scenario, session.state).ok).toBe(true);
+    }
+  });
+
+  it('after a wrong delete the demonstration move is Undo', () => {
+    const s = applyAction(createSession(CASE_2), { type: 'delete', entryId: 'E14' });
+    expect(coachAction(CASE_2, s.state)).toBe('undo');
   });
 });

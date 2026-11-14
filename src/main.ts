@@ -5,6 +5,7 @@ import './theme.css';
 import { initWorkbenchEvents } from './ui/workbench-events';
 import { isCategoryId } from './core/categories';
 import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
+import { coachAction, coachStep } from './core/coach';
 import { actionFeedback } from './core/feedback';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
@@ -17,7 +18,7 @@ import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
-import { startTour, tourSeen } from './ui/tour';
+import { startTour, tourSeen, type TourStep } from './ui/tour';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
 import { saveDrillRun } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
@@ -185,6 +186,63 @@ function render(): void {
   }
 }
 
+/** Scroll to the row the coach means and pulse it. */
+function lookAtTarget(): void {
+  const row = app.querySelector<HTMLElement>('tr.co-t');
+  if (!row) return;
+  row.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
+  row.classList.remove('co-look');
+  void row.offsetWidth; // restart the pulse
+  row.classList.add('co-look');
+}
+
+/**
+ * "Show me how": a three-step demonstration of the current fix. It lights the line, then the tool, and
+ * on the last step makes the move itself, through the same dispatch as a learner's click, so feedback
+ * and progress behave as usual. Given once per file; skipping it changes nothing.
+ */
+function showMeHow(): void {
+  const ui = current();
+  if (!ui) return;
+  const s = ui.session.scenario;
+  const step = coachStep(s, ui.session.state);
+  const action = coachAction(s, ui.session.state);
+  if (!action || step.kind === 'done') return;
+  const id = step.entryIds[0];
+  const tool: Record<string, { sel: string; say: string }> = {
+    restore: { sel: '[data-act=undo]', say: 'Undo takes back the last move. It is always safe to press.' },
+    record: { sel: `[data-record="${step.txnIds[0]}"]`, say: 'This button copies the bank line into the books and asks for its category.' },
+    duplicate: { sel: `[data-del="${action !== 'undo' && action.type === 'delete' ? action.entryId : id}"]`, say: 'The bin deletes this copy. The other copy stays, matched to its bank line.' },
+    amount: { sel: `[data-edit="${id}"]`, say: 'Click the amount to retype it. The bank line shows the right figure.' },
+    tick: { sel: `[data-clear="${id}"]`, say: 'The tick says: I found this payment on the bank statement.' },
+    untick: { sel: `[data-clear="${id}"]`, say: 'No tick means the bank has not processed it yet. The line stays in the books.' },
+    category: { sel: `select[data-cat="${id}"]`, say: "This menu sets what kind of money the line is. The client's note tells you which one is true." },
+  };
+  const t = tool[step.kind];
+  const steps: TourStep[] = [
+    { target: 'tr.co-t', title: 'First, find the line', text: step.title },
+    { target: `${t.sel}, tr.co-t`, title: 'Then, the tool', text: t.say },
+    { target: 'tr.co-t, .status .figs', title: 'Watch this one', text: `${step.action} I will make this move for you now. Read what changes, then do the next problem yourself.` },
+  ];
+  startTour(steps, {
+    demo: true,
+    finish: 'Do it for me',
+    onDone: () => {
+      const now = current();
+      if (!now) return;
+      now.demoUsed = true;
+      now.helpLevel = 0;
+      now.hintOpen = false;
+      if (action === 'undo') {
+        now.session = undo(now.session);
+        now.editing = now.recording = null;
+        now.feedback = null;
+        render();
+      } else dispatch(action);
+    },
+  });
+}
+
 function dispatch(action: Action): void {
   const ui = current()!;
   const before = ui.session.state;
@@ -195,6 +253,9 @@ function dispatch(action: Action): void {
   ui.editing = null;
   ui.editError = null;
   ui.recording = null;
+  if (ui.feedback?.tone === 'good') {
+    ui.helpLevel = 0;
+  }
   render();
 }
 
@@ -280,19 +341,17 @@ app.addEventListener('click', (ev) => {
     case 'toggle-math':
       ui.mathOpen = !ui.mathOpen;
       return render();
-    case 'show-target': {
-      const row = app.querySelector<HTMLElement>('tr.co-t');
-      if (row) {
-        row.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
-        row.classList.remove('co-look');
-        void row.offsetWidth; // restart the pulse
-        row.classList.add('co-look');
-      }
+    case 'show-target':
+      return lookAtTarget();
+    case 'toggle-hint': {
+      // Help climbs with each press on the same problem: a clue, then the row, then a demonstration (once per file).
+      ui.helpLevel += 1;
+      ui.hintOpen = true;
+      render();
+      if (ui.helpLevel === 2 || (ui.helpLevel >= 3 && ui.demoUsed)) return lookAtTarget();
+      if (ui.helpLevel >= 3) return showMeHow();
       return;
     }
-    case 'toggle-hint':
-      ui.hintOpen = !ui.hintOpen;
-      return render();
     case 'toggle-guide':
       ui.guideOpen = !ui.guideOpen;
       return render();
