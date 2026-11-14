@@ -1,5 +1,6 @@
 import { CASES } from '../core/scenarios';
 import { DRILL_ROUNDS, DRILL_TOPIC, drillRounds, type DrillRound } from '../core/drill';
+import { gloss } from './terms';
 import { esc, loadTheme, newSeed, themeButton } from './util';
 
 /** The warm-up drill page (app.html#/drill): five one-tap rounds, made for a phone. */
@@ -65,7 +66,7 @@ export function renderDrill(d: DrillState): string {
       <p class="drill-step">Warm-up, ${d.i + 1} of ${d.rounds.length}<span>${esc(r.business)}</span></p>
       <div class="drill-bar" role="img" aria-label="Round ${d.i + 1} of ${d.rounds.length}">${d.rounds.map((_, k) => `<i class="${k < d.i || (k === d.i && d.hit) ? 'on' : k === d.i ? 'now' : ''}"></i>`).join('')}</div>
     </div>
-    <h1 class="drill-q" data-testid="drill-prompt">${esc(r.prompt)}</h1>
+    <h1 class="drill-q" data-testid="drill-prompt">${gloss(r.prompt)}</h1>
     <ol class="drill-rows">
       ${r.rows
         .map((row) => {
@@ -80,7 +81,7 @@ export function renderDrill(d: DrillState): string {
         .join('')}
     </ol>
     <div class="drill-say ${d.hit ? 'good' : d.missed.length ? 'warn' : ''}" role="status" aria-live="polite" data-testid="drill-say">
-      ${d.hit ? `<p><b>Right.</b> ${esc(r.why)} <a href="#/guide/${DRILL_TOPIC[r.kind]}">More in the guide</a></p><button type="button" class="btn primary big" data-drill="next">${d.i + 1 >= d.rounds.length ? 'See my score' : 'Next'}</button>` : d.missed.length ? `<p><b>Not that one.</b> ${esc(r.nudge)}</p>` : '<p class="quiet">Tap a line. You can try again if you miss.</p>'}
+      ${d.hit ? `<p><b>Right.</b> ${gloss(r.why)} <a href="#/guide/${DRILL_TOPIC[r.kind]}">More in the guide</a></p><button type="button" class="btn primary big" data-drill="next">${d.i + 1 >= d.rounds.length ? 'See my score' : 'Next'}</button>` : d.missed.length ? `<p><b>Not that one.</b> ${gloss(r.nudge)}</p>` : '<p class="quiet">Tap a line. You can try again if you miss.</p>'}
     </div>
   </main>`;
 }

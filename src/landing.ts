@@ -5,6 +5,10 @@
  */
 import { formatCents } from './core/money';
 import { heroVerdict } from './ui/hero';
+import { glossElement, initTerms } from './ui/terms';
+
+initTerms('app.html#/guide/words');
+document.querySelectorAll<HTMLElement>('[data-gloss]').forEach(glossElement);
 
 const THEME_KEY = 'ledger-fix-lab:theme';
 const root = document.documentElement;

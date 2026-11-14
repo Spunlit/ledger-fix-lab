@@ -306,3 +306,8 @@ h1, h2, h3, .next-t, .step-title, .brand, .drill-q, .drill-end h1, .warm-t b { f
   .guide-toc a { font-size: 13.5px; }
 }
 @media (max-width: 720px) { .coach .next { flex-basis: 100%; } }
+
+.guide-lead.small { font-size: 15.5px; }
+.guide-words dl > div { grid-template-columns: 170px minmax(0, 1fr); padding-top: 12px; border-top: 1px solid var(--line); }
+.guide-words dt { color: var(--ink); font-size: 15px; }
+.fig-label .term, th .term { border-bottom-style: dotted; }

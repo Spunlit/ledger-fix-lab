@@ -4,6 +4,7 @@ import { canUndo, checkAll, initialState, isLocked, statementLines, type CheckRe
 import { explain, shortDate, SKILL_LABEL } from '../core/explain';
 import { coachStep, type CoachStep } from '../core/coach';
 import { guideTopic } from '../core/guide';
+import { gloss } from './terms';
 import { progress, type Feedback, type Progress } from '../core/feedback';
 import { MATCH_WINDOW_DAYS, matchRows, type RowMatch } from '../core/match';
 import { formatCents, formatSignedCents } from '../core/money';
@@ -219,11 +220,11 @@ export function renderWorkbench(ui: CaseUI): string {
   <main class="bench">
     <section class="status" aria-label="Reconciliation" aria-live="polite">
       <div class="figs">
-        <div class="fig"><span class="fig-label">Bank${hasOutstanding ? '<small> after uncleared items</small>' : ''}</span><strong class="num">${formatCents(r.adjustedBankCents)}</strong></div>
+        <div class="fig"><span class="fig-label">Bank${hasOutstanding ? '<small> after <button type="button" class="term" data-term="cleared">uncleared</button> items</small>' : ''}</span><strong class="num">${formatCents(r.adjustedBankCents)}</strong></div>
         <span class="op" aria-hidden="true">−</span>
         <div class="fig"><span class="fig-label">Books</span><strong class="num">${formatCents(r.bookBalanceCents)}</strong></div>
         <span class="op" aria-hidden="true">=</span>
-        <div class="fig diff ${report.balanced ? 'zero' : 'off'} ${before ? 'tick' : ''}" data-testid="difference"><span class="fig-label">Difference</span><strong class="num">${formatSignedCents(r.differenceCents)}</strong></div>
+        <div class="fig diff ${report.balanced ? 'zero' : 'off'} ${before ? 'tick' : ''}" data-testid="difference"><span class="fig-label"><button type="button" class="term" data-term="difference">Difference</button></span><strong class="num">${formatSignedCents(r.differenceCents)}</strong></div>
       </div>
       <button type="button" class="math-toggle" data-act="toggle-math" aria-expanded="${ui.mathOpen}" aria-controls="math"><span class="q" aria-hidden="true">?</span><span class="lbl">${ui.mathOpen ? 'Hide the math' : 'How is this calculated?'}</span></button>
     </section>
@@ -238,11 +239,11 @@ export function renderWorkbench(ui: CaseUI): string {
         solved
           ? ''
           : step && prog
-            ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${esc(step.title)}</p><p class="next-a">${esc(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p>${step.topic ? `<details class="why"><summary>Why?</summary><p>${esc(guideTopic(step.topic).why)}</p><p><b>How to tell:</b> ${esc(guideTopic(step.topic).tell)} <a href="#/guide/${step.topic}">Open the guide</a></p></details>` : ''}</div>`
+            ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${gloss(step.title)}</p><p class="next-a">${gloss(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p>${step.topic ? `<details class="why"><summary>Why?</summary><p>${gloss(guideTopic(step.topic).why)}</p><p><b>How to tell:</b> ${gloss(guideTopic(step.topic).tell)} <a href="#/guide/${step.topic}">Open the guide</a></p></details>` : ''}</div>`
             : `<p class="next">${esc(coachText(report, pairs))}</p>`
       }
       ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}
-      ${showHint ? `<p class="hint">${esc(cl[0].text)}</p>` : ''}
+      ${showHint ? `<p class="hint">${gloss(cl[0].text)}</p>` : ''}
     </section>
 
     <aside class="note-strip ${ui.noteOpen ? 'open' : ''}" aria-label="Note from the client">
@@ -278,7 +279,7 @@ function renderPairs(v: View, s: Scenario, pairs: PairRow[], bookBalanceCents: n
     ${guideList}
     <table class="rows pairs ${clr ? 'with-clr' : ''}">
       <thead><tr>
-        ${clr ? '<th class="c-clr">Cleared</th>' : ''}<th>In the books</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Delete</span></th>
+        ${clr ? '<th class="c-clr"><button type="button" class="term" data-term="cleared">Cleared</button></th>' : ''}<th>In the books</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Delete</span></th>
         <th class="c-link"><span class="sr">Match</span></th>
         <th class="st">On the bank statement</th><th class="st r">Amount</th>
       </tr></thead>
@@ -306,7 +307,7 @@ function renderPair(v: View, { entry: e, line: l }: PairRow): string {
     return `<tr class="pair only-books ${rowState(v, e)} ${hint}" data-entry="${esc(e.entryId)}" data-amt="${e.amountCents}">
       ${bookCells(v, e)}
       <td class="c-link"></td>
-      <td class="st s-gap" colspan="2"><span class="gap-label">No bank match</span>${why ? `<span class="gap-why">${why}</span>` : ''}</td>
+      <td class="st s-gap" colspan="2"><span class="gap-label">No bank match</span>${why ? `<span class="gap-why">${gloss(why)}</span>` : ''}</td>
     </tr>`;
   }
   if (!l) return '';
@@ -335,7 +336,7 @@ function renderLists(v: View, s: Scenario, entries: LedgerEntry[], lines: Statem
       <div class="desk-head"><h2 id="books-h">Books</h2>${guide}</div>
       ${guideList}
       <table class="rows ledger ${clr ? 'with-clr' : ''}">
-        <thead><tr>${clr ? '<th class="c-clr">Cleared</th>' : ''}<th>Description</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Delete</span></th></tr></thead>
+        <thead><tr>${clr ? '<th class="c-clr"><button type="button" class="term" data-term="cleared">Cleared</button></th>' : ''}<th>Description</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Delete</span></th></tr></thead>
         <tbody>${
           entries.length
             ? entries.map((e) => `<tr class="${rowState(v, e)}" data-entry="${esc(e.entryId)}" data-amt="${e.amountCents}">${bookCells(v, e)}</tr>`).join('')
@@ -483,7 +484,7 @@ function renderReview(report: CheckReport): string {
           ([key, title, ok, lines]) => `
         <li class="check ${ok ? 'pass' : 'fail'}" data-testid="check-${key}">
           <h3><span class="dot" aria-hidden="true"></span>${title}<span class="st">${ok ? 'Pass' : 'Fix needed'}</span></h3>
-          ${ok ? '' : `<ul>${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}
+          ${ok ? '' : `<ul>${lines.map((l) => `<li>${gloss(l)}</li>`).join('')}</ul>`}
         </li>`,
         )
         .join('')}

@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ledger Fix Lab: reconciliation practice for new bookkeepers</title>
-<meta name="description" content="Fix a small business's books against its bank statement. You are graded on the books you end with, so balanced-but-wrong still fails. Two cases free, no sign-up.">
+<title>Ledger Fix Lab: bookkeeping practice for beginners</title>
+<meta name="description" content="Bookkeeping practice for beginners: match a small business's books to its bank statement and fix what is wrong. You are graded on the books you end with, so balanced-but-wrong still fails. Two cases free, no sign-up.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Ledger Fix Lab: reconciliation practice for new bookkeepers">
+<meta property="og:title" content="Ledger Fix Lab: bookkeeping practice for beginners">
 <meta property="og:description" content="The books match the bank to the cent and the profit is still $5,000 too high. Find the line. Free, no sign-up.">
 <meta property="og:image" content="https://spunlit.github.io/ledger-fix-lab/og.png">
 <meta property="og:url" content="https://spunlit.github.io/ledger-fix-lab/">
@@ -62,8 +62,8 @@
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5">
         <a class="lf-pill" href="app.html#/drill"><b>New</b>60-second warm-up: tap the wrong line<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <h1 id="hero-h">Reconciliation practice for new bookkeepers</h1>
-        <p class="hero__lead">Fix a small business's books against its bank statement. You are graded on the books you end with, not on your clicks.</p>
+        <h1 id="hero-h">Bookkeeping practice for beginners</h1>
+        <p class="hero__lead" data-gloss>Match a small business's books to its bank statement, find what is wrong and fix it. You are graded on the books you end with, not on your clicks.</p>
         <div class="btn-row">
           <a class="btn btn--primary" href="app.html#/case/maple-pine-oct">Start the free case<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           <a class="btn btn--secondary" href="app.html#/daily">Open today's file</a>
@@ -93,13 +93,13 @@
     </div></div>
   </section>
 
-  <div class="lf-ticker" aria-label="What the files test"><div class="lf-ticker__track"><div><span>Duplicate entries</span><span>Genuine repeat purchases</span><span>Missing bank charges</span><span>Transposed amounts</span><span>Outstanding checks</span><span>Wrong expense category</span><span>Owner money booked as income</span></div><div aria-hidden="true"><span>Duplicate entries</span><span>Genuine repeat purchases</span><span>Missing bank charges</span><span>Transposed amounts</span><span>Outstanding checks</span><span>Wrong expense category</span><span>Owner money booked as income</span></div></div></div>
+  <div class="lf-ticker" aria-label="What the files test"><div class="lf-ticker__track"><div><span>Duplicate entries</span><span>Real repeat purchases</span><span>Missing bank charges</span><span>Swapped digits</span><span>Checks not at the bank yet</span><span>Wrong category</span><span>Owner money booked as income</span></div><div aria-hidden="true"><span>Duplicate entries</span><span>Real repeat purchases</span><span>Missing bank charges</span><span>Swapped digits</span><span>Checks not at the bank yet</span><span>Wrong category</span><span>Owner money booked as income</span></div></div></div>
 
   <section class="section" id="workbench" aria-labelledby="workbench-h">
     <div class="wrap">
       <div class="grid lf-head">
-        <h2 id="workbench-h" class="span-6">Every bank line next to its book entry</h2>
-        <p class="span-5 start-8 muted">Matched lines are done. What is left is your list: missing, doubled or mistyped. Fix each one and watch the difference drop to zero. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera case</a></p>
+        <h2 id="workbench-h" class="span-6">Every bank line next to its line in the books</h2>
+        <p class="span-5 start-8 muted" data-gloss>Matched lines are done. What is left is your list: missing, doubled or mistyped. Fix each one and watch the difference drop to zero. <a class="link" href="app.html#/case/rivera-mar">Open the Rivera case</a></p>
       </div>
       <div class="lf-frame"><div class="ui app lf-app" role="img" aria-label="The workbench: Rivera's March bank statement beside the books, with the Verizon payment open. The books say $48.37, the bank says $84.37.">
         <div class="app__pane app__pane--list">
@@ -124,14 +124,14 @@
               <div><small>Bank statement, Mar 5</small><b class="lf-big">−$84.37</b><span>VERIZON WIRELESS DES:PAYMENTS</span></div>
               <div data-fix-books><small>Your books, Mar 5</small><b class="lf-big" data-fix-amount>−$48.37</b><span>Typed by hand, Phone &amp; internet</span></div>
             </div>
-            <p class="lf-clue">Off by $36.00. A gap that divides evenly by 9 usually means two digits were swapped: 48 and 84.</p>
+            <p class="lf-clue" data-gloss>Off by $36.00. A gap that divides evenly by 9 usually means two digits were swapped: 48 and 84.</p>
             <div class="lf-fix"><span class="lf-btn" data-fix-btn>Fix amount to $84.37</span><span class="lf-btn lf-btn--ghost" data-fix-btn2>Mark cleared</span></div>
             <div class="lf-recon">
               <div><small>Bank after uncleared items</small><b data-fix-bank>$17,022.00</b></div>
               <div><small>Books</small><b data-fix-booksbal>$17,121.37</b></div>
               <div><small>Difference</small><b class="t-warn" data-fix-diff>$99.37</b></div>
             </div>
-            <p class="lf-next">Fix the amount and mark it cleared: the difference drops to $15.00, the bank fee the books never recorded.</p>
+            <p class="lf-next" data-gloss>Fix the amount and mark it cleared: the difference drops to $15.00, the bank fee the books never recorded.</p>
           </div>
         </div>
       </div></div>
@@ -148,7 +148,7 @@
         <article class="lf-tile lf-tile--a" data-spot data-rv>
           <span class="lf-num">Step 1</span>
           <h3>Match the bank feed</h3>
-          <p>Each bank line pairs with a book entry. Anything without a pair goes on your list.</p>
+          <p>Each bank line pairs with a line in the books. Anything without a pair goes on your list.</p>
           <div class="lf-pairs" data-match-demo role="img" aria-label="Bank lines pairing with book entries; the AutoZone hose is in the books twice and a bank fee is missing">
             <div class="lf-mrow"><span>Square payout</span><i></i><span>SQUARE INC DEPOSIT</span></div>
             <div class="lf-mrow"><span>Chemical Guys, wax</span><i></i><span>CHEMICAL GUYS CA</span></div>
@@ -160,26 +160,26 @@
         <article class="lf-tile lf-tile--b" data-spot data-rv>
           <span class="lf-num">Step 2</span>
           <h3>Fix each problem</h3>
-          <p>Five tools, the same ones a bookkeeper uses. Undo works on every step.</p>
-          <ul class="lf-lines">
+          <p data-gloss>Five tools, the same ones a bookkeeper uses. Undo works on every step.</p>
+          <ul class="lf-lines" data-gloss>
             <li><b>Delete</b><span>the second AutoZone copy</span></li>
             <li><b>Fix amount</b><span>Verizon, $48.37 to $84.37</span></li>
             <li><b>Mark cleared</b><span>once it is on the statement</span></li>
             <li><b>Record</b><span>the monthly fee as Bank fees</span></li>
-            <li><b>Recategorize</b><span>the savings transfer</span></li>
+            <li><b>Change category</b><span>the savings transfer</span></li>
           </ul>
         </article>
         <article class="lf-tile lf-tile--c" data-spot data-rv>
           <span class="lf-num">Step 3</span>
           <h3>Check the books</h3>
           <p>Four checks run on the books you end with. Each one says what it found.</p>
-          <ul class="lf-lines lf-checks">
+          <ul class="lf-lines lf-checks" data-gloss>
             <li><i class="ok">✓</i><span>Each transaction recorded exactly once</span></li>
             <li><i class="ok">✓</i><span>Amounts match the bank</span></li>
             <li><i class="ok">✓</i><span>Cleared items ticked correctly</span></li>
             <li><i class="bad">×</i><span>Categories right: $5,000 still in sales</span></li>
           </ul>
-          <div class="lf-verdict"><b>Balanced, but wrong</b><span>The difference is $0.00 and 1 check fails. Profit is overstated by $5,000.</span></div>
+          <div class="lf-verdict" data-gloss><b>Balanced, but wrong</b><span>The difference is $0.00 and 1 check fails. Profit is overstated by $5,000.</span></div>
         </article>
         <article class="lf-tile lf-tile--d" data-spot data-rv id="daily">
           <span class="lf-num">Every day after</span>
@@ -189,7 +189,7 @@
             <div class="lf-card__row"><span class="lf-h5">Skill record</span><span class="lf-tag">Example</span></div>
             <div class="lf-skill"><span>Duplicate entries</span><span class="lf-bar"><i style="--v:100%"></i></span><b>3 of 3</b></div>
             <div class="lf-skill"><span>Missing bank charges</span><span class="lf-bar"><i style="--v:67%"></i></span><b>2 of 3</b></div>
-            <div class="lf-skill"><span>Transposed amounts</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
+            <div class="lf-skill"><span>Swapped digits</span><span class="lf-bar"><i style="--v:50%"></i></span><b>1 of 2</b></div>
             <div class="lf-skill is-weak"><span>Owner money vs income</span><span class="lf-bar"><i style="--v:0%"></i></span><b>0 of 2</b></div>
           </div>
           <a class="link" href="app.html#/daily">Open today's file</a>
@@ -249,7 +249,7 @@
           </div>
           <a class="link" href="https://github.com/Spunlit/ledger-fix-lab">Read the code on GitHub</a>
         </div>
-        <div class="faq span-6 start-7">
+        <div class="faq span-6 start-7" data-gloss>
           <div class="faq__item"><h3>Who is Ledger Fix Lab for?</h3><p>New bookkeepers and students before a first client. Owners who keep their own books use it to check their habits.</p></div>
           <div class="faq__item"><h3>Are the client files real?</h3><p>No. Each file is a practice business written for the trainer, so no one's real books are shared. The mistakes are the common real ones.</p></div>
           <div class="faq__item"><h3>Do I need QuickBooks or Xero?</h3><p>No. It runs in the browser. The cleanup steps are the same in any accounting software.</p></div>

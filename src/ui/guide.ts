@@ -1,4 +1,6 @@
+import { GLOSSARY } from '../core/glossary';
 import { GUIDE, RECONCILIATION_STEPS } from '../core/guide';
+import { gloss } from './terms';
 import { esc, loadTheme, themeButton } from './util';
 
 /** The field guide page (app.html#/guide): how a reconciliation works and the seven things the files test. */
@@ -13,12 +15,12 @@ export function renderGuide(): string {
       <p class="drill-step">Field guide</p>
       <h1>Seven things to check in any set of books</h1>
       <p class="guide-lead">What each one looks like, how to tell it from a line that is fine, and what to do. Every case and file in the trainer is built from these.</p>
-      <nav class="guide-toc" aria-label="Topics">${GUIDE.map((t, i) => `<a href="#/guide/${t.id}"><span>${i + 1}</span>${esc(t.title)}</a>`).join('')}</nav>
+      <nav class="guide-toc" aria-label="Topics">${GUIDE.map((t, i) => `<a href="#/guide/${t.id}"><span>${i + 1}</span>${esc(t.title)}</a>`).join('')}<a href="#/guide/words"><span>A</span>Words explained</a></nav>
     </header>
 
     <section class="guide-recon" aria-labelledby="g-recon-h">
       <h2 id="g-recon-h">First, how a bank reconciliation works</h2>
-      <ol>${RECONCILIATION_STEPS.map((s) => `<li><b>${esc(s.label)}</b><span>${esc(s.text)}</span></li>`).join('')}</ol>
+      <ol>${RECONCILIATION_STEPS.map((s) => `<li><b>${esc(s.label)}</b><span>${gloss(s.text)}</span></li>`).join('')}</ol>
       <p class="guide-formula"><span>Statement ending balance</span><i>−</i><span>payments not cleared</span><i>+</i><span>deposits in transit</span><i>=</i><span>books balance</span></p>
     </section>
 
@@ -31,14 +33,20 @@ export function renderGuide(): string {
         <div><small>Bank</small><span>${esc(t.example.bank)}</span></div>
       </div>
       <dl>
-        <div><dt>What you see</dt><dd>${esc(t.see)}</dd></div>
-        <div><dt>How to tell</dt><dd>${esc(t.tell)}</dd></div>
-        <div><dt>What to do</dt><dd>${esc(t.fix)}</dd></div>
-        <div><dt>Why it matters</dt><dd>${esc(t.why)}${t.differenceNote ? ` ${esc(t.differenceNote)}` : ''}</dd></div>
+        <div><dt>What you see</dt><dd>${gloss(t.see)}</dd></div>
+        <div><dt>How to tell</dt><dd>${gloss(t.tell)}</dd></div>
+        <div><dt>What to do</dt><dd>${gloss(t.fix)}</dd></div>
+        <div><dt>Why it matters</dt><dd>${gloss(t.why)}${t.differenceNote ? ` ${esc(t.differenceNote)}` : ''}</dd></div>
       </dl>
       <a class="link" href="${t.practice.href}">Practice it in ${esc(t.practice.label)}</a>
     </article>`,
     ).join('')}
+
+    <section class="guide-topic guide-words" id="g-words" aria-labelledby="g-words-h">
+      <header><span class="guide-n">A</span><h2 id="g-words-h">Words explained</h2></header>
+      <p class="guide-lead small">Every bookkeeping word the trainer uses, in plain language. In the cases, tap any word with a dashed underline to see its meaning.</p>
+      <dl>${GLOSSARY.map((t) => `<div><dt>${esc(t.term)}</dt><dd>${esc(t.plain)}</dd></div>`).join('')}</dl>
+    </section>
 
     <section class="guide-end">
       <h2>Now try it on a file</h2>

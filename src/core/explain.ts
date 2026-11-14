@@ -16,9 +16,9 @@ export const SKILL_LABEL: Record<SkillId, string> = {
   duplicates: 'Spotting duplicate entries',
   genuineRepeats: 'Keeping genuine repeat purchases',
   missing: 'Recording bank charges missing from the books',
-  transposition: 'Catching transposed amounts',
-  timing: 'Leaving outstanding checks in place',
-  categories: 'Choosing the right expense category',
+  transposition: 'Catching swapped digits',
+  timing: 'Leaving checks that are not at the bank yet',
+  categories: 'Choosing the right category',
   ownerEquity: 'Separating owner money from income',
 };
 

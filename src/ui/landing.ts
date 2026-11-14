@@ -3,6 +3,7 @@ import { generateFile, todaySeed } from '../core/generator';
 import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
 import { dailyHref, practiceHref } from './routes';
+import { gloss } from './terms';
 import { dailyStreak, esc, loadTheme, newSeed, themeButton, type Completed } from './util';
 
 const tick = `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -40,7 +41,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
       stats.length
         ? `<div class="record">
         <h3>Your skill record <small>first-check accuracy on unguided files</small></h3>
-        <ul>${stats.map((st) => `<li><span>${esc(SKILL_LABEL[st.skill])}</span><span class="meter" style="--v:${Math.round((st.firstTry / st.attempts) * 100)}%" aria-hidden="true"></span><span class="num">${st.firstTry}/${st.attempts}</span></li>`).join('')}</ul>
+        <ul>${stats.map((st) => `<li><span>${gloss(SKILL_LABEL[st.skill])}</span><span class="meter" style="--v:${Math.round((st.firstTry / st.attempts) * 100)}%" aria-hidden="true"></span><span class="num">${st.firstTry}/${st.attempts}</span></li>`).join('')}</ul>
         <a class="btn" href="${practiceHref(newSeed(), weakestSkills(history, 2))}">Practice my weak spots</a>
       </div>`
         : ''

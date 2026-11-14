@@ -148,3 +148,8 @@
 - "Try it" banner and the coach are blue instructions; the attention colour is only for the wrong line and too-high figures.
 - New: field guide (app.html#/guide), seven topics from src/core/guide.ts; the coach has "Why?" per step linking to its topic; drill results link to the guide.
 - Checked: 104 unit tests, 58 e2e checks.
+
+## v13 (Nov 14, ~21:00 UTC): plain words
+- Founder feedback: some bookkeeping words are unknown to a beginner. Added src/core/glossary.ts (15 terms, one plain sentence each) and tappable terms (dashed underline; card on desktop, bottom sheet on a phone) in the coach, hints, review, figures, guide, drill and landing page. Guide has a "Words explained" list.
+- Plainer copy: h1 "Bookkeeping practice for beginners"; "swapped digits" instead of "transposed", "checks not at the bank yet", "Change category".
+- Checked: 108 unit tests (4 new for the glossary), 60 e2e checks.

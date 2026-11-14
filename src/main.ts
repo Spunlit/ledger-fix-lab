@@ -13,6 +13,7 @@ import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './u
 import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
 import { resolve } from './ui/routes';
+import { initTerms } from './ui/terms';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
 import { renderPaywall, type PaywallState } from './ui/paywall';
@@ -31,6 +32,7 @@ document.addEventListener('click', (ev) => {
   document.documentElement.dataset.theme = theme;
   b.outerHTML = themeButton(theme);
 });
+initTerms('#/guide/words');
 const cases = new Map<string, CaseUI>();
 let completed = loadCompleted();
 let history = loadHistory();

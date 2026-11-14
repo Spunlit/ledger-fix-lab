@@ -83,8 +83,8 @@ export const GUIDE: GuideTopic[] = [
   {
     id: 'outstanding',
     skill: 'timing',
-    title: 'Outstanding check',
-    see: 'A payment in the books near the end of the month that is not on the bank statement.',
+    title: 'A check that is not at the bank yet',
+    see: 'A payment in the books near the end of the month that is not on the bank statement. Bookkeepers call it outstanding.',
     tell: 'It is real (a check was mailed, a payment was sent), it just has not reached the bank yet.',
     fix: 'Leave it in the books and leave Cleared unticked. It will be on next month\'s statement.',
     why: 'Deleting it makes the difference look better and the books wrong: the money is already promised. Reconciliation handles it by subtracting outstanding payments from the bank\'s ending balance.',
