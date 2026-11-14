@@ -65,3 +65,12 @@
   the engine, tests or a cited source; observed / inferred / unknown separated. Rendered PDF pages inspected with
   pypdfium2 (already installed); fixed caption/footer collision, screenshot scrollbars, sparse type.
 - UX: edit hint on amounts; note that deleting is only acceptable in an unreconciled month.
+
+## 2026-11-14 ~17:00–18:30 Astana — v3: retention made real
+- Owner critique: two fixed cases = no reason to return; case packs only on a slide; authoring cost unsolved.
+- Built: generator.ts (seeded, provably solvable files; 4 archetypes; 6 problem kinds + genuine-repeat trap),
+  skills.ts (first-check attribution, stats, weak spots), file of the day, practice files, skill record on landing,
+  first-check results + copy result + "Practice my weak spots" on completion, planned-pricing section ($12/mo, labeled).
+- Verified: npm test 58/58 (900 generated files valid/broken/solved; trap, transposition, exhaustive-delete properties);
+  e2e 39/39 locally and against the live site after deploy (c9aaf33).
+- Pitch slides 6–10 rebuilt for v3; rendered PDF pages inspected (fixed slide 6 crop twice).

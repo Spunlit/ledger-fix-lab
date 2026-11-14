@@ -66,6 +66,16 @@ Buying hypothesis **[H]**: a new freelance bookkeeper pays once for a case pack 
 cleanup. Cheapest test: post the free case in bookkeeping-learner communities; measure completion, which trap catches
 people, and clicks on "notify me about the next case pack". Not yet run.
 
+## 6. Rev. 3 (14 Nov, evening): make retention real
+Owner review of v2: the engine and grading were strong, but two fixed cases gave no reason to return and made "case
+packs" a slide-only promise; authoring cost was the main business risk. Decision: a generator of provably solvable
+client files (same engine and checks), a file of the day, a first-check skill record, and weak-spot practice files.
+Pricing hypothesis changed from a one-time pack to **$12/month** for unlimited weak-spot files and month-end tracks,
+because practice recurs while a pack is consumed once. Still **[H]**: nobody has paid or returned yet. Next test:
+share the daily file in learner communities for two weeks; measure completion, day-7 return and plan sign-ups against
+a bar set in advance. Not built on purpose: accounts, payments, backend, QuickBooks import, AI tutor, leaderboards,
+certificates.
+
 ## Sources
 - https://quickbooks.intuit.com/community/off-topic-discussion-73/how-to-kickstart-my-bookkeeping-gig-165177
 - https://quickbooks.intuit.com/learn-support/en-us/other-questions/how-can-i-become-a-bookkeeping-trainee-for-a-professional/00/1498241

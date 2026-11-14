@@ -69,7 +69,7 @@
   <div class="grid2" style="grid-template-columns: 1.15fr 0.85fr; align-items: center;">
     <div>
       <h1 style="font-size:60px; max-width: 15ch;">Practice your first bookkeeping cleanup before a client pays for it.</h1>
-      <p class="muted" style="font-size:22px; max-width: 34ch;">Realistic client books, graded on whether they end up right, not just balanced.</p>
+      <p class="muted" style="font-size:22px; max-width: 34ch;">Realistic client books, graded on whether they end up right, not just balanced. A new file every day.</p>
     </div>
     <div>
       <div class="sheet">
@@ -150,35 +150,32 @@
 
 <!-- 6. Loop -->
 <section class="s" style="padding-top:44px;">
-  <h2 style="margin-bottom:22px; max-width:none;">Every move is checked against the bank and explained</h2>
-  <div class="flow">
-    <div><b>Brief</b>Read the client's note: context, not answers.</div>
-    <div><b>Reconcile</b>Tick, edit, re-categorize, delete, record a missing bank line.</div>
-    <div><b>Clues</b>Bookkeeper heuristics on the live difference, like ÷9 for swapped digits.</div>
-    <div><b>Check</b>Four checks say which rule broke, in plain words.</div>
-    <div><b>Deliver</b>A cleanup summary generated from what you changed.</div>
+  <h2 style="margin-bottom:18px; max-width:none;">A new client file every day, aimed at what you miss</h2>
+  <div class="shot" style="width:1128px; height:250px; background-image:url(img/daily.png); background-size:1170px auto; background-position:-40px -568px;"></div>
+  <div class="grid3" style="margin-top:22px;">
+    <div><div class="label">File of the day</div><p style="font-size:20px;">A fresh, generated client file. The same file for everyone, new every day.</p></div>
+    <div><div class="label">Skill record</div><p style="font-size:20px;">Each file records which kinds of problem you caught on the first check.</p></div>
+    <div><div class="label">Weak-spot practice</div><p style="font-size:20px;">Practice files plant more of the problems you miss, as often as you want.</p></div>
   </div>
-  <div class="shot fade" style="width:1060px; height:350px; background-image:url(img/solved.png); background-size:1120px auto; background-position:-22px -215px;"></div>
-  <div class="foot"><span>Screenshot of the live site. Synthetic client data.</span><span>6</span></div>
+  <div class="foot"><span>Screenshot of the live site. Skill record shown with sample history.</span><span>6</span></div>
 </section>
 
 <!-- 7. Engineering -->
 <section class="s">
-  <h2>The grading is exhaustively tested</h2>
+  <h2>Every file is proven solvable before you see it</h2>
   <div class="grid2" style="grid-template-columns: 0.9fr 1.1fr; gap: 56px;">
     <div>
       <div class="big"><span class="dbl">2</span> <span class="muted" style="font-size:40px; font-weight:600;">of 524,288</span></div>
-      <p style="margin-top:22px; font-size:22px;">Case 2 states tried in the test suite: every combination of deletions, ticks and recording the bank fee. Exactly the two valid solutions pass. Many others reach $0.00 and still fail, by design.</p>
+      <p style="margin-top:22px; font-size:21px;">Case 2 states tried by the test suite: every combination of deletions, ticks and recording. Only the two valid solutions pass; many others reach $0.00 and still fail, by design.</p>
     </div>
     <ul style="font-size:21px;">
-      <li>A truth model per transaction; four independent checks; money in integer cents.</li>
-      <li>Any correct end state passes, whatever order you work in.</li>
-      <li>Every shortcut has a test: plugging an amount, unticking a duplicate, deleting the uncleared check, recording a line twice.</li>
-      <li>47 unit tests, plus a 31-step browser test run against the live URL at desktop and phone widths.</li>
-      <li>CI runs the tests before every deploy. Static site: nothing leaves the browser; works offline.</li>
+      <li>A truth model per transaction, four independent checks, money in integer cents.</li>
+      <li>The generator only returns a file that passes the validator, fails as handed over, and is solved by its own reference solution. 900 generated files are checked in tests.</li>
+      <li>Any correct end state passes; every shortcut (plugging an amount, deleting the uncleared check) has a test.</li>
+      <li>58 unit tests, a 39-step browser test on the live URL, CI before every deploy. No backend; nothing leaves the browser.</li>
     </ul>
   </div>
-  <div class="foot"><span>Open source: tests/engine.test.ts, scripts/e2e.mjs</span><span>7</span></div>
+  <div class="foot"><span>Open source: src/core/generator.ts, tests/, scripts/e2e.mjs</span><span>7</span></div>
 </section>
 
 <!-- 8. Business -->
@@ -186,15 +183,15 @@
   <h2>Who pays, and why they would</h2>
   <div class="grid2" style="gap:56px;">
     <div>
-      <h3>Buyer</h3><p>The new freelance bookkeeper, paying personally, in the weeks before quoting a first cleanup.</p>
-      <h3 style="margin-top:22px;">Offer (hypothesis)</h3><p>First two cases free. A one-time pack of harder client files: credit cards, payroll, sales tax, a catch-up year. Priced well below the courses they already buy; a starting point of $29–$49 to test.</p>
+      <h3>Buyer</h3><p>The new freelance bookkeeper, paying personally, in the months before and after a first cleanup client.</p>
+      <h3 style="margin-top:22px;">Price we will test: $12 a month</h3><p>Free: both cases, the file of the day, the skill record. Paid: unlimited weak-spot files and month-end tracks (credit cards, payroll, sales tax). Well under the $59 a month they already pay for courses.</p>
     </div>
     <div>
-      <h3>Reason to return (hypothesis)</h3><p>A new client file each month that mirrors a real month-end close. Retention is unknown.</p>
-      <h3 style="margin-top:22px;">First customers</h3><p>Where learners already ask: the Intuit ProAdvisor community, r/Bookkeeping, course alumni groups. Later, course creators who want graded practice for their students.</p>
+      <h3>Why it can recur</h3><p>Practice is a habit, not a purchase: the daily file and the weak-spot loop are built and working today. Whether people actually return is unknown.</p>
+      <h3 style="margin-top:22px;">First customers</h3><p>Where learners already ask for practice: the Intuit ProAdvisor community, r/Bookkeeping, course alumni groups. Later, course creators who want graded practice for their students.</p>
     </div>
   </div>
-  <div class="foot"><span>No revenue, users or retention exist yet. Nothing on this slide is measured.</span><span>8</span></div>
+  <div class="foot"><span>Nothing is for sale yet. No revenue, users or retention exist; nothing on this slide is measured.</span><span>8</span></div>
 </section>
 
 <!-- 9. Risks -->
@@ -202,8 +199,8 @@
   <h2>What could kill it</h2>
   <table>
     <tr><td>Free is good enough</td><td>Test Drive plus YouTube may satisfy most learners. We have to show the check is worth paying for.</td></tr>
-    <tr><td>One and done</td><td>After a few cases, people may not come back. The case-pack model has to prove itself.</td></tr>
-    <tr><td>Authoring cost</td><td>Every realistic, provably solvable case takes expert time to build and test.</td></tr>
+    <tr><td>Nobody comes back</td><td>The daily file is our bet on a habit. If daily return stays low, the subscription case fails.</td></tr>
+    <tr><td>Realism ceiling</td><td>Generated files use four business types and seven problem kinds. Real cleanups are messier.</td></tr>
     <tr><td>A shrinking field</td><td>BLS projects bookkeeping clerk jobs down 6% from 2024 to 2034, still with about 170k openings a year.</td></tr>
     <tr><td>An incumbent</td><td>Akadian already sells practice to the same people, with an audience.</td></tr>
   </table>
@@ -214,9 +211,9 @@
 <section class="s">
   <h2>Working today, and the next test</h2>
   <div class="grid3">
-    <div><div class="label">Working today</div><p>Live site, two cases, four checks, clues, P&amp;L before and after, cleanup summary, undo, phone layout. Tests and CI. Open source.</p></div>
-    <div><div class="label">Not built</div><p>Accounts, payments, more cases, any QuickBooks or bank connection. Both clients are synthetic.</p></div>
-    <div><div class="label">Next experiment (not run)</div><p>Share case 1 in learner communities for two weeks. Measure completion, which trap catches people, and sign-ups for the next pack, against a bar set in advance.</p></div>
+    <div><div class="label">Working today</div><p>Two guided cases, a generated file of the day, weak-spot practice, a skill record, four checks, clues, cleanup summary. Tests and CI.</p></div>
+    <div><div class="label">Not built</div><p>Accounts, payments, month-end tracks, any QuickBooks or bank connection. All clients are synthetic.</p></div>
+    <div><div class="label">Next experiment (not run)</div><p>Share the daily file in learner communities for two weeks. Measure completion, day-7 return and sign-ups for the paid plan, against a bar set in advance.</p></div>
   </div>
   <div class="links" style="margin-top:46px;"><div><b>Live</b>spunlit.github.io/ledger-fix-lab</div><div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div></div>
   <div class="foot"><span>Ledger Fix Lab</span><span>10</span></div>

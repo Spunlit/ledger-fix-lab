@@ -35,7 +35,7 @@ function dailyBand(done: Completed, history: SkillAttempt[]): string {
       <div class="daily-file">
         <p class="daily-date">${esc(longDate(day))}</p>
         <h2 id="daily-h">Today’s client file: ${esc(f.business)}</h2>
-        <p>${esc(f.period)} books, ${problems} problems planted, about ${f.minutes} minutes. Everyone gets the same file today; a new one is generated tomorrow.</p>
+        <p>${esc(f.period)} books, ${problems} things to catch, about ${f.minutes} minutes. Everyone gets the same file today; a new one is generated tomorrow.</p>
         <div class="cta-row">
           <a class="btn ${finished ? '' : 'primary'}" href="${dailyHref(day)}">${startLabel}</a>
           ${finished ? `<span class="done-tag">Done today, ${finished.checksRun} ${finished.checksRun === 1 ? 'check' : 'checks'}</span>` : ''}

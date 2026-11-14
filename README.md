@@ -17,6 +17,16 @@ but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_S
 | 1 | **The doubled import** (Maple & Pine Design Studio, Oct) | Duplicate bank-feed imports vs genuine identical purchases; expense categories; why deleting the wrong $412.50 row "balances" but is wrong. |
 | 2 | **Balanced, but wrong** (Rivera Mobile Detailing, Mar) | Recording a bank fee from the statement, catching a transposed amount ($84.37 typed as $48.37), leaving an outstanding check in place, removing a duplicate, and reclassifying the owner's $5,000 transfer from Sales to Owner's contribution — the reconciliation hits $0.00 while profit is still overstated by $5,000. |
 
+## A new client file every day
+Beyond the two guided cases, a generator builds fresh client files from four business types, planting 3–5 kinds of
+problem (duplicates, transposed amounts, missing bank fees, outstanding checks, wrong categories, owner money booked as
+income/expense) plus traps like genuine repeat purchases. Every file is returned only if it passes the scenario
+validator, fails as handed over, and is solved by its own reference solution (900 generated files are checked in
+tests).
+- **File of the day** (`#/daily`): the same file for everyone, new every UTC day.
+- **Skill record**: the first check on each file records which kinds of problem you caught (kept in your browser).
+- **Weak-spot practice** (`#/practice/<seed>/<skills>`): files that plant more of what you miss.
+
 ## How grading works
 Four independent checks on the final state, plus the reconciliation arithmetic:
 1. Every real transaction is in the books exactly once (nothing doubled, nothing real deleted, nothing unknown).
@@ -34,23 +44,24 @@ Clues use real bookkeeper heuristics on the live difference (matches a bank line
 start over, reconciliation worksheet, four checks with explanations, clues, P&L before/after, cleanup summary,
 completion remembered in your browser. All in the browser; nothing is sent anywhere.
 
-**Synthetic / not built:** both client files are fictional training data. Simplified single-account model, no
-QuickBooks/Xero/bank connection, no accounts, no payments. Pricing and demand are untested hypotheses.
+**Synthetic / not built:** all client files are fictional training data (the generated ones too). Simplified single-account model, no
+QuickBooks/Xero/bank connection, no accounts, no payments. The $12/month price on the site is a hypothesis to test;
+demand and retention are unmeasured.
 
 ## Run and test
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 47 unit tests incl. exhaustive state-space checks
+npm test                    # 58 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 31 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 39 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.
 
 ## Structure
 - `src/core/` — pure engine, no DOM: `engine.ts` (actions, undo, reconciliation, checks, validation),
-  `scenarios.ts` (the two cases), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
+  `scenarios.ts` (the two cases), `generator.ts` (generated files), `skills.ts` (skill record), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
 - `src/ui/`, `src/main.ts`, `src/style.css` — interface (vanilla TypeScript, Public Sans bundled locally).
 - `tests/` — Vitest; `scripts/e2e.mjs` — browser checks.
 - `pitch/` — pitch deck source and PDF.
