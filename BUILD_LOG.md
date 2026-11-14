@@ -79,3 +79,15 @@
   traps credited only after the user worked the file; genuine-repeat focus always planted; no wire fee without a
   wire; no rideshare-as-car or vehicle insurance; no defensible "wrong" categories; no duplicates on small repeatable
   purchases; home page guarded against generator errors. Regression tests added: npm test 68/68; e2e 39/39.
+
+## 2026-11-14 ~18:00–19:30 Astana — v4: simpler experience (user rated design 2/10, site 4/10)
+- Research (UX_RESEARCH.md): QBO Dojo sells practice clients $49–119 each (needs QBO, self-check, no auto-grading);
+  Akadian CAS $97–197/mo; Brilliant (question first, one idea, instant feedback, scaffolding removed in practice);
+  NN/g progressive disclosure; Linear 2026 (less visual weight, same capability).
+- Home is now a 30-second challenge on real case 1 rows graded by the engine ("Balanced, but wrong" vs "Right").
+- Guided cases: instant feedback per action (core/feedback.ts), progress dots, one next-step line, hint on demand,
+  case 1 shows only delete + category; note, math and category guide collapsed. Exam mode for daily/practice files;
+  only exam files feed the skill record.
+- New visual language (white, airy, one elevated element). Two screenshot review passes; fixed truncated labels,
+  layout shift, a CSS class collision and the phone header.
+- npm test 76/76; e2e rewritten, 42/42 locally.

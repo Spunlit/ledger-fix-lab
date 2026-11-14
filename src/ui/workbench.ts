@@ -1,34 +1,45 @@
 import { CATEGORIES, category } from '../core/categories';
 import { clues } from '../core/clues';
-import { canUndo, checkAll, isLocked, statementLines, type CheckReport } from '../core/engine';
+import { canUndo, checkAll, initialState, isLocked, statementLines, type CheckReport } from '../core/engine';
 import { explain, shortDate, SKILL_LABEL } from '../core/explain';
+import { progress, type Feedback } from '../core/feedback';
 import { formatCents, formatSignedCents } from '../core/money';
 import { cleanupReport } from '../core/report';
 import { CASES } from '../core/scenarios';
 import { weakestSkills } from '../core/skills';
-import type { CategoryId, LedgerEntry, Session, SkillId } from '../core/types';
+import { ALL_TOOLS, type CategoryId, type LedgerEntry, type Scenario, type Session, type SkillId, type Tool } from '../core/types';
 import { dailyHref, practiceHref } from './routes';
 import { centsToPlain, esc, loadHistory, newSeed } from './util';
 
-/** Per-case UI state. All ledger logic lives in ../core. */
+/** Per-file UI state. All ledger logic lives in ../core. */
 export interface CaseUI {
   session: Session;
   checked: boolean;
   checksRun: number;
   noteOpen: boolean;
-  showMatches: boolean;
+  mathOpen: boolean;
+  hintOpen: boolean;
+  guideOpen: boolean;
   editing: string | null;
   editError: string | null;
   recording: string | null;
   /** UTC day for a file of the day. */
   day?: string;
-  /** Skill outcomes of the first check on this file (what the skill record keeps). */
+  /** Skill outcomes of the first check (unguided files only). */
   firstCheck: Partial<Record<SkillId, boolean>> | null;
+  /** Instant feedback on the last action (guided cases only). */
+  feedback: Feedback | null;
 }
 
 export function newCaseUI(session: Session, day?: string): CaseUI {
-  return { session, checked: false, checksRun: 0, noteOpen: true, showMatches: false, editing: null, editError: null, recording: null, day, firstCheck: null };
+  return {
+    session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, guideOpen: false,
+    editing: null, editError: null, recording: null, day, firstCheck: null, feedback: null,
+  };
 }
+
+export const isGuided = (s: Scenario) => s.kind === 'case';
+const toolsOf = (s: Scenario): Set<Tool> => new Set(s.tools ?? ALL_TOOLS);
 
 function badgeText(ui: CaseUI): string {
   const s = ui.session.scenario;
@@ -39,153 +50,148 @@ function badgeText(ui: CaseUI): string {
 export function shareText(ui: CaseUI, url: string): string {
   const s = ui.session.scenario;
   const fc = Object.values(ui.firstCheck ?? {});
-  const caught = fc.filter(Boolean).length;
   return [
     `Ledger Fix Lab: ${badgeText(ui)} (${s.business}, ${s.period})`,
-    `Reconciled and right after ${ui.checksRun} ${ui.checksRun === 1 ? 'check' : 'checks'}. First check: ${caught} of ${fc.length} skills clean.`,
+    `Reconciled and right. Checks run: ${ui.checksRun}.${fc.length ? ` First check: ${fc.filter(Boolean).length} of ${fc.length} skills clean.` : ''}`,
     url,
   ].join('\n');
 }
 
-const sourceTag = (e: LedgerEntry) =>
-  e.source === 'Bank feed' ? '' : `<span class="src ${e.source === 'Manual entry' ? 'manual' : 'added'}">${e.source === 'Manual entry' ? 'Typed by hand' : 'Recorded from statement'}</span>`;
+const ICON = {
+  trash: `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 3h6m-9 3h12m-1.5 0-.7 10.1a1.5 1.5 0 0 1-1.5 1.4H7.7a1.5 1.5 0 0 1-1.5-1.4L5.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  plus: `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  back: `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M12 4 6 10l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
 
 function categorySelect(attr: string, value: CategoryId | null, label: string): string {
+  const opts = (kind: string) =>
+    CATEGORIES.filter((c) => c.kind === kind)
+      .map((c) => `<option value="${c.id}" ${c.id === value ? 'selected' : ''}>${esc(c.name)}</option>`)
+      .join('');
   return `<select ${attr} aria-label="${esc(label)}">
     ${value === null ? '<option value="" selected disabled>Choose a category</option>' : ''}
-    <optgroup label="Income">${opts('income', value)}</optgroup>
-    <optgroup label="Expenses">${opts('expense', value)}</optgroup>
-    <optgroup label="Owner's equity (not profit or loss)">${opts('equity', value)}</optgroup>
+    <optgroup label="Income">${opts('income')}</optgroup>
+    <optgroup label="Expenses">${opts('expense')}</optgroup>
+    <optgroup label="Owner's money (not profit or loss)">${opts('equity')}</optgroup>
   </select>`;
 }
-const opts = (kind: string, value: CategoryId | null) =>
-  CATEGORIES.filter((c) => c.kind === kind)
-    .map((c) => `<option value="${c.id}" ${c.id === value ? 'selected' : ''}>${esc(c.name)}</option>`)
-    .join('');
+
+function coachText(s: Scenario, report: CheckReport): string {
+  if (!isGuided(s)) return 'No hints in this file. Fix everything you find, then press Check the books.';
+  if (report.ok) return 'Everything checks out. Press Check the books to confirm.';
+  const d = report.recon.differenceCents;
+  if (d !== 0) return `The books are ${formatCents(Math.abs(d))} away from the bank. Compare the two lists, line by line.`;
+  return "The difference is $0.00, but something is still wrong. Read the client's note and check the categories.";
+}
 
 export function renderWorkbench(ui: CaseUI): string {
   const { scenario: s, state } = ui.session;
   const report = checkAll(s, state);
   const r = report.recon;
+  const guided = isGuided(s);
+  const tools = toolsOf(s);
   const cl = clues(s, state);
-  const hlEntries = new Set(ui.showMatches ? cl.flatMap((c) => c.entryIds) : []);
-  const hlLines = new Set(ui.showMatches ? cl.flatMap((c) => c.txnIds) : []);
+  const showHint = guided && ui.hintOpen && cl.length > 0;
+  const hlEntries = new Set(showHint ? cl.flatMap((c) => c.entryIds) : []);
+  const hlLines = new Set(showHint ? cl.flatMap((c) => c.txnIds) : []);
   const recordedByUser = new Set(state.entries.filter((e) => e.source === 'Added from statement').map((e) => e.txnId));
   const solved = ui.checked && report.ok;
-  const next = CASES.find((c) => c.number === s.number + 1);
+  const prog = guided ? progress(s, initialState(s), state) : null;
+  const hasOutstanding = r.outstandingPaymentsCents !== 0 || r.depositsInTransitCents !== 0;
+  const teaser = s.note.paragraphs[1] ?? s.note.paragraphs[0];
 
   return `
-  <header class="site compact">
-    <a class="brand" href="#/" aria-label="All cases"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
-    <div class="case-title">
-      <span class="case-badge">${esc(badgeText(ui))}</span>
-      <h1>${esc(s.kind === 'case' ? s.title : s.business)}</h1>
-      <span class="case-sub">${s.kind === 'case' ? `${esc(s.business)}, ${esc(s.period)}` : `${esc(s.period)} books, generated for practice`}</span>
-    </div>
-    <div class="top-actions">
-      <button type="button" class="btn" data-act="undo" ${canUndo(ui.session) ? '' : 'disabled'}>Undo</button>
-      <button type="button" class="btn" data-act="reset" ${canUndo(ui.session) ? '' : 'disabled'}>Start over</button>
+  <header class="bar">
+    <a class="back" href="#/" aria-label="Back to home">${ICON.back}<span class="mark" aria-hidden="true"></span></a>
+    <div class="bar-title"><span class="badge ${guided ? '' : 'exam'}">${esc(badgeText(ui))}</span><h1>${esc(s.kind === 'case' ? s.title : s.business)}</h1></div>
+    <div class="bar-actions">
+      <button type="button" class="btn ghost" data-act="undo" ${canUndo(ui.session) ? '' : 'disabled'}>Undo</button>
+      <button type="button" class="btn ghost" data-act="reset" ${canUndo(ui.session) ? '' : 'disabled'}>Start over</button>
     </div>
   </header>
 
   <main class="bench">
-    <section class="brief" aria-label="Client note and your job">
-      <article class="note ${ui.noteOpen ? '' : 'closed'}">
-        <header>
-          <div><span class="note-from">From ${esc(s.note.from)}</span><h2>${esc(s.note.subject)}</h2></div>
-          <button type="button" class="link" data-act="toggle-note" aria-expanded="${ui.noteOpen}">${ui.noteOpen ? 'Hide note' : 'Show client note'}</button>
-        </header>
-        ${ui.noteOpen ? s.note.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('') : ''}
-      </article>
-      <div class="jobwrap"><ol class="job">
-        <li>Compare the books with the bank statement, line by line.</li>
-        <li>Fix what's wrong: delete, correct an amount (click it), change a category, tick what's on the statement, or record a bank line that's missing.</li>
-        <li>When the difference reads $0.00, press <b>Check the books</b>.</li>
-      </ol>
-      <p class="job-note">This month hasn't been reconciled yet, so deleting a wrong row is fine here. In real books, never delete a row from a month that's already reconciled.</p></div>
-    </section>
-
-    <section class="worksheet" aria-label="Bank reconciliation worksheet" aria-live="polite">
-      <div class="eq">
-        <div class="term"><span class="op" aria-hidden="true"></span><span class="lbl">Statement ending</span><span class="num">${formatCents(r.statementEndingCents)}</span></div>
-        <div class="term"><span class="op" aria-hidden="true">−</span><span class="lbl">Outstanding <small>(unticked payments)</small></span><span class="num">${formatCents(-r.outstandingPaymentsCents)}</span></div>
-        <div class="term"><span class="op" aria-hidden="true">+</span><span class="lbl">In transit <small>(unticked deposits)</small></span><span class="num">${formatCents(r.depositsInTransitCents)}</span></div>
-        <div class="term strong"><span class="op" aria-hidden="true">=</span><span class="lbl">Adjusted bank</span><span class="num">${formatCents(r.adjustedBankCents)}</span></div>
-        <div class="term strong"><span class="op vs" aria-hidden="true">vs</span><span class="lbl">Books</span><span class="num">${formatCents(r.bookBalanceCents)}</span></div>
+    <section class="status" aria-label="Reconciliation" aria-live="polite">
+      <div class="figs">
+        <div class="fig"><span>Bank${hasOutstanding ? ' <small>after uncleared items</small>' : ''}</span><strong class="num">${formatCents(r.adjustedBankCents)}</strong></div>
+        <div class="fig"><span>Books</span><strong class="num">${formatCents(r.bookBalanceCents)}</strong></div>
+        <div class="fig diff ${report.balanced ? 'zero' : 'off'}" data-testid="difference"><span>Difference</span><strong class="num">${formatSignedCents(r.differenceCents)}</strong></div>
       </div>
-      <div class="diff ${report.balanced ? 'zero' : 'off'}" data-testid="difference"><span class="lbl">Difference</span><span class="num">${formatSignedCents(r.differenceCents)}</span></div>
-      <button type="button" class="btn primary big check-btn" data-act="check">Check the books</button>
+      <div class="status-side">
+        ${prog ? `<div class="prog" aria-label="${prog.fixed} of ${prog.total} problems fixed"><span class="dots">${Array.from({ length: prog.total }, (_, i) => `<i class="${i < prog.fixed ? 'on' : ''}"></i>`).join('')}</span><span>${prog.fixed} of ${prog.total} fixed</span></div>` : ''}
+        <button type="button" class="btn primary" data-act="check">Check the books</button>
+      </div>
+      <button type="button" class="link small math-toggle" data-act="toggle-math" aria-expanded="${ui.mathOpen}">${ui.mathOpen ? 'Hide the math' : 'How is this calculated?'}</button>
       ${
-        cl.length
-          ? `<div class="clue"><p><b>Clue.</b> ${esc(cl[0].text)}${cl.length > 1 ? ` <span class="more">${cl.slice(1).map((c) => esc(c.text)).join(' ')}</span>` : ''}</p>${
-              cl.some((c) => c.entryIds.length || c.txnIds.length)
-                ? `<button type="button" class="link" data-act="toggle-matches" aria-pressed="${ui.showMatches}">${ui.showMatches ? 'Hide matches' : 'Highlight matches'}</button>`
-                : ''
-            }</div>`
-          : `<div class="clue calm"><p><b>Reconciled to $0.00.</b> That's necessary, not sufficient. Check the books to see whether they're actually right.</p></div>`
+        ui.mathOpen
+          ? `<p class="math">Statement ending ${formatCents(r.statementEndingCents)} − outstanding payments ${formatCents(-r.outstandingPaymentsCents)} + deposits in transit ${formatCents(r.depositsInTransitCents)} = adjusted bank ${formatCents(r.adjustedBankCents)}. Books: opening ${formatCents(s.openingBalanceCents)} plus every row = ${formatCents(r.bookBalanceCents)}. Unticked rows are the outstanding items.</p>`
+          : ''
       }
     </section>
 
-    ${ui.checked ? (solved ? renderSolved(ui, report, next?.id) : renderReview(ui, report)) : ''}
+    <section class="coach" aria-live="polite">
+      <p class="next">${esc(coachText(s, report))}</p>
+      ${guided && cl.length ? `<button type="button" class="btn small" data-act="toggle-hint" aria-expanded="${ui.hintOpen}">${ui.hintOpen ? 'Hide hint' : 'Hint'}</button>` : ''}
+      ${showHint ? `<p class="hint">${esc(cl[0].text)}</p>` : ''}
+      ${ui.feedback ? `<p class="toast ${ui.feedback.tone}" role="status" data-testid="feedback">${esc(ui.feedback.text)}</p>` : ''}
+    </section>
+
+    <aside class="note-strip ${ui.noteOpen ? 'open' : ''}">
+      <p><b>${esc(s.note.from.split(',')[0])}:</b> ${ui.noteOpen ? '' : `“${esc(teaser)}”`}</p>
+      ${ui.noteOpen ? s.note.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('') : ''}
+      <button type="button" class="link small" data-act="toggle-note" aria-expanded="${ui.noteOpen}">${ui.noteOpen ? 'Hide note' : 'Read the full note'}</button>
+    </aside>
+
+    ${ui.checked ? (solved ? renderSolved(ui, report) : renderReview(report)) : ''}
 
     <div class="desk">
       <section class="books" aria-labelledby="books-h">
-        <h2 id="books-h">The client's books <span class="count">${state.entries.length} rows</span></h2>
-        <div class="scroll">
-          <table class="ledger">
-            <thead><tr><th class="c-clr">Cleared</th><th>Date</th><th>Description</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Actions</span></th></tr></thead>
-            <tbody>
-              ${state.entries.map((e) => renderRow(ui, e, report, hlEntries.has(e.entryId))).join('')}
-            </tbody>
-          </table>
-        </div>
+        <h2 id="books-h">Books</h2>
+        <table class="ledger ${tools.has('cleared') ? 'with-clr' : ''}">
+          <thead><tr>${tools.has('cleared') ? '<th class="c-clr">Cleared</th>' : ''}<th>Date</th><th>Description</th><th class="r">Amount</th><th>Category</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody>${state.entries.map((e) => renderRow(ui, e, report, tools, hlEntries.has(e.entryId))).join('')}</tbody>
+        </table>
+        <button type="button" class="link small" data-act="toggle-guide" aria-expanded="${ui.guideOpen}">${ui.guideOpen ? 'Hide category guide' : 'Category guide'}</button>
+        ${ui.guideOpen ? `<dl class="guide">${CATEGORIES.map((c) => `<div><dt>${esc(c.name)}</dt><dd>${esc(c.rule)}</dd></div>`).join('')}</dl>` : ''}
       </section>
 
-      <aside class="side">
-        <section class="statement" aria-labelledby="stmt-h">
-          <h2 id="stmt-h">Bank statement <span class="count">${esc(s.account)}</span></h2>
-          <table class="stmt">
-            <tbody>
-              <tr class="muted"><td class="s-desc" colspan="2">Beginning balance</td><td class="r num s-amt">${formatCents(s.openingBalanceCents)}</td><td class="s-rec"></td></tr>
-              ${statementLines(s)
-                .map((l) => {
-                  const recording = ui.recording === l.txnId;
-                  return `<tr class="${hlLines.has(l.txnId) ? 'hl' : ''}" data-amt="${l.amountCents}">
+      <section class="statement" aria-labelledby="stmt-h">
+        <h2 id="stmt-h">Bank statement</h2>
+        <table class="stmt">
+          <tbody>
+            <tr class="muted"><td class="s-desc" colspan="2">Beginning balance</td><td class="r num s-amt">${formatCents(s.openingBalanceCents)}</td>${tools.has('record') ? '<td class="s-rec"></td>' : ''}</tr>
+            ${statementLines(s)
+              .map((l) => {
+                const recording = ui.recording === l.txnId;
+                return `<tr class="${hlLines.has(l.txnId) ? 'hl' : ''}" data-amt="${l.amountCents}">
                   <td class="nowrap s-date">${shortDate(l.date)}</td><td class="bankdesc s-desc">${esc(l.description)}</td>
                   <td class="r num s-amt ${l.amountCents > 0 ? 'in' : ''}">${formatSignedCents(l.amountCents)}</td>
-                  <td class="r s-rec">${
-                    recordedByUser.has(l.txnId)
-                      ? '<span class="src added">Recorded</span>'
-                      : `<button type="button" class="mini ghost rec" data-record="${esc(l.txnId)}" aria-expanded="${recording}" aria-label="Record ${esc(l.description)} in the books">Record</button>`
-                  }</td></tr>
+                  ${
+                    tools.has('record')
+                      ? `<td class="r s-rec">${recordedByUser.has(l.txnId) ? '<span class="tag">Added</span>' : `<button type="button" class="icon-btn" data-record="${esc(l.txnId)}" aria-expanded="${recording}" aria-label="Record ${esc(l.description)} in the books" title="Record in the books">${ICON.plus}</button>`}</td>`
+                      : ''
+                  }</tr>
                   ${
                     recording
-                      ? `<tr class="record-row"><td colspan="4">
-                    <form class="record-form" data-record-form="${esc(l.txnId)}">
-                      <span>Add ${formatSignedCents(l.amountCents)} to the books as</span>
-                      ${categorySelect('name="cat" required', null, 'Category for the recorded line')}
-                      <button type="submit" class="btn primary">Add to books</button>
-                      <button type="button" class="link" data-act="cancel-record">Cancel</button>
-                    </form></td></tr>`
+                      ? `<tr class="record-row"><td colspan="4"><form class="record-form" data-record-form="${esc(l.txnId)}">
+                          <span>Add ${formatSignedCents(l.amountCents)} to the books as</span>
+                          ${categorySelect('name="cat" required', null, 'Category for the recorded line')}
+                          <button type="submit" class="btn primary small">Add</button>
+                          <button type="button" class="link small" data-act="cancel-record">Cancel</button>
+                        </form></td></tr>`
                       : ''
                   }`;
-                })
-                .join('')}
-              <tr class="total"><td class="s-desc" colspan="2">Ending balance</td><td class="r num s-amt">${formatCents(s.statementEndingBalanceCents)}</td><td class="s-rec"></td></tr>
-            </tbody>
-          </table>
-        </section>
-        <details class="guide">
-          <summary>Category guide</summary>
-          <dl>${CATEGORIES.map((c) => `<div><dt>${esc(c.name)}</dt><dd>${esc(c.rule)}</dd></div>`).join('')}</dl>
-        </details>
-      </aside>
+              })
+              .join('')}
+            <tr class="total"><td class="s-desc" colspan="2">Ending balance</td><td class="r num s-amt">${formatCents(s.statementEndingBalanceCents)}</td>${tools.has('record') ? '<td class="s-rec"></td>' : ''}</tr>
+          </tbody>
+        </table>
+      </section>
     </div>
-  </main>
-  <footer class="site-foot"><p>${esc(s.business)} and ${esc(s.client)} are fictional. Synthetic practice data, simplified one-account model.</p></footer>`;
+  </main>`;
 }
 
-function renderRow(ui: CaseUI, e: LedgerEntry, report: CheckReport, hl: boolean): string {
+function renderRow(ui: CaseUI, e: LedgerEntry, report: CheckReport, tools: Set<Tool>, hl: boolean): string {
   const flagged =
     ui.checked &&
     (report.amounts.wrong.some((w) => w.entry.entryId === e.entryId) ||
@@ -194,104 +200,96 @@ function renderRow(ui: CaseUI, e: LedgerEntry, report: CheckReport, hl: boolean)
   const locked = isLocked(e);
   const editing = ui.editing === e.entryId;
   const label = `${e.description}, ${shortDate(e.date)}`;
+  const tag = e.source === 'Manual entry' ? '<span class="tag manual">Typed by hand</span>' : e.source === 'Added from statement' ? '<span class="tag">Added</span>' : '';
+  const amount = editing
+    ? `<form class="amt-form" data-amt-form="${esc(e.entryId)}">
+        <span aria-hidden="true">${e.amountCents < 0 ? '−$' : '$'}</span>
+        <input name="amt" inputmode="decimal" autocomplete="off" value="${centsToPlain(e.amountCents)}" aria-label="New amount for ${esc(label)}" ${ui.editError ? 'aria-invalid="true"' : ''}>
+        <button type="submit" class="btn primary small">Save</button><button type="button" class="link small" data-act="cancel-edit">Cancel</button>
+        ${ui.editError ? `<span class="err" role="alert">${esc(ui.editError)}</span>` : ''}
+      </form>`
+    : tools.has('amount') && !locked
+      ? `<button type="button" class="amt ${e.amountCents > 0 ? 'in' : ''}" data-edit="${esc(e.entryId)}" aria-label="Edit amount ${formatSignedCents(e.amountCents)} for ${esc(label)}" title="Click to correct the amount">${formatSignedCents(e.amountCents)}</button>`
+      : `<span class="num ${e.amountCents > 0 ? 'in' : ''}">${formatSignedCents(e.amountCents)}</span>`;
   return `<tr data-entry="${esc(e.entryId)}" data-amt="${e.amountCents}" class="${hl ? 'hl' : ''} ${flagged ? 'flag' : ''}">
-    <td class="c-clr"><label class="tick"><input type="checkbox" data-clear="${esc(e.entryId)}" ${e.cleared ? 'checked' : ''} ${locked ? 'disabled' : ''} aria-label="Cleared: ${esc(label)}"><span aria-hidden="true"></span></label></td>
+    ${tools.has('cleared') ? `<td class="c-clr"><label class="tick"><input type="checkbox" data-clear="${esc(e.entryId)}" ${e.cleared ? 'checked' : ''} ${locked ? 'disabled' : ''} aria-label="Cleared: ${esc(label)}"><span aria-hidden="true"></span></label></td>` : ''}
     <td class="nowrap c-date">${shortDate(e.date)}</td>
-    <td class="c-desc">${esc(e.description)} ${sourceTag(e)}</td>
-    <td class="r c-amt">${
-      editing
-        ? `<form class="amt-form" data-amt-form="${esc(e.entryId)}">
-            <span class="sign" aria-hidden="true">${e.amountCents < 0 ? '−$' : '$'}</span>
-            <input name="amt" inputmode="decimal" autocomplete="off" value="${centsToPlain(e.amountCents)}" aria-label="New amount for ${esc(label)}" ${ui.editError ? 'aria-invalid="true"' : ''}>
-            <button type="submit" class="mini">Save</button><button type="button" class="mini ghost" data-act="cancel-edit">Cancel</button>
-            ${ui.editError ? `<span class="err" role="alert">${esc(ui.editError)}</span>` : ''}
-          </form>`
-        : `<button type="button" class="amt ${e.amountCents > 0 ? 'in' : ''}" data-edit="${esc(e.entryId)}" aria-label="Edit amount ${formatSignedCents(e.amountCents)} for ${esc(label)}" ${locked ? 'disabled' : ''}>${formatSignedCents(e.amountCents)}</button>`
-    }</td>
-    <td class="c-cat">${categorySelect(`data-cat="${esc(e.entryId)}"`, e.category, `Category for ${label}`)}</td>
-    <td class="c-del"><button type="button" class="mini ghost del" data-del="${esc(e.entryId)}" aria-label="Delete ${esc(label)}">Delete</button></td>
+    <td class="c-desc">${esc(e.description)} ${tag}</td>
+    <td class="r c-amt">${amount}</td>
+    <td class="c-cat">${tools.has('category') ? categorySelect(`data-cat="${esc(e.entryId)}"`, e.category, `Category for ${label}`) : esc(category(e.category).name)}</td>
+    <td class="c-del">${tools.has('delete') ? `<button type="button" class="icon-btn del" data-del="${esc(e.entryId)}" aria-label="Delete ${esc(label)}" title="Delete">${ICON.trash}</button>` : ''}</td>
   </tr>`;
 }
 
-function renderReview(ui: CaseUI, report: CheckReport): string {
+function renderReview(report: CheckReport): string {
   const ex = explain(report);
-  const rows: [string, string, boolean, string[], string][] = [
-    ['integrity', 'Each transaction recorded exactly once', report.integrity.ok, ex.integrity, 'Nothing missing, nothing doubled.'],
-    ['amounts', 'Amounts match the bank', report.amounts.ok, ex.amounts, 'Every amount matches its source.'],
-    ['cleared', 'Cleared items ticked correctly', report.cleared.ok, ex.cleared, 'Ticked exactly when it is on this statement.'],
-    ['categories', 'Categories right', report.categories.ok, ex.categories, 'Every row fits its category.'],
+  const rows: [string, string, boolean, string[]][] = [
+    ['integrity', 'Each transaction recorded exactly once', report.integrity.ok, ex.integrity],
+    ['amounts', 'Amounts match the bank', report.amounts.ok, ex.amounts],
+    ['cleared', 'Cleared items ticked correctly', report.cleared.ok, ex.cleared],
+    ['categories', 'Categories right', report.categories.ok, ex.categories],
   ];
-  const failing = rows.filter((x) => !x[2]).length;
+  const failing = rows.filter((x) => !x[2]);
   const verdict = report.balanced
-    ? `Not yet. The difference is $0.00, but ${failing === 1 ? 'one check fails' : `${failing} checks fail`}. Balanced isn't the same as right.`
-    : `Not yet. The books are ${formatSignedCents(report.recon.differenceCents)} away from the bank, and ${failing === 1 ? 'one check fails' : `${failing} checks fail`}.`;
+    ? `The difference is $0.00, but ${failing.length === 1 ? 'one check fails' : `${failing.length} checks fail`}. Balanced isn't the same as right.`
+    : `Not yet: ${formatSignedCents(report.recon.differenceCents)} to go, and ${failing.length === 1 ? 'one check fails' : `${failing.length} checks fail`}.`;
   return `
   <section class="review" aria-live="polite" aria-labelledby="review-h">
     <h2 id="review-h">${esc(verdict)}</h2>
     <ul class="checks">
       ${rows
         .map(
-          ([key, title, ok, lines, okText]) => `
+          ([key, title, ok, lines]) => `
         <li class="check ${ok ? 'pass' : 'fail'}" data-testid="check-${key}">
-          <span class="dot" aria-hidden="true"></span>
-          <div><h3>${title} <span class="status">${ok ? 'Pass' : 'Fix needed'}</span></h3>
-          ${ok ? `<p>${okText}</p>` : `<ul>${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}</div>
+          <h3><span class="dot" aria-hidden="true"></span>${title}<span class="st">${ok ? "Pass" : "Fix needed"}</span></h3>
+          ${ok ? '' : `<ul>${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}
         </li>`,
         )
         .join('')}
     </ul>
-    <p class="review-foot">Checks run: ${ui.checksRun}. The review updates as you keep working.</p>
   </section>`;
 }
 
-function renderSolved(ui: CaseUI, report: CheckReport, nextId: string | undefined): string {
+function renderSolved(ui: CaseUI, report: CheckReport): string {
   const s = ui.session.scenario;
   const rep = cleanupReport(s, ui.session.state);
   const beforeNet = rep.before.pnl.netIncomeCents;
   const afterNet = rep.after.pnl.netIncomeCents;
   return `
   <section class="solved" data-testid="success" aria-live="polite" aria-labelledby="solved-h">
-    <div class="solved-head">
-      <h2 id="solved-h">Books reconciled, and right.</h2>
-      <p>All four checks pass (checks run: ${ui.checksRun}). Here's the summary you'd send ${esc(s.client.split(' ')[0])}.</p>
-    </div>
+    <h2 id="solved-h">Books reconciled, and right.</h2>
     <div class="beforeafter">
-      <div><span>Difference</span><span class="num"><s>${formatSignedCents(rep.before.recon.differenceCents)}</s> ${formatSignedCents(report.recon.differenceCents)}</span></div>
-      <div><span>Net profit for ${esc(s.period.split(' ')[0])}</span><span class="num">${beforeNet === afterNet ? formatCents(afterNet) : `<s>${formatCents(beforeNet)}</s> ${formatCents(afterNet)}`}</span></div>
-      <div><span>Book balance</span><span class="num">${formatCents(rep.after.recon.bookBalanceCents)}</span></div>
+      <div><span>Difference</span><strong class="num"><s>${formatSignedCents(rep.before.recon.differenceCents)}</s> ${formatSignedCents(report.recon.differenceCents)}</strong></div>
+      <div><span>Net profit, ${esc(s.period.split(' ')[0])}</span><strong class="num">${beforeNet === afterNet ? formatCents(afterNet) : `<s>${formatCents(beforeNet)}</s> ${formatCents(afterNet)}`}</strong></div>
+      <div><span>Checks run</span><strong class="num">${ui.checksRun}</strong></div>
     </div>
-    <article class="summary" aria-label="Cleanup summary for the client">
-      <h3>${esc(s.business)}: ${esc(s.period)} cleanup summary</h3>
-      <ul>${rep.items.map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>
-    </article>
     ${renderFirstCheck(ui)}
+    <details class="summary">
+      <summary>The cleanup summary you'd send ${esc(s.client.split(' ')[0])} (${rep.items.length} fixes)</summary>
+      <ul>${rep.items.map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>
+    </details>
     <div class="solved-actions">
-      <button type="button" class="btn" data-act="copy-report">Copy client summary</button>
-      <button type="button" class="btn" data-act="copy-result">Copy my result</button>
-      ${nextAction(s, nextId)}
+      ${nextAction(s)}
+      <button type="button" class="btn ghost" data-act="copy-report">Copy client summary</button>
+      ${isGuided(s) ? '' : '<button type="button" class="btn ghost" data-act="copy-result">Copy my result</button>'}
     </div>
   </section>`;
 }
 
 function renderFirstCheck(ui: CaseUI): string {
   const fc = ui.firstCheck;
-  if (!fc) return '';
+  if (!fc || !Object.keys(fc).length) return '';
   const entries = Object.entries(fc) as [SkillId, boolean][];
   const clean = entries.filter(([, ok]) => ok).length;
   return `<div class="firstcheck">
-    <h3>Your first check: ${clean} of ${entries.length} skills clean</h3>
-    <ul>${entries.map(([k, ok]) => `<li class="${ok ? 'ok' : 'miss'}"><span aria-hidden="true">${ok ? '✓' : '✗'}</span> ${esc(SKILL_LABEL[k])}${ok ? '' : ' <small>(fixed after feedback)</small>'}</li>`).join('')}</ul>
-    <p class="practiced">Saved to your skill record in this browser. Practice files target the skills you miss most.</p>
+    <h3>First check: ${clean} of ${entries.length} skills clean</h3>
+    <ul>${entries.map(([k, ok]) => `<li class="${ok ? 'ok' : 'miss'}"><span aria-hidden="true">${ok ? '✓' : '✗'}</span> ${esc(SKILL_LABEL[k])}</li>`).join('')}</ul>
   </div>`;
 }
 
-function nextAction(s: Session['scenario'], nextId: string | undefined): string {
-  if (s.kind === 'case' && nextId) return `<a class="btn primary" href="#/case/${nextId}">Next case</a>`;
-  if (s.kind === 'case') return `<a class="btn primary" href="${dailyHref()}">Start today's file</a>`;
-  const focus = weakestSkills(loadHistory(), 2);
-  return `<a class="btn primary" href="${practiceHref(newSeed(), focus)}">Practice my weak spots</a><a class="btn" href="#/">Home</a>`;
-}
-
-export function categoryLabel(id: CategoryId): string {
-  return category(id).name;
+function nextAction(s: Scenario): string {
+  const next = CASES.find((c) => c.number === s.number + 1);
+  if (s.kind === 'case' && next) return `<a class="btn primary" href="#/case/${next.id}">Next case</a>`;
+  if (s.kind === 'case') return `<a class="btn primary" href="${dailyHref()}">Try today's file, no hints</a>`;
+  return `<a class="btn primary" href="${practiceHref(newSeed(), weakestSkills(loadHistory(), 2))}">Practice my weak spots</a><a class="btn ghost" href="#/">Home</a>`;
 }

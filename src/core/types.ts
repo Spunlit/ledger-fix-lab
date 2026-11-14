@@ -74,6 +74,10 @@ export interface ClientNote {
   paragraphs: string[];
 }
 
+/** Editing tools a scenario exposes. Guided beginners get fewer (progressive disclosure). */
+export type Tool = 'delete' | 'category' | 'amount' | 'cleared' | 'record';
+export const ALL_TOOLS: Tool[] = ['delete', 'category', 'amount', 'cleared', 'record'];
+
 /** A problem deliberately planted in a scenario, tied to the transaction a check would flag. */
 export interface Planted {
   skill: SkillId;
@@ -107,6 +111,8 @@ export interface Scenario {
   ledger: LedgerEntry[];
   /** What was planted, for the skill record. */
   planted: Planted[];
+  /** Tools shown for this scenario; all when omitted. */
+  tools?: Tool[];
 }
 
 export interface LedgerState {

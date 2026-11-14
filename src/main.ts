@@ -1,19 +1,44 @@
 import './style.css';
 import { isCategoryId } from './core/categories';
-import { applyAction, checkAll, createSession, reset, undo } from './core/engine';
+import { applyAction, checkAll, createSession, initialState, reset, undo } from './core/engine';
+import { actionFeedback } from './core/feedback';
+import { formatSignedCents } from './core/money';
 import { cleanupReport, reportText } from './core/report';
 import { skillOutcomes } from './core/skills';
 import type { Action } from './core/types';
 import { renderLanding } from './ui/landing';
 import { resolve } from './ui/routes';
 import { loadCompleted, loadHistory, parseDollarsToCents, saveCompleted, saveHistory } from './ui/util';
-import { newCaseUI, renderWorkbench, shareText, type CaseUI } from './ui/workbench';
+import { isGuided, newCaseUI, renderWorkbench, shareText, type CaseUI } from './ui/workbench';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const cases = new Map<string, CaseUI>();
 let completed = loadCompleted();
 let history = loadHistory();
 let currentId: string | null = null;
+/** Home-page challenge: which row the visitor deleted. */
+let challengeDeleted: string | null = null;
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderHome(animate = false): void {
+  app.innerHTML = renderLanding(completed, history, challengeDeleted);
+  const el = app.querySelector<HTMLElement>('[data-testid=ch-diff]');
+  const box = app.querySelector<HTMLElement>('.challenge');
+  if (!animate || !el || !box || !el.dataset.from || reducedMotion()) return;
+  // Count the difference down to its new value, then reveal the verdict.
+  const from = Number(el.dataset.from);
+  const to = 0;
+  box.classList.add('counting');
+  const t0 = performance.now();
+  const tick = (now: number) => {
+    const k = Math.min(1, (now - t0) / 650);
+    const v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    el.textContent = formatSignedCents(v);
+    if (k < 1) requestAnimationFrame(tick);
+    else box.classList.remove('counting');
+  };
+  requestAnimationFrame(tick);
+}
 
 function current(): CaseUI | null {
   return currentId ? cases.get(currentId) ?? null : null;
@@ -37,7 +62,7 @@ function route(): void {
   } else {
     currentId = null;
     document.title = 'Ledger Fix Lab: practice bookkeeping cleanups';
-    app.innerHTML = renderLanding(completed, history);
+    renderHome();
     // In-page anchors (#cases) are handled by the browser; only reset scroll for the home route.
     if (location.hash === '' || location.hash === '#/') window.scrollTo(0, 0);
   }
@@ -66,7 +91,11 @@ function render(): void {
 
 function dispatch(action: Action): void {
   const ui = current()!;
+  const before = ui.session.state;
   ui.session = applyAction(ui.session, action);
+  const s = ui.session.scenario;
+  // Guided cases answer every move immediately; unguided files stay silent until Check.
+  ui.feedback = isGuided(s) ? actionFeedback(s, initialState(s), before, ui.session.state) : null;
   ui.editing = null;
   ui.editError = null;
   ui.recording = null;
@@ -75,7 +104,13 @@ function dispatch(action: Action): void {
 
 app.addEventListener('click', (ev) => {
   const ui = current();
-  if (!ui) return;
+  if (!ui) {
+    const b = (ev.target as HTMLElement).closest<HTMLElement>('[data-ch-del], [data-ch-reset]');
+    if (!b) return;
+    challengeDeleted = b.dataset.chDel ?? null;
+    renderHome(Boolean(challengeDeleted));
+    return;
+  }
   const t = (ev.target as HTMLElement).closest<HTMLElement>('button, [data-act]');
   if (!t || (t as HTMLButtonElement).disabled) return;
   const d = t.dataset;
@@ -93,6 +128,7 @@ app.addEventListener('click', (ev) => {
     case 'undo':
       ui.session = undo(ui.session);
       ui.editing = ui.recording = null;
+      ui.feedback = null;
       return render();
     case 'reset':
       cases.set(currentId!, { ...newCaseUI(reset(ui.session), ui.day), noteOpen: ui.noteOpen, firstCheck: ui.firstCheck });
@@ -100,8 +136,14 @@ app.addEventListener('click', (ev) => {
     case 'toggle-note':
       ui.noteOpen = !ui.noteOpen;
       return render();
-    case 'toggle-matches':
-      ui.showMatches = !ui.showMatches;
+    case 'toggle-math':
+      ui.mathOpen = !ui.mathOpen;
+      return render();
+    case 'toggle-hint':
+      ui.hintOpen = !ui.hintOpen;
+      return render();
+    case 'toggle-guide':
+      ui.guideOpen = !ui.guideOpen;
       return render();
     case 'cancel-edit':
       ui.editing = null;
@@ -114,8 +156,9 @@ app.addEventListener('click', (ev) => {
       ui.checked = true;
       ui.checksRun += 1;
       const s = ui.session.scenario;
-      if (!ui.firstCheck) {
-        // The skill record keeps the outcome of the first check on each file only.
+      ui.feedback = null;
+      if (!ui.firstCheck && !isGuided(s)) {
+        // The skill record keeps the first check on unguided files only: guided feedback would inflate it.
         ui.firstCheck = skillOutcomes(s, checkAll(s, ui.session.state), { worked: ui.session.history.length > 0 });
         if (!history.some((h) => h.fileId === s.id)) {
           history = [...history, { fileId: s.id, at: new Date().toISOString(), firstCheck: ui.firstCheck }];
@@ -123,7 +166,7 @@ app.addEventListener('click', (ev) => {
         }
       }
       render();
-      app.querySelector('.review, .solved')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      app.querySelector('.review, .solved')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
       return;
     }
     case 'copy-result': {

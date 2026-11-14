@@ -1,161 +1,146 @@
-import { checkAll, createSession, applyAction } from '../core/engine';
-import { SKILL_LABEL } from '../core/explain';
-import { formatCents } from '../core/money';
-import { CASES, CASE_2 } from '../core/scenarios';
+import { applyAction, checkIntegrity, createSession, reconcile } from '../core/engine';
+import { shortDate, SKILL_LABEL } from '../core/explain';
 import { generateFile, todaySeed } from '../core/generator';
+import { formatCents, formatSignedCents } from '../core/money';
+import { CASES, CASE_1 } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
 import { dailyHref, practiceHref } from './routes';
-import { esc, longDate, newSeed, type Completed } from './util';
+import { esc, newSeed, type Completed } from './util';
 
-/** Numbers for the hero come from the real Case 2 engine, not from copy. */
-function heroNumbers() {
-  let s = createSession(CASE_2);
-  for (const a of [
-    { type: 'record', txnId: 'R13', category: 'bankfees' },
-    { type: 'setAmount', entryId: 'E03', magnitudeCents: 8437 },
-    { type: 'setCleared', entryId: 'E03', cleared: true },
-    { type: 'delete', entryId: 'E09' },
-  ] as const) {
-    s = applyAction(s, a);
-  }
-  const r = checkAll(CASE_2, s.state);
-  return { diff: r.recon.differenceCents, booked: r.categories.booked.netIncomeCents, correct: r.categories.correct.netIncomeCents };
+/** The 30-second challenge on the home page: real case 1 rows, graded by the real engine. */
+export const CHALLENGE_ROWS = ['E09', 'E10', 'E14'];
+
+export function challengeResult(deleted: string) {
+  const s = applyAction(createSession(CASE_1), { type: 'delete', entryId: deleted });
+  const integrity = checkIntegrity(CASE_1, s.state);
+  return { difference: reconcile(CASE_1, s.state).differenceCents, right: integrity.ok };
 }
 
-function dailyBand(done: Completed, history: SkillAttempt[]): string {
+const trash = `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 3h6m-9 3h12m-1.5 0-.7 10.1a1.5 1.5 0 0 1-1.5 1.4H7.7a1.5 1.5 0 0 1-1.5-1.4L5.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function challenge(deleted: string | null): string {
+  const start = reconcile(CASE_1, createSession(CASE_1).state);
+  const rows = CASE_1.ledger.filter((e) => CHALLENGE_ROWS.includes(e.entryId));
+  const bank = CASE_1.txns.filter((t) => t.txnId === 'T09' || t.txnId === 'T13');
+  const res = deleted ? challengeResult(deleted) : null;
+  const short = (d: string) => d.replace('Upwork — contractor, logo milestone ', 'Upwork, part ');
+  return `
+  <div class="challenge ${res ? (res.right ? 'is-right' : 'is-wrong') : ''}" aria-live="polite">
+    <div class="ch-head">
+      <span class="ch-label">Try it, 30 seconds</span>
+      <div class="ch-diff"><span>Difference</span><strong class="num" data-testid="ch-diff" data-from="${res ? start.differenceCents : ''}">${formatSignedCents(res ? res.difference : start.differenceCents)}</strong></div>
+    </div>
+    <p class="ch-task">The books are <b>$412.50</b> off. One payment was imported twice. Delete the extra copy.</p>
+    <div class="ch-cols">
+      <div>
+        <p class="ch-cap">The books</p>
+        <ul class="ch-rows">
+          ${rows
+            .map((e) => {
+              const gone = deleted === e.entryId;
+              const dup = res && !res.right && e.txnId === 'T09';
+              return `<li class="${gone ? 'gone' : ''} ${dup ? 'dup' : ''}">
+              <span class="d">${shortDate(e.date)}</span><span class="t">${esc(short(e.description))}</span><span class="num">${formatCents(e.amountCents)}</span>
+              ${res ? '<span class="icon-sp"></span>' : `<button type="button" class="icon-btn" data-ch-del="${e.entryId}" aria-label="Delete ${esc(e.description)}, ${shortDate(e.date)}">${trash}</button>`}
+            </li>`;
+            })
+            .join('')}
+        </ul>
+      </div>
+      <div>
+        <p class="ch-cap">The bank statement</p>
+        <ul class="ch-rows bank">
+          ${bank.map((t) => `<li class="${res && !res.right && t.txnId === 'T13' ? 'proof' : ''}"><span class="d">${shortDate(t.date)}</span><span class="t">${esc(short(t.description))}</span><span class="num">${formatCents(t.amountCents)}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>
+    ${
+      res
+        ? res.right
+          ? `<div class="ch-verdict good" data-testid="ch-verdict"><p class="v-title">Right, and balanced.</p><p>The bank shows the Oct 15 payment once, so one copy had to go. That's the habit: match every line to the bank before you delete anything.</p>
+             <div class="ch-actions"><a class="btn primary" href="#/case/${CASES[0].id}">Do the full case</a><button type="button" class="btn ghost" data-ch-reset>Try again</button></div></div>`
+          : `<div class="ch-verdict bad" data-testid="ch-verdict"><p class="v-title">Balanced, but wrong.</p><p>The difference is $0.00, yet you deleted the real Oct 29 payment: it's right there on the bank statement, and the duplicate is still in the books. A reconciliation screen would call this done. We don't.</p>
+             <div class="ch-actions"><button type="button" class="btn primary" data-ch-reset>Try again</button><a class="btn ghost" href="#/case/${CASES[0].id}">Do the full case</a></div></div>`
+        : ''
+    }
+  </div>`;
+}
+
+function practice(done: Completed, history: SkillAttempt[]): string {
   const day = todaySeed();
-  let f;
+  let daily = null;
   try {
-    f = generateFile(day, { kind: 'daily' }).scenario;
+    daily = generateFile(day, { kind: 'daily' }).scenario;
   } catch {
-    return ''; // never let a generator failure blank the home page
+    daily = null; // never let a generator failure blank the home page
   }
-  const finished = done[f.id];
-  const problems = f.planted.length;
   const stats = skillStats(history).filter((st) => st.attempts > 0);
-  const weak = weakestSkills(history, 2);
-  const startLabel = finished ? 'Open again' : 'Start today’s file';
+  const card = (href: string, kicker: string, title: string, body: string, meta: string, isDone: boolean, primary = false) => `
+    <a class="card ${primary ? 'primary' : ''}" href="${href}">
+      <span class="kicker">${kicker}</span>
+      <span class="card-title">${esc(title)}</span>
+      <span class="card-body">${body}</span>
+      <span class="card-meta">${isDone ? '<span class="done">Completed</span>' : meta}</span>
+    </a>`;
   return `
-    <section class="daily" aria-labelledby="daily-h">
-      <div class="daily-file">
-        <p class="daily-date">${esc(longDate(day))}</p>
-        <h2 id="daily-h">Today’s client file: ${esc(f.business)}</h2>
-        <p>${esc(f.period)} books, ${problems} things to catch, about ${f.minutes} minutes. Everyone gets the same file today; a new one is generated tomorrow.</p>
-        <div class="cta-row">
-          <a class="btn ${finished ? '' : 'primary'}" href="${dailyHref(day)}">${startLabel}</a>
-          ${finished ? `<span class="done-tag">Done today, ${finished.checksRun} ${finished.checksRun === 1 ? 'check' : 'checks'}</span>` : ''}
-        </div>
-      </div>
-      <div class="record" aria-labelledby="record-h">
-        <h3 id="record-h">Your skill record</h3>
-        ${
-          stats.length
-            ? `<table class="record-table"><tbody>${stats
-                .map(
-                  (st) => `<tr><th scope="row">${esc(SKILL_LABEL[st.skill])}</th><td class="num">${st.firstTry} of ${st.attempts}</td><td><span class="meter" style="--v:${Math.round((st.firstTry / st.attempts) * 100)}%" aria-hidden="true"></span></td></tr>`,
-                )
-                .join('')}</tbody></table>
-               <p class="fine">Problems caught on the first check, per file. Kept only in this browser.</p>
-               <a class="btn" href="${practiceHref(newSeed(), weak)}">Practice my weak spots</a>`
-            : `<p class="fine">Starts with your first check. Each file records which kinds of problems you caught on the first try, and practice files plant more of the ones you miss.</p>`
-        }
-      </div>
-    </section>`;
+  <section class="practice" id="practice" aria-labelledby="practice-h">
+    <h2 id="practice-h">Start guided, then go it alone</h2>
+    <div class="cards">
+      ${card(`#/case/${CASES[0].id}`, 'Guided case, 6 min', CASES[0].title, 'Duplicate imports, identical real purchases, two wrong categories. Feedback after every move.', 'Start here', Boolean(done[CASES[0].id]), true)}
+      ${card(`#/case/${CASES[1].id}`, 'Guided case, 10 min', CASES[1].title, 'A swapped-digit amount, a missing bank fee, an uncleared check, and owner money booked as sales.', 'Next', Boolean(done[CASES[1].id]))}
+      ${daily ? card(dailyHref(day), 'File of the day', daily.business, 'A new client file every day, the same for everyone. No hints until you check: the real test.', `${daily.period} books`, Boolean(done[daily.id])) : ''}
+    </div>
+    ${
+      stats.length
+        ? `<div class="record">
+        <h3>Your skill record <small>caught on the first check, unguided files only</small></h3>
+        <ul>${stats.map((st) => `<li><span>${esc(SKILL_LABEL[st.skill])}</span><span class="meter" style="--v:${Math.round((st.firstTry / st.attempts) * 100)}%" aria-hidden="true"></span><span class="num">${st.firstTry}/${st.attempts}</span></li>`).join('')}</ul>
+        <a class="btn" href="${practiceHref(newSeed(), weakestSkills(history, 2))}">Practice my weak spots</a>
+      </div>`
+        : ''
+    }
+  </section>`;
 }
 
-export function renderLanding(done: Completed, history: SkillAttempt[]): string {
-  const h = heroNumbers();
-  const returning = Boolean(done[CASES[0].id]);
+export function renderLanding(done: Completed, history: SkillAttempt[], deleted: string | null = null): string {
   return `
-  <header class="site">
+  <header class="nav">
     <a class="brand" href="#/" aria-label="Ledger Fix Lab home"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
-    <nav><a href="#cases">Cases</a><a href="#grading">How grading works</a><a href="#pricing">Pricing</a></nav>
+    <nav><a href="#practice">Practice</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></nav>
   </header>
 
-  <main class="landing">
+  <main class="home">
     <section class="hero">
       <div class="hero-copy">
-        <h1>Practice your first bookkeeping cleanup before a client pays for it.</h1>
-        <p class="lede">Realistic client books with the mistakes real books have: duplicate imports, swapped digits, bank fees nobody recorded, checks that haven't cleared, and owner money booked as income. Reconcile them to the bank statement and find out whether the books are actually right, not just balanced.</p>
-        <div class="cta-row">
-          ${
-            returning
-              ? `<a class="btn primary big" href="${dailyHref()}">Start today’s file</a><a class="textlink" href="#cases">Guided cases</a>`
-              : `<a class="btn primary big" href="#/case/${CASES[0].id}">Start case 1</a><a class="textlink" href="#/case/${CASE_2.id}">Or jump to case 2</a>`
-          }
-        </div>
-        <p class="fine">Free, no sign-up. About 6 minutes for the first case.</p>
+        <h1>Your books balance. Are they right?</h1>
+        <p class="lede">Practice cleaning up real-looking client books. Every fix is checked instantly, including the mistakes that still add up to $0.00.</p>
+        <p class="fine">For new bookkeepers before their first client, and for anyone who keeps their own books. Free, no sign-up.</p>
       </div>
-
-      <figure class="hero-sheet" aria-label="Example from case 2">
-        <div class="sheet">
-          <div class="sheet-row"><span>Reconciliation difference</span><span class="num ok">${formatCents(h.diff)}</span></div>
-          <div class="sheet-row"><span>Net profit, as booked</span><span class="num bad">${formatCents(h.booked)}</span></div>
-          <div class="sheet-row"><span>Net profit, actually</span><span class="num">${formatCents(h.correct)}</span></div>
-        </div>
-        <figcaption>From case 2: the bank reconciliation balances perfectly, yet the books overstate profit by ${formatCents(h.booked - h.correct)}, because the owner's own $5,000 transfer was booked as sales. A reconciliation screen only checks the first line.</figcaption>
-      </figure>
+      ${challenge(deleted)}
     </section>
 
-    ${dailyBand(done, history)}
+    ${practice(done, history)}
 
-    <section id="cases" class="cases" aria-labelledby="cases-h">
-      <h2 id="cases-h">Guided cases</h2>
-      <ol class="case-list">
-        ${CASES.map(
-          (c) => `
-        <li class="case-item">
-          <div class="case-num" aria-hidden="true">${c.number}</div>
-          <div class="case-body">
-            <h3><a href="#/case/${c.id}">${esc(c.title)}</a></h3>
-            <p class="case-meta">${esc(c.business)}, ${esc(c.period)}. ${c.level}, about ${c.minutes} minutes.</p>
-            <p class="case-skills">Practices: ${c.skills.map((k) => esc(SKILL_LABEL[k].toLowerCase())).join(', ')}.</p>
-          </div>
-          <div class="case-go">
-            ${done[c.id] ? '<span class="done-tag">Completed</span>' : ''}
-            <a class="btn ${c.number === 1 ? 'primary' : ''}" href="#/case/${c.id}">${done[c.id] ? 'Play again' : `Start case ${c.number}`}</a>
-          </div>
-        </li>`,
-        ).join('')}
+    <section class="how" id="how" aria-labelledby="how-h">
+      <h2 id="how-h">How it works</h2>
+      <ol class="steps">
+        <li><span class="step-n">1</span><h3>Open a client's books</h3><p>A short note from the owner, their books and the bank statement. Synthetic, but realistic.</p></li>
+        <li><span class="step-n">2</span><h3>Fix them against the bank</h3><p>Delete duplicates, correct amounts, record missing bank fees, choose the right categories.</p></li>
+        <li><span class="step-n">3</span><h3>Get checked on the result</h3><p>Not your clicks: the books you end up with. A $0.00 difference is never enough on its own.</p></li>
       </ol>
     </section>
 
-    <section id="grading" class="grading" aria-labelledby="grading-h">
-      <h2 id="grading-h">We grade the books you end up with, not your clicks</h2>
-      <div class="grading-grid">
-        <p>Every transaction in the books exactly once: no leftover duplicates, nothing real deleted.</p>
-        <p>Every amount matches the bank or the source document.</p>
-        <p>Ticked as cleared exactly when it's on this statement; outstanding checks stay unticked.</p>
-        <p>Every row in the right category, with the effect on profit shown in dollars.</p>
-      </div>
-      <p class="grading-note">A $0.00 difference is required but never enough on its own. Any correct end state passes, whichever duplicate copy you delete and in whatever order you work. When something is wrong, you're told which rule broke and why.</p>
-    </section>
-
-    <section id="pricing" class="pricing" aria-labelledby="pricing-h">
-      <h2 id="pricing-h">The pricing we plan to test</h2>
+    <section class="pricing" id="pricing" aria-labelledby="pricing-h">
+      <h2 id="pricing-h">Pricing we plan to test</h2>
       <div class="plans">
-        <div class="plan">
-          <h3>Free</h3>
-          <p class="price">$0</p>
-          <ul><li>Both guided cases</li><li>A new client file every day</li><li>Your skill record</li></ul>
-        </div>
-        <div class="plan pro">
-          <h3>Practice</h3>
-          <p class="price">$12 <small>a month, planned</small></p>
-          <ul><li>Unlimited practice files aimed at your weak spots</li><li>Month-end tracks: credit cards, payroll, sales tax</li><li>A printable practice log</li></ul>
-        </div>
+        <div class="plan"><h3>Free</h3><p class="price">$0</p><p>Both guided cases, the file of the day and your skill record.</p></div>
+        <div class="plan pro"><h3>Practice</h3><p class="price">$12<small> a month, planned</small></p><p>Unlimited files aimed at your weak spots, plus month-end tracks: credit cards, payroll, sales tax.</p></div>
       </div>
-      <p class="grading-note">Nothing is for sale yet: during this beta, practice files are free and there are no accounts. The price is a hypothesis we will test, not a measured result.</p>
-    </section>
-
-    <section class="who">
-      <h2>Who it's for</h2>
-      <p>New freelance bookkeepers who have finished a course or certification and want hands-on practice before their first cleanup client, and anyone who keeps their own books and wants to check their reconciliation habits. The skills aren't tied to one product: they apply in QuickBooks, Xero or a spreadsheet.</p>
+      <p class="fine">Nothing is for sale yet; during the beta everything is free. For comparison, practice-client files elsewhere sell for $49 to $119 each, and you check your own work.</p>
     </section>
   </main>
 
-  <footer class="site-foot">
-    <p>All businesses, people and numbers are synthetic. Simplified one-account model; not connected to any bank or accounting software. Nothing you do leaves your browser.</p>
-    <p><a href="https://github.com/Spunlit/ledger-fix-lab">Source code on GitHub</a></p>
+  <footer class="foot">
+    <p>All businesses, people and numbers are synthetic. Simplified one-account model, not connected to any bank or accounting software. Nothing you do leaves your browser. <a href="https://github.com/Spunlit/ledger-fix-lab">Source on GitHub</a></p>
   </footer>`;
 }

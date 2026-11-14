@@ -11,6 +11,15 @@ whether the books are actually right.
 Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have finished a course or certification
 but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
 
+## First 30 seconds
+The home page is a one-click challenge: the books are $412.50 off and one payment was imported twice. Delete the
+wrong copy and you see $0.00 together with "Balanced, but wrong": the core lesson, before reading anything.
+
+## Guided vs. unguided
+Guided cases give instant feedback after every move, a progress count and an optional hint, and show only the tools
+the case needs (case 1: delete and category). Files of the day and practice files are exams: no hints or feedback
+until you check, and only they feed the skill record.
+
 ## The two cases
 | | Case | What it practices |
 |---|---|---|
@@ -52,9 +61,9 @@ demand and retention are unmeasured.
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 68 unit tests incl. exhaustive state-space checks and 900 generated files
+npm test                    # 76 unit tests incl. exhaustive state-space checks and 900 generated files
 npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 39 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 42 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
 ```
 CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.

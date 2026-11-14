@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 39; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 42; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -92,53 +92,63 @@ async function main() {
   const choose = (sel, value) => js(`const s = $(${JSON.stringify(sel)}); s.value = ${JSON.stringify(value)}; s.dispatchEvent(new Event('change', { bubbles: true }))`);
   const submitAmount = (entry, value) => js(`if (!$('[data-amt-form=${entry}]')) $('[data-edit=${entry}]').click(); await new Promise(r => setTimeout(r, 30)); const f = $('[data-amt-form=${entry}]'); f.querySelector('input').value = ${JSON.stringify(value)}; f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))`);
   const record = (txn, cat) => js(`$('[data-record=${txn}]').click(); await new Promise(r => setTimeout(r, 30)); const f = $('[data-record-form=${txn}]'); f.querySelector('select').value = ${JSON.stringify(cat)}; f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))`);
-  const clue = () => text('.clue');
+  const clue = () => text('.hint');
+  const toast = () => text('[data-testid=feedback]');
 
   await send('Page.enable');
   await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-  const M = '\u2212';
+  const M = '−';
 
-  // ---------- landing
+  // ---------- home: the 30-second challenge
   await go('');
-  const hero = await text('.hero-sheet');
-  ok(hero.includes('$0.00') && hero.includes('$10,410.76') && hero.includes('$5,410.76'), 'landing hero shows engine-computed case 2 numbers');
-  await shot('0-landing');
+  ok((await text('[data-testid=ch-diff]')) === '+$412.50', 'home challenge starts $412.50 off');
+  await click('[data-ch-del=E14]');
+  await sleep(900);
+  ok((await text('[data-testid=ch-diff]')) === '$0.00' && (await text('[data-testid=ch-verdict]')).includes('Balanced, but wrong'), 'deleting the real Oct 29 payment: $0.00 but "Balanced, but wrong"');
+  ok(await js(`return !!$('.ch-rows.bank li.proof')`), 'the bank line that proves it is highlighted');
+  await click('[data-ch-reset]');
+  await click('[data-ch-del=E10]');
+  await sleep(900);
+  ok((await text('[data-testid=ch-verdict]')).includes('Right, and balanced'), 'deleting the duplicate copy: "Right, and balanced"');
+  await shot('0-home', false);
 
-  // ---------- case 1
+  // ---------- case 1 (guided: instant feedback, delete + category only)
   await go('#/case/maple-pine-oct');
   ok((await diff()) === '+$412.50', `case 1 starts at +$412.50 (got ${await diff()})`);
+  ok((await js(`return document.querySelectorAll('[data-clear], [data-edit], [data-record]').length`)) === 0, 'case 1 shows only delete and category tools');
   ok((await cls('integrity')) === 'absent', 'review hidden before the first check');
-  ok((await clue()).includes('3 ticked rows'), 'clue points at the three $412.50 rows');
-  await shot('1-case1-start', false);
-  await click('[data-act=check]');
-  ok((await cls('integrity')).includes('fail') && (await cls('categories')).includes('fail'), 'first check: transactions and categories fail');
+  await click('[data-act=toggle-hint]');
+  ok((await clue()).includes('3 ticked rows'), 'hint points at the three $412.50 rows');
   await click('[data-del=E14]');
-  ok((await diff()) === '$0.00', 'compensating error: deleting the real Oct 29 payment shows $0.00');
+  ok((await diff()) === '$0.00' && (await toast()).includes('real'), 'deleting the real payment: $0.00 and an instant warning');
+  await click('[data-act=check]');
   const integ = await text('[data-testid=check-integrity]');
   ok(integ.includes('Missing') && integ.includes('Duplicate'), 'review names the missing payment and the duplicate');
   ok((await text('.review h2')).includes('difference is $0.00'), 'verdict says balanced is not right');
   await click('[data-act=undo]');
   ok((await diff()) === '+$412.50' && (await js(`return !!$('tr[data-entry=E14]')`)), 'undo restores the deleted row');
   await click('[data-del=E10]');
+  ok((await toast()).includes('1 of 3'), 'deleting the duplicate: instant "Fixed, 1 of 3"');
   await choose('select[data-cat=E03]', 'software');
   await choose('select[data-cat=E11]', 'car');
   ok((await diff()) === '$0.00' && (await js(`return !!$('[data-testid=success]')`)), 'case 1 solved: success panel shown');
   ok((await text('.summary')).includes('Removed a duplicate entry'), 'cleanup summary lists the duplicate removal');
-  await shot('2-case1-solved', false);
+  await shot('1-case1-solved', false);
   await click('[data-del=E06]');
   ok((await cls('integrity')).includes('fail') && (await diff()) === `${M}$12.50`, 'deleting one of two identical coffees fails (−$12.50)');
   await click('[data-act=undo]');
   ok(await js(`return !!$('[data-testid=success]')`), 'undo returns to the solved state');
 
-  // ---------- case 2
+  // ---------- case 2 (guided, all tools)
   await go('#/case/rivera-mar');
   ok((await diff()) === `${M}$99.37`, `case 2 starts at −$99.37 (got ${await diff()})`);
-  ok((await clue()).includes("doesn't match any single item"), 'first clue: more than one thing is off');
+  await click('[data-act=toggle-hint]');
+  ok((await clue()).includes("doesn't match any single item"), 'first hint: more than one thing is off');
   await record('R13', 'bankfees');
-  ok((await diff()) === `${M}$84.37` && (await clue()).includes('bank line'), 'recording the bank fee: −$84.37, clue points at a bank line');
+  ok((await diff()) === `${M}$84.37` && (await clue()).includes('bank line') && (await toast()).includes('1 of 4'), 'recording the bank fee: −$84.37, progress 1 of 4, hint points at a bank line');
   await click('[data-clear=E03]');
-  ok((await diff()) === `${M}$36.00` && (await clue()).includes('divides evenly by 9'), 'ticking Verizon: −$36.00, transposition clue');
+  ok((await diff()) === `${M}$36.00` && (await clue()).includes('divides evenly by 9'), 'ticking Verizon: −$36.00, transposition hint');
   await submitAmount('E03', 'abc');
   ok((await text('.amt-form .err')).includes('Enter an amount') && (await diff()) === `${M}$36.00`, 'invalid amount is rejected without changing the books');
   await submitAmount('E03', '84.37');
@@ -147,45 +157,46 @@ async function main() {
   await click('[data-act=check]');
   ok((await text('.review h2')).includes('difference is $0.00, but one check fails'), 'headline trap: $0.00 but one check fails');
   ok((await text('[data-testid=check-categories]')).includes('overstated by $5,000.00'), 'review shows profit overstated by $5,000.00');
-  await shot('3-case2-trap', false);
+  await shot('2-case2-trap', false);
   await click('[data-del=E14]');
-  ok((await text('[data-testid=check-integrity]')).includes("hasn't reached the bank yet"), 'deleting the outstanding check is explained as a real, uncleared payment');
+  ok((await toast()).includes("hasn't reached the bank yet"), 'deleting the outstanding check: instant warning that it is real but uncleared');
   await click('[data-act=undo]');
   await choose('select[data-cat=E06]', 'ownerContribution');
   ok(await js(`return !!$('[data-testid=success]')`), 'case 2 solved after reclassifying the owner transfer');
   const sum = await text('.summary');
   ok(sum.includes("Owner's contribution") && sum.includes('outstanding'), 'summary covers the reclassification and the outstanding check');
   ok((await text('.beforeafter')).includes('$5,410.76'), 'before/after shows corrected net profit');
-  const fc = await text('.firstcheck');
-  ok(fc.includes('Your first check') && fc.includes('Separating owner money from income'), 'completion shows first-check results per skill (owner money missed on first check)');
   ok(await js(`return !!$('.solved-actions a[href^="#/daily/"]')`), "case 2 completion offers today's file");
-  await shot('4-case2-solved', false);
+  await shot('3-case2-solved', false);
   await click('[data-act=reset]');
   ok((await diff()) === `${M}$99.37` && (await cls('integrity')) === 'absent', 'start over returns to the handed-over books');
 
-  await go('');
-  ok((await js(`return document.querySelectorAll('.case-go .done-tag').length`)) === 2, 'landing marks both cases completed');
-  ok((await js(`return $('.hero .btn.primary').getAttribute('href')`)).startsWith('#/daily/'), "returning visitor's main call to action is today's file");
-  ok((await js(`return document.querySelectorAll('.record-table tr').length`)) >= 4, 'skill record shows first-check results from both cases');
-  const practice = await js(`return $('.record a.btn').getAttribute('href')`);
-  ok(/^#\/practice\/[a-z0-9]+\//.test(practice) && practice.includes('ownerEquity') && practice.includes('categories'), `weak-spot practice targets the skills missed on first checks (${practice})`);
-  await go(practice);
-  ok((await text('.case-badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
+  // ---------- file of the day (exam: no hints, no instant feedback; feeds the skill record)
   await go('#/daily');
-  ok((await text('.case-badge')).startsWith('File of the day'), 'file of the day opens');
+  ok((await text('.badge')).startsWith('File of the day') && !(await js(`return !!$('[data-act=toggle-hint]')`)), 'file of the day opens in exam mode (no hint button)');
+  await js(`$('tr[data-entry] [data-del]').click()`);
+  ok(!(await js(`return !!$('[data-testid=feedback]')`)), 'no instant feedback in exam mode');
   await click('[data-act=check]');
   ok(await js(`return !!$('.review') || !!$('.solved')`), 'checking the file of the day shows the review');
+
+  await go('');
+  ok((await js(`return document.querySelectorAll('.card-meta .done').length`)) === 2, 'home marks both guided cases completed');
+  ok((await js(`return document.querySelectorAll('.record li').length`)) >= 2, 'skill record appears after the first unguided file');
+  const practice = await js(`return $('.record a.btn').getAttribute('href')`);
+  ok(/^#\/practice\/[a-z0-9]+\//.test(practice), `weak-spot practice link targets missed skills (${practice})`);
+  await go(practice);
+  ok((await text('.badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
 
   // ---------- phone width
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
   await go('');
-  ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'landing: no horizontal scroll at 375px');
-  await shot('5-landing-mobile', false);
+  ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'home: no horizontal scroll at 375px');
+  await shot('4-home-mobile', false);
   await go('#/case/rivera-mar');
   ok((await evaluate('document.documentElement.scrollWidth')) <= 375, 'case 2: no horizontal scroll at 375px');
   await record('R13', 'bankfees');
   ok((await diff()) === `${M}$84.37`, 'phone: recording from the statement works');
-  await shot('6-case2-mobile', false);
+  await shot('5-case2-mobile', false);
 
   ok(consoleErrors.length === 0, `no console errors (${consoleErrors.join('; ') || 'none'})`);
   ws.close();

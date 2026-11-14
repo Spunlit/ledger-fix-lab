@@ -68,6 +68,7 @@ export const CASE_1: Scenario = {
   number: 1,
   kind: 'case',
   badge: 'Case 1',
+  tools: ['delete', 'category'],
   title: 'The doubled import',
   client: 'Jordan Pike',
   business: 'Maple & Pine Design Studio',
