@@ -18,7 +18,7 @@ import { loadProfile, renderAccount, signIn, signOut, type AccountState } from '
 import { SAMPLE_BANK, SAMPLE_BOOKS } from './core/checker';
 import { findingsText, newCheck, rememberCheck, renderCheck, type CheckState } from './ui/check';
 import { renderDesk } from './ui/landing';
-import { renderTerms } from './ui/legal';
+import { renderPrivacy, renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
@@ -169,6 +169,14 @@ function route(): void {
     document.body.dataset.page = 'guide';
     document.title = 'Practice record | Ledger Fix Lab';
     app.innerHTML = renderRecord(completed, history);
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/privacy/.test(location.hash)) {
+    currentId = null;
+    document.body.dataset.page = 'guide';
+    document.title = 'Privacy | Ledger Fix Lab';
+    app.innerHTML = renderPrivacy();
     window.scrollTo(0, 0);
     return;
   }

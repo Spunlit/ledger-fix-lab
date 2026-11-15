@@ -89,3 +89,55 @@ export function renderTerms(): string {
     </section>
   </main>`;
 }
+
+const PRIVACY: { h: string; p: string[] }[] = [
+  {
+    h: 'Your files stay on your device',
+    p: [
+      '"Check your own books" reads the two files you choose inside this browser tab. They are not uploaded, not sent to any server and not sent to any AI service. There is no server to send them to: this site is a set of static pages.',
+      'The files are not saved. Closing or reloading the tab forgets them. Only the month of the statement and the number of findings are kept in this browser, to show your last check on your desk.',
+    ],
+  },
+  {
+    h: 'What this browser remembers',
+    p: [
+      'Your progress (finished files, skill record, streak), your theme, the email you typed if you signed in, the optional name on your practice record, and the demo plan if you started it. All of it is in this browser\'s local storage. We cannot see it.',
+      'To erase it, clear this site\'s data in your browser settings.',
+    ],
+  },
+  {
+    h: 'What does leave your device',
+    p: [
+      'Loading the pages is a normal web request to GitHub Pages, which hosts the site and keeps its own server logs. The pages load their fonts from Google Fonts, so Google also receives a normal web request. Neither receives your files or your progress.',
+      'There are no analytics, no advertising trackers and no cookies set by us.',
+    ],
+  },
+  {
+    h: 'How to check this yourself',
+    p: [
+      'Open your browser\'s developer tools, go to the Network tab, and run a check: no request is made. The source code is public on GitHub, and an automated test verifies on every release that a check sends nothing.',
+    ],
+  },
+];
+
+export function renderPrivacy(): string {
+  return `
+  <header class="nav">
+    <a class="brand" href="./" aria-label="Ledger Fix Lab, back to the main page"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
+    <div class="nav-right"><a class="nav-link" href="#/">Your desk</a>${themeButton(loadTheme())}</div>
+  </header>
+  <main class="guide-page legal">
+    <header class="guide-head">
+      <p class="drill-step">Privacy</p>
+      <h1>Your books never leave your browser</h1>
+      <p class="legal-draft" data-testid="privacy-draft"><b>Plain version.</b> This describes what the current build really does. It is not yet reviewed by a lawyer. Last updated ${esc(UPDATED)}.</p>
+    </header>
+    ${PRIVACY.map((x) => `<section class="legal-sec"><h2>${esc(x.h)}</h2>${x.p.map((t) => `<p>${esc(t)}</p>`).join('')}</section>`).join('')}
+    <section class="guide-end">
+      <div class="drill-actions">
+        <a class="btn primary big" href="#/check">Check your own books</a>
+        <a class="btn big" href="#/terms">Terms and Conditions</a>
+      </div>
+    </section>
+  </main>`;
+}

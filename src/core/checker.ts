@@ -246,6 +246,22 @@ function dayNumber(isoDay: string | null): number | null {
   return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
 }
 const digits = (cents: number) => String(Math.abs(cents)).split('').sort().join('');
+/** Amounts one typing slip apart: one digit different, or one digit dropped or added (8437 and 843, 8437 and 8497). */
+export function oneSlipApart(a: number, b: number): boolean {
+  const x = String(Math.abs(a));
+  const y = String(Math.abs(b));
+  if (x === y) return false;
+  if (x.length === y.length) {
+    let diff = 0;
+    for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) diff++;
+    return diff === 1;
+  }
+  const [long, short] = x.length > y.length ? [x, y] : [y, x];
+  if (long.length - short.length !== 1) return false;
+  for (let i = 0; i < long.length; i++) if (long.slice(0, i) + long.slice(i + 1) === short) return true;
+  return false;
+}
+
 /** 9415 and 9145: the same digits in another order, the classic typing slip. */
 export function looksSwapped(a: number, b: number): boolean {
   return a !== b && Math.sign(a) === Math.sign(b) && digits(a) === digits(b);
@@ -290,7 +306,24 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
     pairs.push({ bank: c.b, books: c.k });
   }
 
-  // 2. the same payment with a different amount: alike descriptions, close in time, the same direction.
+  // 2. a second copy of a line that already found its bank line. This runs before amounts are compared,
+  //    so a spare copy is never mistaken for a mistyped version of some other payment to the same payee.
+  const twinsByCents = new Map<number, CsvLine[]>();
+  for (const p of pairs) {
+    const same = twinsByCents.get(p.books.cents);
+    if (same) same.push(p.books);
+    else twinsByCents.set(p.books.cents, [p.books]);
+  }
+  for (const k of books) {
+    if (!booksFree.has(k)) continue;
+    const twin = (twinsByCents.get(k.cents) ?? []).find((t) => gap(t, k) <= WINDOW_DAYS && similarity(t.text, k.text) >= 0.5) ?? null;
+    if (!twin) continue;
+    booksFree.delete(k);
+    findings.push({ kind: 'duplicate', bank: null, books: k, twin, effectCents: -k.cents, swapped: false });
+  }
+
+  // 3. the same payment with a different amount: alike descriptions, close in time, the same direction,
+  //    and amounts that look like one typing slip apart. Two unrelated payments to one payee stay apart.
   //    Each bank line keeps only its three best candidates, so the list stays short on large files.
   type Near = { b: CsvLine; k: CsvLine; g: number; s: number; sw: boolean };
   const best = (x: Near, y: Near) => Number(y.sw) - Number(x.sw) || y.s - x.s || x.g - y.g || x.b.row - y.b.row || x.k.row - y.k.row;
@@ -302,8 +335,10 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
       if (b.cents < 0 !== k.cents < 0) continue;
       const g = gap(b, k);
       if (g > WINDOW_DAYS) continue;
+      const sw = looksSwapped(b.cents, k.cents);
+      if (!sw && !oneSlipApart(b.cents, k.cents)) continue;
       const sim = similarity(b.text, k.text);
-      if (sim >= 0.5) mine.push({ b, k, g, s: sim, sw: looksSwapped(b.cents, k.cents) });
+      if (sim >= 0.5 || (sw && g <= 1)) mine.push({ b, k, g, s: sim, sw });
     }
     near.push(...mine.sort(best).slice(0, 3));
   }
@@ -315,11 +350,9 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
     findings.push({ kind: 'amount', bank: c.b, books: c.k, twin: null, effectCents: c.b.cents - c.k.cents, swapped: c.sw });
   }
 
-  // 3. what is left in the books: a second copy of a paired line, or a line the bank has not seen
+  // what is left in the books: a line the bank has not seen
   for (const k of books) {
-    if (!booksFree.has(k)) continue;
-    const twin = pairs.find((p) => p.books.cents === k.cents && gap(p.books, k) <= WINDOW_DAYS && similarity(p.books.text, k.text) >= 0.5)?.books ?? null;
-    findings.push({ kind: twin ? 'duplicate' : 'notAtBank', bank: null, books: k, twin, effectCents: -k.cents, swapped: false });
+    if (booksFree.has(k)) findings.push({ kind: 'notAtBank', bank: null, books: k, twin: null, effectCents: -k.cents, swapped: false });
   }
   // 4. what is left at the bank: nobody recorded it
   for (const b of bank) if (bankFree.has(b)) findings.push({ kind: 'missing', bank: b, books: null, twin: null, effectCents: b.cents, swapped: false });

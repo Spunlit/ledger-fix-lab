@@ -169,7 +169,7 @@ export function renderCheck(s: CheckState, plan: Plan | null): string {
       <button type="button" class="btn big" data-check="sample" data-testid="check-sample">Try the sample files</button>
       ${s.bank || s.books ? '<button type="button" class="btn big" data-check="clear">Clear</button>' : ''}
     </div>
-    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded. One account at a time, US dates, amounts in dollars. With your own files the first three findings are free. ${s.sample ? 'The sample files are a made-up business.' : 'Only the month and the number of findings are remembered, to show your last check on your desk.'}</p>
+    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded, to us or to any AI service (<a href="#/privacy">how it works</a>). One account at a time, US dates, amounts in dollars. With your own files the first three findings are free. ${s.sample ? 'The sample files are a made-up business.' : 'Only the month and the number of findings are remembered, to show your last check on your desk.'}</p>
     ${s.ran ? results(s, plan) : ''}
   </main>`;
 }
