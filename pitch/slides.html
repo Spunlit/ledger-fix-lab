@@ -173,7 +173,8 @@
   .glow.low { background: radial-gradient(ellipse 850px 380px at 680px 980px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
   .glow.side { background: radial-gradient(ellipse 550px 550px at 1350px 400px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
   .glow.corner { background: radial-gradient(ellipse 500px 450px at 20px 820px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
-  .duo .crop.tall { height: 452px; }
+  .duo .crop.tall { height: 452px; position: relative; }
+  .duo .crop.tall::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(rgba(2, 7, 10, 0), #02070A); }
   .biz2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 40px; }
   .biz2 h3 { font: 500 13px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 16px; }
   .biz2 .price { font: 400 76px/0.95 'Instrument Serif', serif; color: var(--ink); }
@@ -185,7 +186,7 @@
 
 <section class="s cover">
   <i class="glow hero"></i>
-  <p class="lab">Business Cup 2.0, Skills track</p>
+  <p class="lab">Team Unemployment, Business Cup 2.0, Skills track</p>
   <h1>Books that balance<br>can still be <em>wrong.</em></h1>
   <p class="sub">Bookkeeping practice that grades your result.</p>
   <div class="links"><span class="pill solid">spunlit.github.io/ledger-fix-lab</span><span class="pill">github.com/Spunlit/ledger-fix-lab</span></div>
