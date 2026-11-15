@@ -116,30 +116,55 @@ interface Columns { date: number; text: number; amount: number; debit: number; c
 
 function findColumns(header: string[]): Columns {
   const h = header.map((c) => c.toLowerCase());
-  const find = (test: (c: string) => boolean) => h.findIndex(test);
-  return {
-    date: find((c) => has(c, 'date', 'posted')),
-    text: find((c) => has(c, 'description', 'memo', 'payee', 'name', 'details', 'merchant', 'narrative')),
-    amount: find((c) => c === 'amount' || (has(c, 'amount') && !has(c, 'debit', 'credit'))),
-    debit: find((c) => has(c, 'debit', 'withdraw', 'money out', 'paid out')),
-    credit: find((c) => has(c, 'credit', 'deposit', 'money in', 'paid in')),
-    category: find((c) => has(c, 'category', 'account')),
+  /** The first header holding the earliest word in the list, so "Description" beats "Details". */
+  const pick = (...words: string[]) => {
+    for (const w of words) {
+      const i = h.findIndex((c) => c.includes(w));
+      if (i >= 0) return i;
+    }
+    return -1;
   };
+  const amount = h.indexOf('amount');
+  return {
+    date: pick('date', 'posted'),
+    text: pick('description', 'payee', 'memo', 'name', 'merchant', 'narrative', 'details'),
+    amount: amount >= 0 ? amount : h.findIndex((c) => c.includes('amount') && !has(c, 'debit', 'credit')),
+    debit: pick('debit', 'withdraw', 'money out', 'paid out', 'payment'),
+    credit: pick('credit', 'deposit', 'money in', 'paid in'),
+    category: pick('category', 'account'),
+  };
+}
+const usable = (c: Columns) => c.amount >= 0 || (c.debit >= 0 && c.credit >= 0);
+
+/** With no header row: the amount is the last cell written like money, the description the longest other cell. */
+function guessColumns(cells: string[]): Columns | null {
+  const date = cells.findIndex((x) => parseDate(x) !== null);
+  const money = cells.map((x, i) => (i !== date && parseMoney(x) !== null ? i : -1)).filter((i) => i >= 0);
+  const amount = money.filter((i) => /[.\-\u2212()$]/.test(cells[i])).pop() ?? money.pop() ?? -1;
+  if (amount < 0) return null;
+  let text = -1;
+  cells.forEach((x, i) => {
+    if (i !== amount && i !== date && x.length > (text < 0 ? 0 : cells[text].length)) text = i;
+  });
+  return { date, text, amount, debit: -1, credit: -1, category: -1 };
 }
 
 /** Reads one pasted file. `what` names it in messages ("bank statement", "books"). */
 export function parseCsv(text: string, what: string): ParsedCsv {
   const rows = splitCsv(text).map((cells, i) => ({ cells, row: i + 1 })).filter((r) => r.cells.some((c) => c !== ''));
   if (!rows.length) return { lines: [], skipped: [], error: `The ${what} is empty. Paste the rows or choose a CSV file.` };
-  let cols = findColumns(rows[0].cells);
-  let body = rows.slice(1);
-  if (cols.amount < 0 && (cols.debit < 0 || cols.credit < 0)) {
-    // No header we recognise: read the columns from the first row's contents instead.
-    const c = rows[0].cells;
-    const amount = c.map((x, i) => (parseMoney(x) !== null && parseDate(x) === null ? i : -1)).filter((i) => i >= 0).pop() ?? -1;
-    const date = c.findIndex((x) => parseDate(x) !== null);
-    if (amount < 0) return { lines: [], skipped: [], error: `Could not find an amount column in the ${what}. It needs columns like Date, Description, Amount.` };
-    cols = { date, text: c.findIndex((x, i) => i !== amount && i !== date && x !== ''), amount, debit: -1, credit: -1, category: -1 };
+  // Some banks put a summary above the table, so the header is looked for in the first rows, not only the first.
+  const headerAt = rows.slice(0, 12).findIndex((r) => usable(findColumns(r.cells)));
+  let cols: Columns;
+  let body: typeof rows;
+  if (headerAt >= 0) {
+    cols = findColumns(rows[headerAt].cells);
+    body = rows.slice(headerAt + 1);
+  } else {
+    // No header we recognise: read the columns from the first row that holds a date and an amount.
+    const first = rows.slice(0, 5).map((r) => guessColumns(r.cells)).find((c) => c && c.date >= 0) ?? guessColumns(rows[0].cells);
+    if (!first) return { lines: [], skipped: [], error: `Could not find an amount column in the ${what}. It needs columns like Date, Description, Amount.` };
+    cols = first;
     body = rows;
   }
   const lines: CsvLine[] = [];
@@ -280,6 +305,18 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
   const bankTotal = sumCents(bank.map((l) => l.cents));
   const booksTotal = sumCents(books.map((l) => l.cents));
   return { bankTotal, booksTotal, difference: bankTotal - booksTotal, matched: pairs.length, findings };
+}
+
+/**
+ * Some ledgers export a bank account the accountant's way round: money in as a debit, or payments as
+ * positive numbers. Then almost nothing pairs. When reading the books with every sign turned over pairs
+ * far more lines, that reading is used, and the page says so.
+ */
+export function reconcileAuto(bank: CsvLine[], books: CsvLine[]): { result: CheckResult; flipped: boolean } {
+  const straight = reconcile(bank, books);
+  if (straight.matched * 2 >= Math.min(bank.length, books.length)) return { result: straight, flipped: false };
+  const turned = reconcile(bank, books.map((l) => ({ ...l, cents: -l.cents })));
+  return turned.matched >= 3 && turned.matched > straight.matched * 2 ? { result: turned, flipped: true } : { result: straight, flipped: false };
 }
 
 // ---------- sample files: a made-up business, so the tool can be tried in one press

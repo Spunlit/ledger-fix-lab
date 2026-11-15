@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { findingsText } from '../src/ui/check';
-import { looksSwapped, parseCsv, parseDate, parseMoney, reconcile, SAMPLE_BANK, SAMPLE_BOOKS, similarity, splitCsv, type CsvLine } from '../src/core/checker';
+import { looksSwapped, reconcileAuto, parseCsv, parseDate, parseMoney, reconcile, SAMPLE_BANK, SAMPLE_BOOKS, similarity, splitCsv, type CsvLine } from '../src/core/checker';
 
 const line = (row: number, date: string, text: string, cents: number, category: string | null = null): CsvLine => ({ row, date, text, cents, category });
 const effects = (r: ReturnType<typeof reconcile>) => r.findings.reduce((n, f) => n + f.effectCents, 0);
@@ -46,6 +46,29 @@ describe('check your own books: reading files', () => {
   it('reads a file with no header row by what the cells hold', () => {
     const p = parseCsv('4/2/2026,Coffee,-4.50\n4/3/2026,Client,200.00', 'books');
     expect(p.lines.map((l) => [l.date, l.text, l.cents])).toEqual([['2026-04-02', 'Coffee', -450], ['2026-04-03', 'Client', 20000]]);
+  });
+
+  it('reads the shapes real banks and ledgers export', () => {
+    const got = (csv: string) => parseCsv(csv, 'bank statement').lines.map((l) => [l.date, l.text, l.cents]);
+    // a first column of DEBIT/CREDIT next to the real description, and a balance column to ignore
+    expect(got('Details,Posting Date,Description,Amount,Type,Balance,Check or Slip #\nDEBIT,04/02/2026,SHELL OIL 5744,-48.20,DEBIT_CARD,951.80,,\nCREDIT,04/03/2026,SQUARE INC,"1,250.00",ACH_CREDIT,"2,201.80",,')).toEqual([
+      ['2026-04-02', 'SHELL OIL 5744', -4820],
+      ['2026-04-03', 'SQUARE INC', 125000],
+    ]);
+    // a summary block above the table
+    expect(got('Description,,Summary Amt.\nBeginning balance as of 04/01/2026,,"1,000.00"\nTotal credits,,"1,250.00"\n\nDate,Description,Amount,Running Bal.\n04/01/2026,Beginning balance as of 04/01/2026,,"1,000.00"\n04/02/2026,SHELL OIL,-48.20,951.80')).toEqual([
+      ['2026-04-02', 'SHELL OIL', -4820],
+    ]);
+    // no header at all, with a check number that is not the amount
+    expect(got('"04/02/2026","-48.20","*","","CHECKCARD SHELL OIL"\n"04/05/2026","-180.00","*","1042","CHECK 1042"')).toEqual([
+      ['2026-04-02', 'CHECKCARD SHELL OIL', -4820],
+      ['2026-04-05', 'CHECK 1042', -18000],
+    ]);
+    // a ledger register with separate Payment and Deposit columns
+    expect(got('Date,Ref No.,Payee,Memo,Payment,Deposit,Balance\n04/02/2026,,Shell,van fuel,48.20,,951.80\n04/03/2026,,Square,,,"1,250.00","2,201.80"')).toEqual([
+      ['2026-04-02', 'Shell', -4820],
+      ['2026-04-03', 'Square', 125000],
+    ]);
   });
 
   it('explains what is missing when a file cannot be used', () => {
@@ -98,6 +121,19 @@ describe('check your own books: pairing', () => {
     const r = reconcile(bank, books);
     expect(r.difference).toBe(0);
     expect(r.findings.map((f) => f.kind)).toEqual(['category']);
+  });
+
+  it('reads books kept with the signs the other way round, and says so', () => {
+    const bank = parseCsv(SAMPLE_BANK, 'bank statement').lines;
+    const books = parseCsv(SAMPLE_BOOKS, 'books').lines;
+    const turned = books.map((l) => ({ ...l, cents: -l.cents }));
+    const a = reconcileAuto(bank, turned);
+    expect(a.flipped).toBe(true);
+    expect(a.result.matched).toBe(9);
+    expect(a.result.difference).toBe(23489);
+    expect(reconcileAuto(bank, books).flipped).toBe(false);
+    // two short unrelated files are left as they are
+    expect(reconcileAuto([line(2, '2026-04-02', 'A', -100)], [line(2, '2026-04-02', 'B', 100)]).flipped).toBe(false);
   });
 
   it('knows a transposition from an ordinary difference', () => {

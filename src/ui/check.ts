@@ -1,4 +1,4 @@
-import { parseCsv, reconcile, type CsvLine, type Finding, type FindingKind } from '../core/checker';
+import { parseCsv, reconcileAuto, type CsvLine, type Finding, type FindingKind } from '../core/checker';
 import type { GuideId } from '../core/guide';
 import { formatCents, formatSignedCents } from '../core/money';
 import { esc, loadTheme, themeButton, type Plan } from './util';
@@ -50,7 +50,7 @@ export function findingsText(s: CheckState, plan: Plan | null): string {
   const bank = parseCsv(s.bank, 'bank statement');
   const books = parseCsv(s.books, 'books');
   if (bank.error || books.error) return '';
-  const r = reconcile(bank.lines, books.lines);
+  const { result: r } = reconcileAuto(bank.lines, books.lines);
   const open = s.sample || plan ? r.findings : r.findings.slice(0, FREE_FINDINGS);
   return [
     'Bank and books check (Ledger Fix Lab)',
@@ -77,7 +77,7 @@ function results(s: CheckState, plan: Plan | null): string {
   if (bank.error || books.error) {
     return `<section class="ck-out" aria-live="polite"><p class="acct-err" role="alert" data-testid="check-error">${esc(bank.error ?? books.error ?? '')}</p></section>`;
   }
-  const r = reconcile(bank.lines, books.lines);
+  const { result: r, flipped } = reconcileAuto(bank.lines, books.lines);
   const money = r.findings.filter((f) => f.kind !== 'category');
   const open = s.sample || plan ? r.findings : r.findings.slice(0, FREE_FINDINGS);
   const locked = r.findings.length - open.length;
@@ -97,6 +97,7 @@ function results(s: CheckState, plan: Plan | null): string {
       <div class="${r.difference === 0 ? 'ok' : 'off'}"><span>Difference</span><b class="num" data-testid="check-diff">${formatSignedCents(r.difference)}</b></div>
     </div>
     <p class="ck-verdict" data-testid="check-verdict">${esc(verdict)} <span>${r.matched} ${r.matched === 1 ? 'line' : 'lines'} paired.</span></p>
+    ${flipped ? '<p class="acct-note" data-testid="check-flipped"><b>Signs turned over.</b> Your books list money out as positive numbers, so they were read the other way round to pair with the bank.</p>' : ''}
     <ol class="ck-list">${open.map(card).join('')}</ol>
     ${open.length ? '<div class="ck-tools"><button type="button" class="btn" data-check="copy" data-testid="check-copy">Copy the list</button></div>' : ''}
     ${locked > 0 ? `<a class="ck-lock" href="#/upgrade" data-testid="check-lock"><b>${locked} more ${locked === 1 ? 'finding' : 'findings'}</b><span>The first ${FREE_FINDINGS} are free. All of them come with the Practice plan.</span><span class="btn primary">See the plan</span></a>` : ''}
