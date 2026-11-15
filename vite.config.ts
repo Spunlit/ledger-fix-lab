@@ -17,5 +17,7 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
+    // The exhaustive state-space and large-file tests take seconds on a small CI machine.
+    testTimeout: 30_000,
   },
 });
