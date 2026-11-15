@@ -175,6 +175,9 @@ export function saveOpenedPractice(ids: string[]): void {
 }
 
 /** A practice file can be opened if the visitor has a plan, already opened it, or still has free files left. */
+/** Topic drills from the guide: the first three topics are free, the rest come with the Practice plan. */
+export const FREE_TOPIC_DRILLS = 3;
+
 export function canOpenPractice(id: string, opened: string[], plan: Plan | null): boolean {
   return Boolean(plan) || opened.includes(id) || opened.length < FREE_PRACTICE_FILES;
 }

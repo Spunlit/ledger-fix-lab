@@ -1,10 +1,11 @@
 import { GLOSSARY } from '../core/glossary';
 import { GUIDE, RECONCILIATION_STEPS } from '../core/guide';
 import { gloss } from './terms';
-import { esc, loadTheme, themeButton } from './util';
+import { esc, FREE_TOPIC_DRILLS, loadPlan, loadTheme, themeButton } from './util';
 
 /** The field guide page (app.html#/guide): how a reconciliation works and the seven things the files test. */
 export function renderGuide(): string {
+  const plan = loadPlan();
   return `
   <header class="nav">
     <a class="brand" href="./" aria-label="Ledger Fix Lab, back to the main page"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
@@ -38,7 +39,7 @@ export function renderGuide(): string {
         <div><dt>What to do</dt><dd>${gloss(t.fix)}</dd></div>
         <div><dt>Why it matters</dt><dd>${gloss(t.why)}${t.differenceNote ? ` ${esc(t.differenceNote)}` : ''}</dd></div>
       </dl>
-      <div class="guide-do"><a class="btn primary" href="#/drill/${t.id}">Practice this: 3 quick rounds</a><a class="link" href="${t.practice.href}">or see it in ${esc(t.practice.label)}</a></div>
+      <div class="guide-do">${plan || i < FREE_TOPIC_DRILLS ? `<a class="btn primary" href="#/drill/${t.id}">Practice this: 3 quick rounds</a>` : `<a class="btn locked-btn" href="#/drill/${t.id}" data-testid="topic-locked">Practice rounds: with the Practice plan</a>`}<a class="link" href="${t.practice.href}">or see it in ${esc(t.practice.label)}</a></div>
     </article>`,
     ).join('')}
 

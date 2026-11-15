@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 77; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 79; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -211,12 +211,18 @@ async function main() {
 
   await go('#/');
   ok((await text('[data-testid=home-next]')).includes("Do today's file") && (await js(`return document.querySelectorAll('.home-days span').length`)) === 7, 'desk shows one next action (the file of the day, still unsolved) and the seven-day strip');
-  ok((await js(`return document.querySelectorAll('.step.done').length`)) === 2, 'home path marks both guided cases completed');
+  ok((await js(`return document.querySelectorAll('.step.done').length`)) === 2 && (await js(`return document.querySelectorAll('.rung.locked').length`)) >= 1 && (await text('.ladder-note')).includes('this browser only'), 'home path marks both guided cases completed');
   ok((await js(`return document.querySelectorAll('.record li').length`)) >= 2, 'skill record appears after the first unguided file');
   const practice = await js(`return $('.record a.btn').getAttribute('href')`);
   ok(/^#\/practice\/[a-z0-9]+\//.test(practice), `weak-spot practice link targets missed skills (${practice})`);
   await go(practice);
   ok((await text('.badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
+
+  // ---------- the ladder's lock: topic practice for a later topic leads to the plan page (theory stays open)
+  await go('#/drill/owner');
+  ok(await js(`return !!$('.pw-card')`), 'a locked topic drill opens the plan page for a free user');
+  await go('#/guide/owner');
+  ok((await text('#g-owner')).includes('Why it matters') && (await js(`return !!$('#g-owner [data-testid=topic-locked]')`)) && !(await js(`return !!$('#g-duplicate [data-testid=topic-locked]')`)), 'the theory of a locked topic is readable; its practice button says it needs the plan; the first topic is free');
 
   // ---------- paywall: free tier allows one practice file, then the Practice plan (demo checkout)
   await go('#/practice/zzz999/timing');

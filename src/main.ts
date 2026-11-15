@@ -21,7 +21,7 @@ import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
 import { startTour, tourSeen, type TourStep } from './ui/tour';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
-import { saveDrillRun } from './ui/util';
+import { FREE_TOPIC_DRILLS, saveDrillRun } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
 import { renderPaywall, type PaywallState } from './ui/paywall';
 import { todaySeed } from './core/generator';
@@ -129,6 +129,14 @@ function route(): void {
     document.body.dataset.page = 'guide';
     document.title = 'Terms and Conditions | Ledger Fix Lab';
     app.innerHTML = renderTerms();
+    window.scrollTo(0, 0);
+    return;
+  }
+  const lockedTopic = drillTopic();
+  if (lockedTopic && !plan && GUIDE.findIndex((t) => t.id === lockedTopic) >= FREE_TOPIC_DRILLS) {
+    // Practice rounds for the later topics come with the plan; the theory itself stays open in the guide.
+    paywall = { returnTo: location.hash, step: 'plans', billing: paywall.billing };
+    renderUpgrade();
     window.scrollTo(0, 0);
     return;
   }

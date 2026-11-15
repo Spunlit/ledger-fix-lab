@@ -431,3 +431,17 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
   .record-page { padding-top: 0; }
   .rec-name input::placeholder { color: transparent; }
 }
+
+/* ================= the path as a ladder: done, open, locked */
+.ladder-h { font-family: var(--font-ui); font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 26px 0 12px; }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.rung { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 16px 18px; }
+.rung:hover { transform: none; box-shadow: inset 0 0 0 1px var(--blue), var(--shadow); }
+.rung.locked .step-title, .rung.locked .step-meta { color: var(--ink-3); }
+.rung.locked .step-n { background: var(--surface-2); color: var(--ink-3); }
+.rung-tag { font: 500 11.5px/1 var(--font-mono); padding: 6px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.rung-tag.done { background: var(--green-soft); color: var(--green); }
+.rung-tag.locked { background: var(--amber-soft); color: var(--amber); }
+.ladder-note { margin-top: 12px; font-size: 13px; color: var(--ink-3); }
+.locked-btn { box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); min-height: 42px; }
+@media (max-width: 640px) { .rung { grid-template-columns: 30px minmax(0, 1fr); } .rung-tag { grid-column: 2; justify-self: start; } }

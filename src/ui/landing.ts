@@ -5,7 +5,7 @@ import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
 import { basicsDone } from './basics';
 import { dailyHref, practiceHref } from './routes';
 import { gloss } from './terms';
-import { dailyStreak, esc, loadDrillRecord, loadTheme, masteryLevel, newSeed, themeButton, weekDays, type Completed } from './util';
+import { dailyStreak, esc, FREE_PRACTICE_FILES, FREE_TOPIC_DRILLS, loadDrillRecord, loadOpenedPractice, loadPlan, loadTheme, masteryLevel, newSeed, themeButton, weekDays, type Completed } from './util';
 
 const tick = `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -18,11 +18,16 @@ function path(done: Completed, history: SkillAttempt[]): string {
     daily = null; // never let a generator failure blank the home page
   }
   const streak = dailyStreak(done, day);
-  const step = (n: string, href: string, title: string, meta: string, isDone: boolean, current: boolean) => `
-    <a class="step ${isDone ? 'done' : ''} ${current ? 'current' : ''}" href="${href}">
-      <span class="step-n">${isDone ? tick : n}</span>
-      <span class="step-body"><span class="step-title">${esc(title)}</span><span class="step-meta">${meta}</span></span>
-    </a>`;
+  const lock = `<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path d="M6.5 9V6.8a3.5 3.5 0 0 1 7 0V9M5 9h10v7.5H5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  const rung = (n: string, href: string, title: string, meta: string, state: 'done' | 'open' | 'locked', tag: string) => `
+    <li><a class="step rung ${state === 'done' ? 'done' : ''} ${state === 'locked' ? 'locked' : ''}" href="${state === 'locked' ? '#/upgrade' : href}">
+      <span class="step-n">${state === 'done' ? tick : state === 'locked' ? lock : n}</span>
+      <span class="step-body"><span class="step-title">${esc(title)}</span><span class="step-meta">${esc(meta)}</span></span>
+      <span class="rung-tag ${state}">${esc(state === 'done' ? 'Done' : tag)}</span>
+    </a></li>`;
+  const plan = loadPlan();
+  const freeLeft = Math.max(0, FREE_PRACTICE_FILES - loadOpenedPractice().length);
+  const zeroDone = basicsDone();
   const d1 = Boolean(done[CASES[0].id]);
   const d2 = Boolean(done[CASES[1].id]);
   const dd = daily ? Boolean(done[daily.id]) : false;
@@ -58,11 +63,17 @@ function path(done: Completed, history: SkillAttempt[]): string {
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
     <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
     <a class="warm quiet" href="#/record"><span class="warm-t"><b>Practice record</b><span>Proof of what you have done, on one page you can print. It stays current while you keep practising.</span></span><span class="btn">Open</span></a>
-    <div class="path">
-      ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
-      ${step('2', `#/case/${CASES[1].id}`, CASES[1].title, 'Guided, 10 min. The full reconciliation.', d2, d1 && !d2)}
-      ${daily ? step('3', dailyHref(day), "Today's file", `No hints. A new client every day.${streak ? ` <b>${streak}-day streak</b>` : ''}`, dd, d1 && d2 && !dd) : ''}
-    </div>
+    <h2 class="ladder-h">Your path</h2>
+    <ol class="ladder" data-testid="ladder">
+      ${rung('0', '#/basics', 'Start from zero', 'Five ideas in two minutes.', zeroDone ? 'done' : 'open', 'Free')}
+      ${rung('1', `#/case/${CASES[0].id}`, `Practice 1: ${CASES[0].title}`, 'Guided, 6 min. Duplicates and categories.', d1 ? 'done' : 'open', 'Free')}
+      ${rung('2', `#/case/${CASES[1].id}`, `Practice 2: ${CASES[1].title}`, 'Guided, 10 min. The full reconciliation.', d2 ? 'done' : 'open', 'Free')}
+      ${daily ? rung('3', dailyHref(day), "Today's file", `No hints. A new client every day.${streak ? ` ${streak}-day streak.` : ''}`, dd ? 'done' : 'open', 'Free, daily') : ''}
+      ${rung('4', practiceHref(newSeed(), weak), 'Practice 3: a file aimed at your weak spots', 'No hints. Built from the mistakes you miss.', plan || freeLeft > 0 ? 'open' : 'locked', plan ? 'Practice plan' : freeLeft > 0 ? `${freeLeft} free` : 'Practice plan')}
+      ${rung('5', plan ? practiceHref(newSeed(), weak) : '#/upgrade', 'Practice 4 and beyond', 'Unlimited files, and your practice record stays current.', plan ? 'open' : 'locked', 'Practice plan')}
+      ${rung('T', '#/guide', 'Theory and topic practice', `Seven topics. All the theory is open; practice rounds are free for ${FREE_TOPIC_DRILLS}, the other ${7 - FREE_TOPIC_DRILLS} come with the plan.`, 'open', plan ? 'All open' : `${FREE_TOPIC_DRILLS} of 7 free`)}
+    </ol>
+    <p class="ladder-note">Your progress is saved in this browser only. Accounts, to keep it across devices, are not built yet.</p>
     ${
       stats.length
         ? `<div class="record">

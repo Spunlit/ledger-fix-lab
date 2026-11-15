@@ -199,3 +199,8 @@
 - New: practice record (app.html#/record). Five requirements for level 1, first-check accuracy per skill, a "current" status that lapses 30 days after the last file solved without hints, optional name, print to PDF. It states that it is not a certification and that Ledger Fix Lab is not an accredited body. Pure logic in src/core/record.ts with tests.
 - Positioning decided with the founder: no self-issued "certificate"; a record of practice that stays current fits a subscription, a one-time certificate would fit a course.
 - Checked: 122 unit tests, 77 e2e checks.
+
+## v22 (Nov 15, ~01:10 UTC)
+- Desk shows the path as a ladder: Start from zero, Practice 1, Practice 2, today file, Practice 3 (one free), Practice 4+ (plan), theory and topic practice (3 of 7 topic drills free). Locked rungs lead to the plan page; the theory itself stays open.
+- No accounts: the brief requires the main scenario without registration, and a static site has no backend. The desk says so: progress lives in this browser, accounts are not built yet.
+- Checked: 122 unit tests, 79 e2e checks.
