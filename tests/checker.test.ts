@@ -71,6 +71,20 @@ describe('check your own books: reading files', () => {
     ]);
   });
 
+  it('never throws on 400 files of junk: it reads what it can and says what it skipped', () => {
+    let seed = 99;
+    const rnd = (n: number) => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };
+    const bits = ['"', ',', ';', '\n', '\r\n', '\t', '-', '(', ')', '$', '.', '1', '23', '4/5/2026', '2026-13-40', 'Amount', 'Date', 'Debit', 'Credit', 'x', ' ', '<b>', '\u2212', '9'.repeat(30), 'NaN', '1e9', ''];
+    for (let i = 0; i < 400; i++) {
+      const text = Array.from({ length: rnd(60) }, () => bits[rnd(bits.length)]).join('');
+      const bank = parseCsv(text, 'bank statement');
+      const books = parseCsv(text.split('').reverse().join(''), 'books');
+      for (const l of [...bank.lines, ...books.lines]) expect(Number.isSafeInteger(l.cents)).toBe(true);
+      const r = reconcile(bank.lines, books.lines);
+      expect(r.findings.reduce((n, f) => n + f.effectCents, 0)).toBe(r.difference);
+    }
+  });
+
   it('explains what is missing when a file cannot be used', () => {
     expect(parseCsv('', 'books').error).toContain('empty');
     expect(parseCsv('Name,Notes\nCoffee,nice', 'bank statement').error).toContain('amount column');

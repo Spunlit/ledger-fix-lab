@@ -105,6 +105,12 @@ await go('app.html#/drill');
 await shot('phone-drill');
 await go('app.html#/record');
 await shot('phone-record');
+await go('app.html#/check');
+await click('[data-testid=check-sample]');
+await sleep(500);
+await js(`document.querySelector('.ck-figs').scrollIntoView({ block: 'start' }); window.scrollBy(0, -14)`);
+await sleep(400);
+await shot('phone-check');
 
 // 7. the desk's ladder on desktop
 await size(1280, 800);
