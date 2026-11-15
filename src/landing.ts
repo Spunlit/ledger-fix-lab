@@ -28,7 +28,11 @@ document.addEventListener('click', (e) => {
 try {
   if (localStorage.getItem('ledger-fix-lab:v23:profile')) {
     const a = document.querySelector<HTMLAnchorElement>('[data-account-link]');
-    if (a) { a.textContent = 'Your desk'; a.href = 'app.html#/'; }
+    if (a) {
+      a.href = 'app.html#/';
+      const roll = a.querySelector<HTMLElement>('.roll');
+      if (roll) { roll.dataset.t = 'Your desk'; roll.querySelector('span')!.textContent = 'Your desk'; } else a.textContent = 'Your desk';
+    }
   }
 } catch { /* storage blocked: the link stays "Sign in" */ }
 

@@ -130,6 +130,37 @@
   .status .card { padding: 28px 28px 30px; } .status p { font-size: 18.5px; line-height: 1.45; }
   .next { margin-top: 30px; font-size: 19px; max-width: 92ch; }
   .end { position: absolute; left: 72px; right: 72px; bottom: 62px; display: flex; gap: 14px; }
+
+  /* v5: eight slides, fewer words */
+  .big h2 { font-size: 62px; max-width: 21ch; }
+  .prob { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; margin-top: 40px; align-items: end; }
+  .bars { display: grid; gap: 22px; }
+  .bar span { display: block; font: 500 13px/1 'Geist Mono', monospace; color: var(--ink-2); margin-bottom: 10px; }
+  .bar div { height: 54px; border-radius: 10px; display: flex; align-items: center; padding-left: 18px; font: 400 38px/1 'Instrument Serif', serif; color: #fff; white-space: nowrap; }
+  .bar .w { width: 96px; background: rgba(255, 255, 255, 0.14); }
+  .bar .p { width: 100%; background: linear-gradient(90deg, #FC734D, #E5553A); }
+  .pnums { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .pnums .num { font-size: 84px; }
+  .pnums p { font-size: 17px; margin-top: 10px; }
+  .srcline { position: absolute; left: 72px; right: 72px; bottom: 50px; font: 400 11px/1.5 'Geist Mono', monospace; color: var(--ink-3); }
+  .duo { display: grid; grid-template-columns: 330px 1fr; gap: 40px; align-items: start; margin-top: 30px; }
+  .duo .crop { width: 766px; height: 440px; }
+  .duo .steps li { padding: 17px 0; }
+  .duo .steps b { font-size: 23px; }
+  .duo p { font-size: 20px; }
+  .duo p + p { margin-top: 18px; }
+  /* the glow is one full-bleed layer, so its box edges never fall inside a slide */
+  .glow { border-radius: 0; inset: -40px; width: auto !important; height: auto !important; left: -40px !important; top: -40px !important; }
+  .glow.hero { background: radial-gradient(ellipse 1050px 550px at 680px 825px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
+  .glow.low { background: radial-gradient(ellipse 850px 380px at 680px 980px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
+  .glow.side { background: radial-gradient(ellipse 550px 550px at 1350px 400px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
+  .glow.corner { background: radial-gradient(ellipse 500px 450px at 20px 820px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
+  .duo .crop.tall { height: 452px; }
+  .biz2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 40px; }
+  .biz2 h3 { font: 500 13px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 16px; }
+  .biz2 .price { font: 400 76px/0.95 'Instrument Serif', serif; color: var(--ink); }
+  .biz2 p { font-size: 17px; margin-top: 14px; }
+  .biz2 .main { background: rgba(2, 151, 222, 0.13); box-shadow: inset 0 0 0 1px rgba(2, 151, 222, 0.5); }
 </style>
 </head>
 <body>
@@ -138,64 +169,61 @@
   <i class="glow hero"></i>
   <p class="lab">Business Cup 2.0, Skills track</p>
   <h1>Books that balance<br>can still be <em>wrong.</em></h1>
-  <p class="sub">Ledger Fix Lab is bookkeeping practice that grades your result.</p>
+  <p class="sub">Bookkeeping practice that grades your result.</p>
   <div class="links"><span class="pill solid">spunlit.github.io/ledger-fix-lab</span><span class="pill">github.com/Spunlit/ledger-fix-lab</span></div>
 </section>
 
-<section class="s">
+<section class="s big">
   <i class="glow side"></i>
   <p class="lab">The problem</p>
-  <h2>Millions keep their own books. <em>Nobody checks them.</em></h2>
-  <div class="three">
-    <div class="card"><div class="num">29.8M</div><p>US businesses with no employees. The owner is the bookkeeper.</p><p class="src">US Census Bureau, Nonemployer Statistics 2022</p></div>
-    <div class="card"><div class="num">2 in 3</div><p>Small-business owners do their own bookkeeping.</p><p class="src">"More than two-thirds": QuickBooks survey, Dec 2025, as reported by CNBC Select</p></div>
-    <div class="card"><div class="num">You</div><p>The taxpayer answers for the return, whoever or whatever prepared it.</p><p class="src">IRS Tax Topic 254</p></div>
+  <h2>Keep your own books, and <em>more than half the income is reported wrong.</em></h2>
+  <div class="prob">
+    <div class="bars">
+      <div class="bar"><span>Wages, reported by an employer</span><div class="w">1%</div></div>
+      <div class="bar"><span>Sole-proprietor income, reported from your own books</span><div class="p">55% misreported</div></div>
+    </div>
+    <div class="pnums">
+      <div><div class="num">$117B</div><p>of tax on it goes unreported in a year.</p></div>
+      <div><div class="num">+20%</div><p>IRS penalty on tax you underpaid.</p></div>
+    </div>
   </div>
-  <p class="who"><b>Our user:</b> a working adult in the US, 25 to 45, who runs a side business or is starting to keep books for others. Courses explain the rules. Nothing tells them their own books are wrong.</p>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>2 / 10</span></div>
+  <p class="srcline">IRS tax gap studies: misreporting rates for tax years 2014 to 2016 (CRS report IF11887); $117B is the IRS projection for tax year 2022 (crfb.org). Penalty: irs.gov, accuracy-related penalty. Misreporting covers honest mistakes and deliberate ones.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>2 / 8</span></div>
 </section>
 
 <section class="s trap">
   <i class="glow low"></i>
-  <p class="lab">The moment the product is built around</p>
+  <p class="lab">How it happens</p>
   <h2>The bank agrees to the cent. <em>Profit is off by $5,000.</em></h2>
   <img class="shot" src="img/trap.png" alt="The review screen: difference $0.00, three checks pass, the category check fails, profit overstated by $5,000.00">
-  <p class="cap">A real screen from case 2. The owner moved savings into the account, and the books call it sales.</p>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>3 / 10</span></div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>3 / 8</span></div>
 </section>
 
 <section class="s">
   <i class="glow corner"></i>
   <p class="lab">The product</p>
-  <h2>Fix real mistakes. <em>Get graded on the result.</em></h2>
-  <div class="split">
+  <h2 style="max-width:none">Fix real mistakes. <em>Get graded.</em></h2>
+  <div class="duo">
     <ol class="steps">
-      <li><i>0</i><div><b>Start from zero</b><span>Five ideas in two minutes. No experience needed.</span></div></li>
-      <li><i>1</i><div><b>Match</b><span>Pair each bank line with a line in the books.</span></div></li>
-      <li><i>2</i><div><b>Fix</b><span>Delete the duplicate, correct the amount, add what is missing.</span></div></li>
-      <li><i>3</i><div><b>Check</b><span>Four checks grade the books you end with.</span></div></li>
-      <li><i>4</i><div><b>Your own books</b><span>Two CSV files, paired in your browser.</span></div></li>
+      <li><i>0</i><div><b>Start from zero</b></div></li>
+      <li><i>1</i><div><b>Match</b></div></li>
+      <li><i>2</i><div><b>Fix</b></div></li>
+      <li><i>3</i><div><b>Check</b></div></li>
     </ol>
     <div class="crop"><img src="img/work.png" alt="The working screen of case 1: bank, books and difference, the coach's next step, books and bank line by line"></div>
   </div>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>4 / 10</span></div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>4 / 8</span></div>
 </section>
 
 <section class="s">
   <i class="glow low"></i>
-  <p class="lab">Learning</p>
-  <div class="phones">
-    <div class="txt">
-      <h2>From zero to<br><em>your own books</em></h2>
-      <p>On a phone, with no sign-up. Every bookkeeping word can be tapped for a plain explanation.</p>
-      <p>Help climbs only when asked:</p>
-      <div class="help"><span>Hint</span><span>More help</span><span>Show me how</span></div>
-    </div>
-    <div class="ph"><div class="frame"><img src="img/phone-basics.png" alt="Start from zero, step 1 of 5, on a phone"></div><p><b>Start from zero.</b> Five ideas, one tap each.</p></div>
-    <div class="ph"><div class="frame"><img src="img/phone-drill.png" alt="A warm-up drill round on a phone"></div><p><b>60-second drills.</b> Tap the line that is wrong.</p></div>
-    <div class="ph"><div class="frame"><img src="img/phone-check.png" alt="Check your own books on a phone: bank and books totals, the difference, and the first finding"></div><p><b>Your own books.</b> Two CSV files, nothing uploaded.</p></div>
+  <p class="lab">Not only practice</p>
+  <h2>Then check <em>your own books</em></h2>
+  <div class="duo">
+    <div><p>Two CSV files: your bank statement and your books.</p><p>Read in the browser. Nothing is uploaded.</p><p>The findings add up to the difference, to the cent.</p></div>
+    <div class="crop tall"><img src="img/check.png" alt="Check your own books: bank and books totals, a difference of $234.89, and the findings that explain it"></div>
   </div>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>5 / 10</span></div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>5 / 8</span></div>
 </section>
 
 <section class="s">
@@ -203,80 +231,40 @@
   <p class="lab">Engineering</p>
   <h2>A grader you can <em>trust</em></h2>
   <div class="four">
-    <div class="card"><div class="num">4</div><p>separate checks: every transaction once, amounts, cleared items, categories</p></div>
-    <div class="card"><div class="num">900</div><p>generated files, each proven broken as handed over and solvable</p></div>
-    <div class="card"><div class="num">146</div><p>unit tests on the engine, run before every deploy</p></div>
-    <div class="card"><div class="num">96</div><p>browser checks of the whole product, run against the live site</p></div>
+    <div class="card"><div class="num">4</div><p>separate checks on the books you end with</p></div>
+    <div class="card"><div class="num">900</div><p>generated files proven solvable</p></div>
+    <div class="card"><div class="num">146</div><p>unit tests before every deploy</p></div>
+    <div class="card"><div class="num">96</div><p>browser checks on the live site</p></div>
   </div>
   <div class="facts">
-    <p>Money is whole cents. No rounding errors, ever.</p>
-    <p>Any correct fix passes. Two real identical purchases are not a duplicate.</p>
-    <p>Undo restores the exact previous state.</p>
-    <p>No backend, no AI in the grading: the same books always get the same grade.</p>
+    <p>Money is whole cents. No AI in the grading.</p>
+    <p>No backend: the same books always get the same grade.</p>
   </div>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>6 / 10</span></div>
-</section>
-
-<section class="s">
-  <i class="glow corner"></i>
-  <p class="lab">Retention</p>
-  <h2>A reason to come back <em>tomorrow</em></h2>
-  <div class="ret">
-    <div class="list">
-      <div><b>Today's file</b><span>A new client every day, with no hints. A streak counts the days.</span></div>
-      <div><b>Skill record</b><span>First-check accuracy for each kind of mistake.</span></div>
-      <div><b>Weak-spot files</b><span>Practice built from what you miss most.</span></div>
-      <div><b>Practice record</b><span>A printable page that stays current for 30 days after your last file.</span></div>
-      <div><b>Month-end check</b><span>Your own statement and books, every month. The desk shows the last one.</span></div>
-    </div>
-    <img class="shot" src="img/ladder.png" alt="The path on the desk: finished steps, open steps and steps that come with the Practice plan">
-  </div>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>7 / 10</span></div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>6 / 8</span></div>
 </section>
 
 <section class="s">
   <i class="glow low"></i>
-  <p class="lab">Business</p>
+  <p class="lab">Business and retention</p>
   <h2>Free to learn. <em>$12 a month</em> to keep sharp.</h2>
-  <div class="biz">
-    <div class="card"><h3>Free</h3><div class="price">$0</div><ul><li>Start from zero</li><li>Both guided cases</li><li>Today's file, every day</li><li>All theory, three topic drills</li><li>Your own books: three findings</li></ul></div>
-    <div class="card main"><h3>Practice</h3><div class="price">$12<small>a month, or $96 a year. 7-day trial.</small></div><ul><li>Unlimited practice files</li><li>Files aimed at weak spots</li><li>Keeps the practice record current</li><li>Your own books: every finding</li></ul></div>
-    <div class="card"><h3>What people pay today</h3>
-      <div class="rows">
-        <div><span>One practice client file, self-graded (QBO Dojo)</span><b>$49 to $119</b></div>
-        <div><span>Intuit bookkeeping course (Coursera)</span><b>$59 a month</b></div>
-        <div><span>Ceiling: 5% of ~20M owners who keep their own books, at $96 a year</span><b>~$100M ARR</b></div>
-      </div>
-    </div>
+  <div class="biz2">
+    <div class="card"><h3>Free</h3><div class="price">$0</div><p>Basics, two guided cases, a new file every day.</p></div>
+    <div class="card main"><h3>Practice plan</h3><div class="price">$12</div><p>Unlimited files, weak-spot practice, your own books every month.</p></div>
+    <div class="card"><h3>Today people pay</h3><div class="price">$49+</div><p>for one practice file they grade themselves (QBO Dojo).</p></div>
   </div>
-  <p class="honest"><b>Honest status:</b> the checkout is a demo and no card is charged. Nobody has paid yet. The ceiling is arithmetic on public numbers (29.8M × two-thirds), not a forecast.</p>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>8 / 10</span></div>
-</section>
-
-<section class="s">
-  <i class="glow side"></i>
-  <p class="lab">"Won't AI do the bookkeeping?"</p>
-  <h2>Software enters the lines. <em>Someone has to check them.</em></h2>
-  <div class="cmp">
-    <div><b>Courses and YouTube</b><span>Explain the rules.</span><em>No practice graded</em></div>
-    <div><b>QuickBooks Test Drive</b><span>A free sandbox company.</span><em>Nothing checks you</em></div>
-    <div><b>An AI chat</b><span>Answers questions. You still sign the books.</span><em>No fixed grade</em></div>
-    <div class="us"><b>Ledger Fix Lab</b><span>You fix a client's books. The end result is graded, the same way every time.</span><em>Graded practice</em></div>
-  </div>
-  <p class="ai">The mistakes practiced here are the ones automation makes: a bank feed that reconnects imports the same lines twice (Intuit help), and an auto-category calls a transfer a sale.</p>
-  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>9 / 10</span></div>
+  <p class="honest">29.8M US businesses have no employees (Census, 2022). The checkout is a demo: nobody has paid yet.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>7 / 8</span></div>
 </section>
 
 <section class="s">
   <i class="glow hero"></i>
   <p class="lab">Where we are</p>
-  <h2>What is real <em>today</em></h2>
+  <h2>Live today. <em>Try it now.</em></h2>
   <div class="status">
-    <div class="card real"><h3>Working, on the live site</h3><p>Grading engine and file generator. Two guided cases, today's file, drills, field guide, practice record, a checker for your own CSV files. Public repository, tests on every deploy.</p></div>
-    <div class="card demo"><h3>Demo, and labelled so</h3><p>Checkout: no card, nothing charged. Sign in: a profile on this device, no server.</p></div>
-    <div class="card none"><h3>Not yet</h3><p>User interviews, paying users, retention data.</p></div>
+    <div class="card real"><h3>Working</h3><p>Grading engine, file generator, cases, daily file, checker for your own files.</p></div>
+    <div class="card demo"><h3>Demo, labelled</h3><p>Checkout and sign in.</p></div>
+    <div class="card none"><h3>Not yet</h3><p>Interviews, paying users, retention data.</p></div>
   </div>
-  <p class="next"><b>Next test:</b> share today's file in bookkeeping-learner communities for two weeks. Measure completion, day-7 return and plan sign-ups against a bar set in advance.</p>
   <div class="end"><span class="pill solid">spunlit.github.io/ledger-fix-lab</span><span class="pill">github.com/Spunlit/ledger-fix-lab</span></div>
 </section>
 

@@ -112,6 +112,13 @@ await js(`document.querySelector('.ck-figs').scrollIntoView({ block: 'start' });
 await sleep(400);
 await shot('phone-check');
 
+// the checker on desktop, with the sample files
+await size(1280, 800);
+await go('app.html#/check');
+await click('[data-testid=check-sample]');
+await sleep(500);
+await shot('check', '.ck-out', 0);
+
 // 7. the desk's ladder on desktop
 await size(1280, 800);
 await go('app.html#/');
