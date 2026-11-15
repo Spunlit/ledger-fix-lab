@@ -1,14 +1,19 @@
 # Ledger Fix Lab
 
-**Books that balance can still be wrong. Practice catching it, and get graded on the result.**
+**Books that balance can still be wrong. Learn to catch it on practice files, then check your own books every month.**
 Live: https://spunlit.github.io/ledger-fix-lab/ (free, no sign-up)
 
 ![The landing page: Books that balance can still be wrong](pitch/img/readme-landing.jpg)
 
-A browser trainer for beginners. You fix the books of a made-up small business against its bank statement: delete the
-duplicate, correct the swapped digits, record the bank fee nobody entered, leave the uncashed check alone, move the
-owner's money out of Sales. A deterministic engine grades the **books you end with**: not only whether the difference
-is $0.00, but whether the books are right. When you have the skill, the same matching checks your own two CSV files.
+Two parts, one skill:
+
+- **Check your own books.** Put your bank statement and your books side by side as two CSV files. The checker pairs
+  the lines in your browser (nothing is uploaded, to us or to any AI service) and lists what to look at: a line entered
+  twice, amounts one typing slip apart, a bank charge nobody recorded, a check the bank has not paid, a transfer filed
+  as income. The findings always add up to the difference. On 500 made-up months with 3,463 planted mistakes it finds
+  99% (`tests/checker-bench.test.ts`; synthetic data, not measured on real books).
+- **Learn it first.** A free trainer for beginners: you fix the books of a made-up small business against its bank
+  statement, and a deterministic engine grades the **books you end with**, including "balanced at $0.00 but wrong".
 
 Track: Skills. For working adults in the US (25 to 45) who keep the books for their own side business, or who are
 starting to keep books for others. They pay out of pocket (B2C). Evidence and open questions:
