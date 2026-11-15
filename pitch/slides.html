@@ -168,6 +168,10 @@
   .two .shot { position: absolute; }
   .two .back { width: 560px; left: 0; top: 0; }
   .two .front { width: 590px; right: 0; bottom: 0; }
+  .tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 34px; }
+  .tri figure { margin: 0; }
+  .tri .shot { width: 100%; }
+  .tri figcaption { font-size: 17px; color: var(--ink-2); margin-top: 14px; line-height: 1.4; }
   .ways { display: grid; gap: 14px; }
   .ways h3 { font: 500 12.5px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 10px; }
   .ways p { font-size: 18px; }
@@ -258,13 +262,10 @@
   <i class="glow corner"></i>
   <p class="lab">The free trainer</p>
   <h2 style="max-width:none">Practice with a <em>coach beside you</em></h2>
-  <div class="duo">
-    <div class="ways">
-      <div class="card"><h3>One problem at a time</h3><p>The coach names the line and what to do.</p></div>
-      <div class="card"><h3>Help on request</h3><p>Hint, then the row, then "Show me how".</p></div>
-      <div class="card"><h3>Graded result</h3><p>Four checks on the books you end with.</p></div>
-    </div>
-    <div class="crop"><img src="img/work.png" alt="The working screen of case 1: the coach's next step, the Hint button, books and bank line by line"></div>
+  <div class="tri">
+    <figure><img class="shot" src="img/p-tour.png" alt="The tour lights one part of the screen and explains it"><figcaption><b>Tour.</b> What each part of the screen is.</figcaption></figure>
+    <figure><img class="shot" src="img/p-hint.png" alt="A hint under the coach's next step"><figcaption><b>Hint.</b> A clue, then the exact row.</figcaption></figure>
+    <figure><img class="shot" src="img/p-demo.png" alt="Show me how: a three-step demonstration that makes the move"><figcaption><b>Show me how.</b> It makes one move and explains it.</figcaption></figure>
   </div>
   <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>6 / 9</span></div>
 </section>

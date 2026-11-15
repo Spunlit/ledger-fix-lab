@@ -65,6 +65,20 @@ await js(`localStorage.setItem('ledger-fix-lab:v16:tour-seen', '1')`);
 await size(1280, 800);
 await go('app.html#/case/maple-pine-oct');
 await shot('work');
+await click('[data-act=tour]');
+await sleep(900);
+await shot('p-tour');
+await go('app.html#/');
+await go('app.html#/case/maple-pine-oct');
+await click('[data-testid=help]');
+await sleep(500);
+await shot('p-hint');
+await click('[data-testid=help]');
+await sleep(300);
+await click('[data-testid=help]');
+await sleep(1100);
+await shot('p-demo');
+await go('app.html#/');
 
 // 3. case 2: reach "$0.00 but one check fails" with real moves
 await go('app.html#/case/rivera-mar');
