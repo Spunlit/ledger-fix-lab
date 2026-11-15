@@ -150,6 +150,24 @@
   .duo p { font-size: 20px; }
   .duo p + p { margin-top: 18px; }
   /* the glow is one full-bleed layer, so its box edges never fall inside a slide */
+  .prob { grid-template-columns: 1fr 470px; gap: 48px; margin-top: 30px; align-items: start; }
+  .pnums { margin-top: 30px; }
+  .pnums .num { font-size: 76px; }
+  .clips { display: grid; gap: 20px; margin-top: -150px; }
+  .clip { margin: 0; }
+  .clip img { display: block; width: 100%; border-radius: 6px; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6); }
+  .clip.a { transform: rotate(-1.2deg); }
+  .clip.b { transform: rotate(0.8deg); width: 88%; justify-self: end; }
+  .clip figcaption { font: 400 11px/1.4 'Geist Mono', monospace; color: var(--ink-3); margin-top: 9px; }
+  .chips { display: flex; gap: 12px; margin-top: 26px; }
+  .chips span { display: inline-flex; align-items: baseline; gap: 12px; padding: 12px 20px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 19px; font-weight: 600; }
+  .chips i { font: 400 26px/1 'Instrument Serif', serif; font-style: normal; color: var(--sky); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 30px; align-items: start; }
+  .pair .shot { width: 100%; }
+  .two { position: relative; width: 766px; height: 452px; }
+  .two .shot { position: absolute; }
+  .two .back { width: 560px; left: 0; top: 0; }
+  .two .front { width: 590px; right: 0; bottom: 0; }
   .glow { border-radius: 0; inset: -40px; width: auto !important; height: auto !important; left: -40px !important; top: -40px !important; }
   .glow.hero { background: radial-gradient(ellipse 1050px 550px at 680px 825px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
   .glow.low { background: radial-gradient(ellipse 850px 380px at 680px 980px, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
@@ -178,16 +196,22 @@
   <p class="lab">The problem</p>
   <h2>Keep your own books, and <em>more than half the income is reported wrong.</em></h2>
   <div class="prob">
-    <div class="bars">
-      <div class="bar"><span>Wages, reported by an employer</span><div class="w">1%</div></div>
-      <div class="bar"><span>Sole-proprietor income, reported from your own books</span><div class="p">55% misreported</div></div>
+    <div>
+      <div class="bars">
+        <div class="bar"><span>Wages, reported by an employer</span><div class="w">1%</div></div>
+        <div class="bar"><span>Sole-proprietor income, reported from your own books</span><div class="p">55% misreported</div></div>
+      </div>
+      <div class="pnums">
+        <div><div class="num">$117B</div><p>of tax on it unreported in a year.</p></div>
+        <div><div class="num">+20%</div><p>IRS penalty on tax you underpaid.</p></div>
+      </div>
     </div>
-    <div class="pnums">
-      <div><div class="num">$117B</div><p>of tax on it goes unreported in a year.</p></div>
-      <div><div class="num">+20%</div><p>IRS penalty on tax you underpaid.</p></div>
+    <div class="clips">
+      <figure class="clip a"><img src="img/src-crfb.png" alt="Excerpt: of the $381 billion projected individual income tax underreporting gap in 2022, $179 billion comes from income with little or no information reporting, including $117 billion from non-farm proprietor income"><figcaption>crfb.org, on the IRS tax gap projection for 2022</figcaption></figure>
+      <figure class="clip b"><img src="img/src-irs.png" alt="Excerpt: in cases of substantial understatement, the accuracy-related penalty is 20% of the portion of the underpayment of tax"><figcaption>irs.gov, accuracy-related penalty</figcaption></figure>
     </div>
   </div>
-  <p class="srcline">IRS tax gap studies: misreporting rates for tax years 2014 to 2016 (CRS report IF11887); $117B is the IRS projection for tax year 2022 (crfb.org). Penalty: irs.gov, accuracy-related penalty. Misreporting covers honest mistakes and deliberate ones.</p>
+  <p class="srcline">55% and 1%: IRS tax gap study, tax years 2014 to 2016 (CRS report IF11887). Misreporting covers honest mistakes and deliberate ones.</p>
   <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>2 / 8</span></div>
 </section>
 
@@ -203,15 +227,8 @@
   <i class="glow corner"></i>
   <p class="lab">The product</p>
   <h2 style="max-width:none">Fix real mistakes. <em>Get graded.</em></h2>
-  <div class="duo">
-    <ol class="steps">
-      <li><i>0</i><div><b>Start from zero</b></div></li>
-      <li><i>1</i><div><b>Match</b></div></li>
-      <li><i>2</i><div><b>Fix</b></div></li>
-      <li><i>3</i><div><b>Check</b></div></li>
-    </ol>
-    <div class="crop"><img src="img/work.png" alt="The working screen of case 1: bank, books and difference, the coach's next step, books and bank line by line"></div>
-  </div>
+  <div class="chips"><span><i>0</i>Start from zero</span><span><i>1</i>Match</span><span><i>2</i>Fix</span><span><i>3</i>Check</span></div>
+  <div class="pair"><img class="shot" src="img/landing.png" alt="The landing page: Books that balance can still be wrong"><img class="shot" src="img/work.png" alt="The working screen of case 1: bank, books and difference, the coach's next step, books and bank line by line"></div>
   <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>4 / 8</span></div>
 </section>
 
