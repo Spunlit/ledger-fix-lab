@@ -234,7 +234,7 @@ async function main() {
   await js(`const b = $('[data-check-text=bank]'); b.value = b.value.replace('SQUARE INC DEPOSIT,860.00', 'SQUARE INC DEPOSIT,861.00'); b.dispatchEvent(new Event('input', { bubbles: true }))`);
   await click('[data-check=run]');
   ok((await js(`return document.querySelectorAll('.ck-card').length`)) === 3 && (await text('[data-testid=check-lock]')).includes('more finding') && (await text('[data-testid=check-diff]')) === '+$235.89', 'checker: with your own files three findings are free and the rest sit behind the plan');
-  ok((await js(`return JSON.parse(localStorage.getItem('ledger-fix-lab:v24:check-runs')).map(r => r.month + ':' + r.findings).join()`)) === '2026-04:6' && !(await evaluate(`localStorage.getItem('ledger-fix-lab:v24:check-runs')`)).includes('SQUARE') && (await js(`return [...document.querySelectorAll('.ck-practice a')].map(a => a.getAttribute('href')).join()`)) === '#/drill/duplicate,#/drill/transposed', 'checker: only the month and the count are remembered, and the findings link to practice');
+  ok((await js(`return JSON.parse(localStorage.getItem('ledger-fix-lab:v24:check-runs')).map(r => r.month + ':' + r.findings).join()`)) === '2026-04:6' && !(await evaluate(`localStorage.getItem('ledger-fix-lab:v24:check-runs')`)).includes('SQUARE') && /^#\/drill\/duplicate,#\/drill\/transposed,#\/practice\/[a-z0-9]+\/duplicates,transposition$/.test(await js(`return [...document.querySelectorAll('.ck-practice a')].map(a => a.getAttribute('href')).join()`)), 'checker: only the month and the count are remembered, and the findings link to practice');
   await click('[data-testid=check-lock]');
   await sleep(200);
   await click('[data-pw=checkout]');

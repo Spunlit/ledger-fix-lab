@@ -2,7 +2,8 @@ import { parseCsv, reconcileAuto, statementMonth, type CsvLine, type Finding, ty
 import { guideTopic } from '../core/guide';
 import type { GuideId } from '../core/guide';
 import { formatCents, formatSignedCents } from '../core/money';
-import { esc, loadTheme, themeButton, type Plan } from './util';
+import { practiceHref } from './routes';
+import { esc, loadTheme, newSeed, themeButton, type Plan } from './util';
 
 /**
  * Check your own books (app.html#/check). Two CSV files, read and paired in this browser by core/checker;
@@ -135,7 +136,7 @@ function results(s: CheckState, plan: Plan | null): string {
     ${open.length > SHOWN_FINDINGS ? `<p class="acct-fine">Showing the first ${SHOWN_FINDINGS} of ${open.length} findings. "Copy the list" has all of them. This many usually means the two files cover different months or accounts.</p>` : ''}
     ${
       open.length
-        ? `<div class="ck-practice"><span>Practice what showed up</span>${[...new Set(open.map((f) => KIND[f.kind].topic))].map((t) => `<a class="btn small" href="#/drill/${t}">${esc(guideTopic(t).title)}</a>`).join('')}</div>`
+        ? `<div class="ck-practice"><span>Practice what showed up</span>${[...new Set(open.map((f) => KIND[f.kind].topic))].map((t) => `<a class="btn small" href="#/drill/${t}">${esc(guideTopic(t).title)}</a>`).join('')}<a class="btn small" href="${practiceHref(newSeed(), [...new Set(open.map((f) => guideTopic(KIND[f.kind].topic).skill))])}" data-testid="check-practice-file">A practice file with these mistakes</a></div>`
         : ''
     }
     ${open.length ? '<div class="ck-tools"><button type="button" class="btn" data-check="copy" data-testid="check-copy">Copy the list</button></div>' : ''}
