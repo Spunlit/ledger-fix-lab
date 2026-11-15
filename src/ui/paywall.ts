@@ -49,13 +49,11 @@ export function renderPaywall(st: PaywallState, plan: Plan | null): string {
         <button type="button" class="${yearly ? 'on' : ''}" data-pw="yearly" aria-pressed="${yearly}">Yearly <span>save 33%</span></button>
       </div>
       <p class="pw-price" data-testid="pw-price">${price}</p>
-      <p class="pw-trial">7-day free trial. Cancel anytime.</p>
+      <p class="pw-trial">Preview of the plan: the checkout is a demo and nothing is charged.</p>
       <ul class="pw-list">
         <li>${check} Unlimited practice files aimed at your weak spots</li>
         <li>${check} Check your own books: every finding, every month</li>
         <li>${check} Your full skill history across every file</li>
-        <li>${check} Harder files: more rows, more traps, timed mode <small>(coming soon)</small></li>
-        <li>${check} Month-end tracks: credit cards, payroll, sales tax <small>(coming soon)</small></li>
       </ul>
       ${
         st.step === 'checkout'

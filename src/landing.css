@@ -387,3 +387,17 @@ h2 { font: 400 clamp(36px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing: -0.02
 
 .steps .src { justify-self: start; font: 500 12px/1.4 var(--mono); color: var(--link); text-decoration: underline; text-underline-offset: 3px; margin-top: 2px; }
 .steps .src:hover { color: var(--ink); }
+
+/* the hero card as a one-tap question */
+.glass-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.glass-pick[hidden] { display: none; }
+.glass-pick button { all: unset; box-sizing: border-box; cursor: pointer; text-align: center; padding: 12px 10px; border-radius: 10px; font: 600 15px/1.2 var(--sans); color: #02070A; background: #fff; transition: transform .16s var(--ease), background-color .16s; }
+.glass-pick button:hover { background: #E8F3F8; }
+.glass-pick button:active { transform: scale(.97); }
+.glass-pick button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+:root[data-theme="light"] .glass-pick button { color: #fff; background: #0B1214; }
+:root[data-theme="light"] .glass-pick button:hover { background: #1c2a30; }
+:root[data-theme="light"] .glass-pick button:focus-visible { outline-color: #0B1214; }
+.glass-say { margin-top: 10px; font-size: 14.5px; line-height: 1.5; color: rgb(246 250 252 / .86); }
+.glass-say a { color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+:root[data-theme="light"] .glass-say { color: #33434B; }

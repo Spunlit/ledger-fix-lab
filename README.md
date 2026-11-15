@@ -68,7 +68,7 @@ npm install
 npm run dev                 # local dev server
 npm test                    # 146 unit tests, incl. exhaustive state-space checks and 900 generated files
 npm run build && npx vite preview --port 4173          # production build, served locally
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/      # 96 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/      # 97 browser checks, headless Chrome/Edge
 node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # the same checks against the live site
 node pitch/shots.mjs && node pitch/build-pdf.mjs                # deck screenshots from the real product, then the PDF
 ```

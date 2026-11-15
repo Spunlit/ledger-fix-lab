@@ -208,7 +208,7 @@ describe('check your own books: the list as text', () => {
   it('lists every finding of the sample files with its lines and what to do', () => {
     const t = findingsText({ bank: SAMPLE_BANK, books: SAMPLE_BOOKS, sample: true, ran: true }, null);
     expect(t).toContain('difference +$234.89. 9 lines paired.');
-    expect(t).toContain('1. In the books twice, at the bank once');
+    expect(t).toContain('1. Looks entered twice: the bank has it once');
     expect(t).toContain('2. The amounts differ (two digits look swapped)');
     expect(t).toContain('Bank row 12: MONTHLY MAINTENANCE FEE, Apr 30, \u2212$12.00');
     expect(t.split('\n').filter((l) => /^\d\./.test(l))).toHaveLength(5);

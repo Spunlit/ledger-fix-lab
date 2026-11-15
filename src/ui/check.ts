@@ -56,8 +56,8 @@ const SHOWN_FINDINGS = 150;
 const day = (iso: string | null) => (iso ? new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'no date');
 
 const KIND: Record<FindingKind, { title: string; fix: string; topic: GuideId }> = {
-  duplicate: { title: 'In the books twice, at the bank once', fix: 'Delete one copy. Keep the one that has its bank line.', topic: 'duplicate' },
-  amount: { title: 'The amounts differ', fix: 'The bank figure is what really moved. Correct the books to match it.', topic: 'transposed' },
+  duplicate: { title: 'Looks entered twice: the bank has it once', fix: 'Check that both lines are the same payment, then delete one copy.', topic: 'duplicate' },
+  amount: { title: 'The amounts differ', fix: 'The bank figure is what really moved. If this is the same payment, correct the books to match it.', topic: 'transposed' },
   missing: { title: 'At the bank, not in the books', fix: 'Record it in the books. Bank fees and small charges hide here.', topic: 'missing' },
   notAtBank: { title: 'In the books, not at the bank yet', fix: 'If it is real (a check not cashed yet), keep it. If not, it should not be in the books.', topic: 'outstanding' },
   category: { title: 'Filed as income, reads like a transfer', fix: 'Money you moved in yourself is not sales. Filed as income, it raises profit and tax.', topic: 'owner' },
@@ -132,6 +132,7 @@ function results(s: CheckState, plan: Plan | null): string {
     </div>
     <p class="ck-verdict" data-testid="check-verdict">${esc(verdict)} <span>${r.matched} ${r.matched === 1 ? 'line' : 'lines'} paired.</span></p>
     ${flipped ? '<p class="acct-note" data-testid="check-flipped"><b>Signs turned over.</b> Your books list money out as positive numbers, so they were read the other way round to pair with the bank.</p>' : ''}
+    <p class="acct-fine" data-testid="check-caveat">These are suggestions from amounts, dates and descriptions. The tool does not know what really happened: check each line against your records before you change the books.</p>
     <ol class="ck-list">${open.slice(0, SHOWN_FINDINGS).map(card).join('')}</ol>
     ${open.length > SHOWN_FINDINGS ? `<p class="acct-fine">Showing the first ${SHOWN_FINDINGS} of ${open.length} findings. "Copy the list" has all of them. This many usually means the two files cover different months or accounts.</p>` : ''}
     ${
@@ -142,7 +143,7 @@ function results(s: CheckState, plan: Plan | null): string {
     ${open.length ? '<div class="ck-tools"><button type="button" class="btn" data-check="copy" data-testid="check-copy">Copy the list</button></div>' : ''}
     ${locked > 0 ? `<a class="ck-lock" href="#/upgrade" data-testid="check-lock"><b>${locked} more ${locked === 1 ? 'finding' : 'findings'}</b><span>The first ${FREE_FINDINGS} are free. All of them come with the Practice plan.</span><span class="btn primary">See the plan</span></a>` : ''}
     ${skipped ? `<p class="acct-fine">${skipped} ${skipped === 1 ? 'row was' : 'rows were'} left out: ${esc([...bank.skipped, ...books.skipped].slice(0, 3).map((k) => `row ${k.row} (${k.why})`).join(', '))}${skipped > 3 ? ', and more' : ''}.</p>` : ''}
-    <p class="acct-fine">This points at lines to look at. It does not know what really happened, so the decision on each line is yours.</p>
+    
   </section>`;
 }
 
@@ -168,7 +169,7 @@ export function renderCheck(s: CheckState, plan: Plan | null): string {
       <button type="button" class="btn big" data-check="sample" data-testid="check-sample">Try the sample files</button>
       ${s.bank || s.books ? '<button type="button" class="btn big" data-check="clear">Clear</button>' : ''}
     </div>
-    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded. One account at a time, US dates, amounts in dollars. ${s.sample ? 'The sample files are a made-up business.' : 'Only the month and the number of findings are remembered, to show your last check on your desk.'}</p>
+    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded. One account at a time, US dates, amounts in dollars. With your own files the first three findings are free. ${s.sample ? 'The sample files are a made-up business.' : 'Only the month and the number of findings are remembered, to show your last check on your desk.'}</p>
     ${s.ran ? results(s, plan) : ''}
   </main>`;
 }

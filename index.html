@@ -60,11 +60,13 @@
         <div><dt>7</dt><dd>kinds of mistake</dd></div>
         <div><dt>4</dt><dd>checks on every file</dd></div>
       </dl>
-      <div class="glass" data-float="2" role="img" aria-label="An example: the bank and the books agree to the cent, and profit is still $5,000 too high">
-        <p class="glass-top">Rivera Mobile Detailing, March</p>
+      <div class="glass" data-float="2" data-play>
+        <p class="glass-top">Try it: a practice example</p>
         <p class="glass-row"><i class="ok">✓</i><span>Bank and books</span><b>$0.00 apart</b></p>
-        <p class="glass-row"><i class="warn">!</i><span>Profit</span><b>$5,000 too high</b></p>
-        <p class="glass-foot">One line is booked wrong. Can you find it?</p>
+        <p class="glass-row" data-play-profit><i class="warn">?</i><span>Profit</span><b>$10,410.76</b></p>
+        <p class="glass-foot" data-play-q>The owner moved $5,000 of savings into the account. How do you book it?</p>
+        <div class="glass-pick" data-play-pick><button type="button" data-pick="sales">Sales income</button><button type="button" data-pick="owner">Owner's money</button></div>
+        <p class="glass-say" data-play-say role="status" hidden></p>
       </div>
       <dl class="stat stat--r" data-float="1">
         <div><dt>900</dt><dd>generated files tested</dd></div>

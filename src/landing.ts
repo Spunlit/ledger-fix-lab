@@ -36,6 +36,24 @@ try {
   }
 } catch { /* storage blocked: the link stays "Sign in" */ }
 
+// ---------- the hero card: one choice, its consequence, then the full case
+const play = document.querySelector<HTMLElement>('[data-play]');
+play?.addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-pick]');
+  if (!b) return;
+  const right = b.dataset.pick === 'owner';
+  const profit = play.querySelector<HTMLElement>('[data-play-profit]')!;
+  profit.querySelector('i')!.textContent = right ? '✓' : '!';
+  profit.querySelector('i')!.className = right ? 'ok' : 'warn';
+  profit.querySelector('b')!.textContent = right ? '$5,410.76' : '$5,000 too high';
+  play.querySelector<HTMLElement>('[data-play-q]')!.textContent = right ? 'Right. It is not sales.' : 'The bank still agrees. Profit is now wrong.';
+  const say = play.querySelector<HTMLElement>('[data-play-say]')!;
+  say.hidden = false;
+  say.innerHTML = `${right ? 'These books had it as sales: balanced to the cent, with $5,000 of profit nobody earned.' : 'Balanced to the cent, and the owner pays tax on $5,000 nobody earned.'} <a href="app.html#/case/rivera-mar">Fix the real file</a>`;
+  play.querySelector<HTMLElement>('[data-play-pick]')!.hidden = true;
+  play.dataset.played = right ? 'right' : 'wrong';
+});
+
 // ---------- plain words
 initTerms('app.html#/guide/words');
 document.querySelectorAll<HTMLElement>('[data-gloss]').forEach(glossElement);

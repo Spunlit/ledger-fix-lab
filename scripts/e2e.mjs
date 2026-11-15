@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 96; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 97; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -111,6 +111,8 @@ async function main() {
   ok((await evaluate('document.documentElement.dataset.theme')) === 'light' && (await evaluate(`localStorage.getItem('ledger-fix-lab:theme')`)) === 'light', 'landing day/night switch works and is remembered');
   await click('[data-theme-toggle]');
   ok((await js(`return [...document.querySelectorAll('a[href^="app.html"]')].length`)) >= 10, 'landing links into the app');
+  await click('[data-pick=sales]');
+  ok((await text('[data-play-profit] b')) === '$5,000 too high' && (await text('[data-play-say]')).includes('nobody earned') && (await js(`return $('[data-play-say] a').getAttribute('href')`)) === 'app.html#/case/rivera-mar', 'landing: one tap on the hero card shows the consequence and leads to the real file');
   await shot('0-home', false);
 
   // ---------- case 1 (guided: instant feedback, delete + category only)
