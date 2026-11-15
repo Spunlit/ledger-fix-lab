@@ -15,7 +15,7 @@ Two parts, one skill:
 - **Learn it first.** A free trainer for beginners: you fix the books of a made-up small business against its bank
   statement, and a deterministic engine grades the **books you end with**, including "balanced at $0.00 but wrong".
 
-Track: Skills. For working adults in the US (25 to 45) who keep the books for their own side business, or who are
+Track: Money (with a learning part: the free trainer). For working adults in the US (25 to 45) who keep the books for their own side business, or who are
 starting to keep books for others. They pay out of pocket (B2C). Evidence and open questions:
 [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md). Deck: [pitch/LedgerFixLab_pitch.pdf](pitch/LedgerFixLab_pitch.pdf).
 
@@ -29,7 +29,7 @@ starting to keep books for others. They pay out of pocket (B2C). Evidence and op
 3. **Case 2, "Balanced, but wrong"** (`app.html#/case/rivera-mar`): bring the difference to $0.00 and press *Check
    the books*. Three checks pass, the fourth says profit is overstated by $5,000.
 4. **Your desk** (`app.html#/`): the path as a ladder (done, open, with the plan), today's file, the skill record.
-   A locked step opens the Practice plan ($12 a month or $96 a year). Checkout is a labelled demo: no card, no charge.
+   A locked step opens the Practice plan ($15 a month or $120 a year). Checkout is a labelled demo: no card, no charge.
 5. **Check your own books** (`app.html#/check`): press *Try the sample files*. The $234.89 difference is explained to
    the cent by four lines, and a transfer filed as income is flagged although it balances.
 6. **Warm-up drill** (`app.html#/drill`, best on a phone) and the **field guide** (`app.html#/guide`).

@@ -11,7 +11,7 @@ export interface PaywallState {
   billing: 'monthly' | 'yearly';
 }
 
-export const PRICE = { monthly: 12, yearly: 96 } as const;
+export const PRICE = { monthly: 15, yearly: 120 } as const;
 
 const check = `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 

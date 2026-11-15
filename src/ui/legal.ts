@@ -36,7 +36,7 @@ const SECTIONS: { h: string; p: string[] }[] = [
     h: '4. Free and Practice plans',
     p: [
       'The Free plan includes both guided cases, the file of the day, warm-up drills, the field guide and one practice file.',
-      'The Practice plan is shown at $12 a month or $96 a year with a 7-day trial. In this build the checkout is a demonstration: you are not asked for a card and nothing is charged. "Starting" the plan only unlocks practice files in this browser.',
+      'The Practice plan is shown at $15 a month or $120 a year with a 7-day trial. In this build the checkout is a demonstration: you are not asked for a card and nothing is charged. "Starting" the plan only unlocks practice files in this browser.',
       'If paid plans are switched on later, the price, renewal and cancellation terms will be shown before you pay, and these terms will be updated first.',
     ],
   },

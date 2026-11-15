@@ -265,7 +265,7 @@ async function main() {
   await go('#/practice/zzz999/timing');
   ok(await js(`return !!$('.pw-card')`) && (await text('.pill')).includes('free practice file'), 'a second practice file opens the paywall');
   await click('[data-pw=yearly]');
-  ok((await text('[data-testid=pw-price]')).includes('$96'), 'yearly price shown ($96/year)');
+  ok((await text('[data-testid=pw-price]')).includes('$120'), 'yearly price shown ($120/year)');
   await click('[data-pw=checkout]');
   ok((await text('[data-testid=pw-checkout]')).includes('nothing is charged'), 'checkout is clearly labelled as a demo');
   await click('[data-pw=confirm]');
