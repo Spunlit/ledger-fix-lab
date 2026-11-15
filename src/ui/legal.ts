@@ -28,7 +28,7 @@ const SECTIONS: { h: string; p: string[] }[] = [
       'You do not need to sign up. Your progress (finished files, skill record, streak, theme) is saved only in this browser, in its local storage. We do not receive it.',
       'Signing in is optional. The email you enter names your profile in this browser. It is not sent to us, it is not checked, and no account is created on a server in this build.',
       'Clearing your browser data, or using another device, starts you from zero. We cannot restore it.',
-      '"Check your own books" reads the files you choose inside this browser. They are not uploaded and not stored; closing the tab forgets them. Its findings are suggestions for you to review, not advice.',
+      '"Check your own books" reads the files you choose inside this browser. They are not uploaded and not stored; closing the tab forgets them. Only the month of the statement and the number of findings are kept in this browser, to show your last check on your desk. Its findings are suggestions for you to review, not advice.',
       'The pages load their fonts from Google Fonts, so Google receives a normal web request from your browser. The site is hosted on GitHub Pages, which keeps its own server logs.',
     ],
   },

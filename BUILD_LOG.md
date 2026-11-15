@@ -219,3 +219,8 @@
 - New: Check your own books (app.html#/check). Two CSV files (bank statement, books) are read in the browser, nothing uploaded. core/checker.ts parses money as integer cents and pairs the lines; findings: in the books twice, amounts differ (with a swapped-digits flag), at the bank but not in the books, in the books but not at the bank yet, income that reads like a transfer. The findings always add up to the difference (tested on 200 shuffled files). Sample files of a made-up business included. With a person's own files the first three findings are free, the rest come with the plan.
 - Landing: badge, plan lists and a FAQ item for it. README rewritten to the current product. New share image (public/og.png). Removed unused src/ui/hero.ts.
 - Checked: 139 unit tests, 90 e2e checks locally.
+
+## v24.1 to v24.4 (Nov 15, night)
+- Checker: the plan page returns to the same files; "Copy the list" gives the findings as plain text; reads real export shapes (a summary above the table, no header row, a DEBIT/CREDIT first column, separate Payment and Deposit columns); detects books kept with the signs the other way round and says so; findings link to the matching topic drills; remembers only the statement month and the count, shown on the desk as the last check.
+- Review wording fits case 1 (no Cleared column, no record tool). Landing: a short section for "your own books".
+- Checked: 144 unit tests, 94 e2e checks, locally and on the live site.

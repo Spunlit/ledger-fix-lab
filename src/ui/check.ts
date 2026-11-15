@@ -1,4 +1,5 @@
-import { parseCsv, reconcileAuto, type CsvLine, type Finding, type FindingKind } from '../core/checker';
+import { parseCsv, reconcileAuto, statementMonth, type CsvLine, type Finding, type FindingKind } from '../core/checker';
+import { guideTopic } from '../core/guide';
 import type { GuideId } from '../core/guide';
 import { formatCents, formatSignedCents } from '../core/money';
 import { esc, loadTheme, themeButton, type Plan } from './util';
@@ -15,6 +16,36 @@ export interface CheckState {
   sample: boolean;
   ran: boolean;
 }
+
+/** What is remembered about a check of a person's own files: the month and the counts, never the lines. */
+export interface CheckRun {
+  at: string;
+  /** "2026-04", or null when the statement had no readable dates. */
+  month: string | null;
+  findings: number;
+  differenceCents: number;
+}
+const RUNS_KEY = 'ledger-fix-lab:v24:check-runs';
+export function loadCheckRuns(): CheckRun[] {
+  try {
+    const a = JSON.parse(localStorage.getItem(RUNS_KEY) ?? '[]');
+    return Array.isArray(a) ? a.filter((r) => r && typeof r.at === 'string' && Number.isSafeInteger(r.findings) && Number.isSafeInteger(r.differenceCents)).slice(-12) : [];
+  } catch {
+    return [];
+  }
+}
+/** Called when a person checks their own files (not the sample). The same statement checked again replaces its entry. */
+export function rememberCheck(s: CheckState, now = new Date()): void {
+  if (s.sample) return;
+  const bank = parseCsv(s.bank, 'bank statement');
+  const books = parseCsv(s.books, 'books');
+  if (bank.error || books.error) return;
+  const { result } = reconcileAuto(bank.lines, books.lines);
+  const run: CheckRun = { at: now.toISOString(), month: statementMonth(bank.lines), findings: result.findings.length, differenceCents: result.difference };
+  const runs = loadCheckRuns().filter((r) => r.month !== run.month || run.month === null);
+  try { localStorage.setItem(RUNS_KEY, JSON.stringify([...runs, run].slice(-12))); } catch { /* storage blocked: the check still works */ }
+}
+export const monthName = (m: string | null) => (m ? new Date(`${m}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }) : 'undated statement');
 
 export const newCheck = (): CheckState => ({ bank: '', books: '', sample: false, ran: false });
 export const FREE_FINDINGS = 3;
@@ -99,6 +130,11 @@ function results(s: CheckState, plan: Plan | null): string {
     <p class="ck-verdict" data-testid="check-verdict">${esc(verdict)} <span>${r.matched} ${r.matched === 1 ? 'line' : 'lines'} paired.</span></p>
     ${flipped ? '<p class="acct-note" data-testid="check-flipped"><b>Signs turned over.</b> Your books list money out as positive numbers, so they were read the other way round to pair with the bank.</p>' : ''}
     <ol class="ck-list">${open.map(card).join('')}</ol>
+    ${
+      open.length
+        ? `<div class="ck-practice"><span>Practice what showed up</span>${[...new Set(open.map((f) => KIND[f.kind].topic))].map((t) => `<a class="btn small" href="#/drill/${t}">${esc(guideTopic(t).title)}</a>`).join('')}</div>`
+        : ''
+    }
     ${open.length ? '<div class="ck-tools"><button type="button" class="btn" data-check="copy" data-testid="check-copy">Copy the list</button></div>' : ''}
     ${locked > 0 ? `<a class="ck-lock" href="#/upgrade" data-testid="check-lock"><b>${locked} more ${locked === 1 ? 'finding' : 'findings'}</b><span>The first ${FREE_FINDINGS} are free. All of them come with the Practice plan.</span><span class="btn primary">See the plan</span></a>` : ''}
     ${skipped ? `<p class="acct-fine">${skipped} ${skipped === 1 ? 'row was' : 'rows were'} left out: ${esc([...bank.skipped, ...books.skipped].slice(0, 3).map((k) => `row ${k.row} (${k.why})`).join(', '))}${skipped > 3 ? ', and more' : ''}.</p>` : ''}
@@ -128,7 +164,7 @@ export function renderCheck(s: CheckState, plan: Plan | null): string {
       <button type="button" class="btn big" data-check="sample" data-testid="check-sample">Try the sample files</button>
       ${s.bank || s.books ? '<button type="button" class="btn big" data-check="clear">Clear</button>' : ''}
     </div>
-    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded. One account at a time, US dates, amounts in dollars. ${s.sample ? 'The sample files are a made-up business.' : ''}</p>
+    <p class="acct-note"><b>Private.</b> Your files are read in this browser and are not uploaded. One account at a time, US dates, amounts in dollars. ${s.sample ? 'The sample files are a made-up business.' : 'Only the month and the number of findings are remembered, to show your last check on your desk.'}</p>
     ${s.ran ? results(s, plan) : ''}
   </main>`;
 }

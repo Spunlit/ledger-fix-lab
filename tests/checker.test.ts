@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { findingsText } from '../src/ui/check';
-import { looksSwapped, reconcileAuto, parseCsv, parseDate, parseMoney, reconcile, SAMPLE_BANK, SAMPLE_BOOKS, similarity, splitCsv, type CsvLine } from '../src/core/checker';
+import { looksSwapped, reconcileAuto, statementMonth, parseCsv, parseDate, parseMoney, reconcile, SAMPLE_BANK, SAMPLE_BOOKS, similarity, splitCsv, type CsvLine } from '../src/core/checker';
 
 const line = (row: number, date: string, text: string, cents: number, category: string | null = null): CsvLine => ({ row, date, text, cents, category });
 const effects = (r: ReturnType<typeof reconcile>) => r.findings.reduce((n, f) => n + f.effectCents, 0);
@@ -134,6 +134,12 @@ describe('check your own books: pairing', () => {
     expect(reconcileAuto(bank, books).flipped).toBe(false);
     // two short unrelated files are left as they are
     expect(reconcileAuto([line(2, '2026-04-02', 'A', -100)], [line(2, '2026-04-02', 'B', 100)]).flipped).toBe(false);
+  });
+
+  it('names the month a statement is for', () => {
+    expect(statementMonth(parseCsv(SAMPLE_BANK, 'bank statement').lines)).toBe('2026-04');
+    expect(statementMonth([line(2, '2026-03-31', 'a', 1), line(3, '2026-04-01', 'b', 1), line(4, '2026-04-02', 'c', 1)])).toBe('2026-04');
+    expect(statementMonth([{ row: 2, date: null, text: 'a', cents: 1, category: null }])).toBeNull();
   });
 
   it('knows a transposition from an ordinary difference', () => {

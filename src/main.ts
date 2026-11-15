@@ -16,7 +16,7 @@ import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { loadProfile, renderAccount, signIn, signOut, type AccountState } from './ui/account';
 import { SAMPLE_BANK, SAMPLE_BOOKS } from './core/checker';
-import { findingsText, newCheck, renderCheck, type CheckState } from './ui/check';
+import { findingsText, newCheck, rememberCheck, renderCheck, type CheckState } from './ui/check';
 import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
@@ -340,6 +340,7 @@ app.addEventListener('click', (ev) => {
     else {
       readCheckBoxes();
       check = { ...check, ran: true };
+      rememberCheck(check);
     }
     renderCheckPage();
     if (check.ran) app.querySelector('.ck-out')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });

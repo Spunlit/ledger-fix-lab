@@ -319,6 +319,15 @@ export function reconcileAuto(bank: CsvLine[], books: CsvLine[]): { result: Chec
   return turned.matched >= 3 && turned.matched > straight.matched * 2 ? { result: turned, flipped: true } : { result: straight, flipped: false };
 }
 
+/** The month most of the lines fall in, as "2026-04"; null when no date could be read. */
+export function statementMonth(lines: CsvLine[]): string | null {
+  const count = new Map<string, number>();
+  for (const l of lines) if (l.date) count.set(l.date.slice(0, 7), (count.get(l.date.slice(0, 7)) ?? 0) + 1);
+  let best: string | null = null;
+  for (const [m, n] of count) if (best === null || n > count.get(best)! || (n === count.get(best)! && m > best)) best = m;
+  return best;
+}
+
 // ---------- sample files: a made-up business, so the tool can be tried in one press
 
 export const SAMPLE_BANK = `Date,Description,Amount

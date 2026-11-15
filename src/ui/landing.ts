@@ -4,6 +4,7 @@ import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
 import { loadProfile, profileLink } from './account';
 import { basicsDone } from './basics';
+import { loadCheckRuns, monthName } from './check';
 import { dailyHref, practiceHref } from './routes';
 import { gloss } from './terms';
 import { dailyStreak, esc, FREE_PRACTICE_FILES, FREE_TOPIC_DRILLS, loadDrillRecord, loadOpenedPractice, loadPlan, loadTheme, masteryLevel, newSeed, themeButton, weekDays, type Completed } from './util';
@@ -35,6 +36,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
   const stats = skillStats(history).filter((st) => st.attempts > 0);
   const week = weekDays(done, day);
   const drillRec = loadDrillRecord();
+  const lastRun = loadCheckRuns().pop() ?? null;
   const weak = weakestSkills(history, 2);
   // One clear next action, the way a course home does it.
   const zero = !basicsDone() && !d1;
@@ -64,7 +66,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
     <a class="warm quiet" href="#/basics"><span class="warm-t"><b>Start from zero</b><span>New to bookkeeping? Five ideas in two minutes: statement, books, matching, difference, categories.</span></span><span class="btn">${basicsDone() ? 'Again' : 'Start'}</span></a>
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
     <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
-    <a class="warm quiet" href="#/check" data-testid="check-entry"><span class="warm-t"><b>Check your own books</b><span>Put your bank statement next to your books. Nothing is uploaded. Sample files included.</span></span><span class="btn">Open</span></a>
+    <a class="warm quiet" href="#/check" data-testid="check-entry"><span class="warm-t"><b>Check your own books</b><span>${lastRun ? `Last check: ${esc(monthName(lastRun.month))}, ${lastRun.findings} ${lastRun.findings === 1 ? 'line' : 'lines'} to look at. Do the next month when its statement arrives.` : 'Put your bank statement next to your books. Nothing is uploaded. Sample files included.'}</span></span><span class="btn">Open</span></a>
     <a class="warm quiet" href="#/record"><span class="warm-t"><b>Practice record</b><span>Proof of what you have done, on one page you can print. It stays current while you keep practising.</span></span><span class="btn">Open</span></a>
     <h2 class="ladder-h">Your path</h2>
     <ol class="ladder" data-testid="ladder">

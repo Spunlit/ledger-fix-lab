@@ -531,3 +531,5 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
 }
 
 .ck-tools { display: flex; justify-content: flex-end; }
+.ck-practice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ck-practice span { font: 500 12px/1.4 var(--font-mono); color: var(--ink-3); margin-right: 4px; }

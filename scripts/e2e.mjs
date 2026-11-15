@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 93; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 94; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -232,6 +232,7 @@ async function main() {
   await js(`const b = $('[data-check-text=bank]'); b.value = b.value.replace('SQUARE INC DEPOSIT,860.00', 'SQUARE INC DEPOSIT,861.00'); b.dispatchEvent(new Event('input', { bubbles: true }))`);
   await click('[data-check=run]');
   ok((await js(`return document.querySelectorAll('.ck-card').length`)) === 3 && (await text('[data-testid=check-lock]')).includes('more finding') && (await text('[data-testid=check-diff]')) === '+$235.89', 'checker: with your own files three findings are free and the rest sit behind the plan');
+  ok((await js(`return JSON.parse(localStorage.getItem('ledger-fix-lab:v24:check-runs')).map(r => r.month + ':' + r.findings).join()`)) === '2026-04:6' && !(await evaluate(`localStorage.getItem('ledger-fix-lab:v24:check-runs')`)).includes('SQUARE') && (await js(`return [...document.querySelectorAll('.ck-practice a')].map(a => a.getAttribute('href')).join()`)) === '#/drill/duplicate,#/drill/transposed', 'checker: only the month and the count are remembered, and the findings link to practice');
   await click('[data-testid=check-lock]');
   await sleep(200);
   await click('[data-pw=checkout]');
@@ -309,7 +310,7 @@ async function main() {
 
   // ---------- sign in: a device profile; any well-formed email is accepted at once, and the page says nothing is sent
   await go('#/');
-  ok((await js(`return !!$('[data-testid=signin-link]')`)) && (await js(`return !!$('[data-testid=signin-nudge]')`)) && (await js(`return !!$('[data-testid=check-entry]')`)), 'the desk offers Sign in once there is progress to keep');
+  ok((await js(`return !!$('[data-testid=signin-link]')`)) && (await js(`return !!$('[data-testid=signin-nudge]')`)) && (await text('[data-testid=check-entry]')).includes('Last check: April 2026'), 'the desk offers Sign in once there is progress to keep');
   await go('#/signin');
   const typeEmail = (v) => js(`const f = $('[data-account-form]'); f.querySelector('input').value = ${JSON.stringify(v)}; f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))`);
   await typeEmail('not an email');
