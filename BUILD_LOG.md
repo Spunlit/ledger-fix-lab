@@ -188,3 +188,8 @@
 ## v19 (Nov 15, ~00:15 UTC)
 - Help in guided cases climbs with each press on the same problem: Hint (a clue), More help (scrolls to the row), Show me how (a three-step demonstration that lights the line, the tool, then makes the move through the normal dispatch). The demonstration is given once per file; skipping it changes nothing. coachAction() in src/core/coach.ts, tested to solve both cases.
 - Checked: 117 unit tests, 75 e2e checks.
+
+## v20 (Nov 15, ~00:45 UTC)
+- "Show me how" is available on every problem (after Hint and More help), not once per file; the progress bar says how many fixes were shown.
+- The "why learn this" block now cites primary sources: Intuit help on duplicate bank-feed transactions, IRS Topic 254 (the taxpayer answers for the return), AIPB Certified Bookkeeper designation (bank reconciliation and error correction are tested). The page states it is independent, not affiliated or endorsed, and issues no certificate.
+- Checked: 117 unit tests, 76 e2e checks.

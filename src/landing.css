@@ -384,3 +384,6 @@ h2 { font: 400 clamp(36px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing: -0.02
 .steps.why li { padding-top: 26px; }
 @media (max-width: 1023px) { .steps.why { grid-template-columns: minmax(0, 1fr); } .steps.why li, .steps.why li:nth-child(2n) { border-right: 0; padding: 22px 0; } }
 #why h2 { max-width: 22ch; }
+
+.steps .src { justify-self: start; font: 500 12px/1.4 var(--mono); color: var(--link); text-decoration: underline; text-underline-offset: 3px; margin-top: 2px; }
+.steps .src:hover { color: var(--ink); }

@@ -199,7 +199,7 @@ function lookAtTarget(): void {
 /**
  * "Show me how": a three-step demonstration of the current fix. It lights the line, then the tool, and
  * on the last step makes the move itself, through the same dispatch as a learner's click, so feedback
- * and progress behave as usual. Given once per file; skipping it changes nothing.
+ * and progress behave as usual. Available on every problem after two asks for help; skipping it changes nothing. The file remembers how many fixes were demonstrated.
  */
 function showMeHow(): void {
   const ui = current();
@@ -231,6 +231,7 @@ function showMeHow(): void {
       const now = current();
       if (!now) return;
       now.demoUsed = true;
+      now.demos += 1;
       now.helpLevel = 0;
       now.hintOpen = false;
       if (action === 'undo') {
@@ -348,7 +349,7 @@ app.addEventListener('click', (ev) => {
       ui.helpLevel += 1;
       ui.hintOpen = true;
       render();
-      if (ui.helpLevel === 2 || (ui.helpLevel >= 3 && ui.demoUsed)) return lookAtTarget();
+      if (ui.helpLevel === 2) return lookAtTarget();
       if (ui.helpLevel >= 3) return showMeHow();
       return;
     }

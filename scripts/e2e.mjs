@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 75; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 76; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -167,6 +167,10 @@ async function main() {
   await click('[data-tour=next]');
   await sleep(500);
   ok((await diff()) === `${M}$84.37` && (await toast()).includes('1 of 4') && (await text('[data-testid=help]')) === 'Hint', 'the demonstration makes the move (bank fee recorded), with the usual feedback; help resets');
+  // the demonstration is there again for the next problem
+  await click('[data-testid=help]');
+  await click('[data-testid=help]');
+  ok((await text('[data-testid=help]')) === 'Show me how' && (await text('.prog-text')).includes('1 shown to you'), 'the next problem offers the demonstration again, and the bar says one fix was shown');
   await click('[data-act=undo]');
   ok((await diff()) === `${M}$99.37`, `case 2 starts at −$99.37 (got ${await diff()})`);
   await click('[data-act=toggle-hint]');

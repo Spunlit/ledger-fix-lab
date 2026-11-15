@@ -25,8 +25,9 @@ export interface CaseUI {
   hintOpen: boolean;
   /** How many times help was asked on the current problem: 1 a clue, 2 the row, 3 a demonstration. */
   helpLevel: number;
-  /** The demonstration is given once per file. */
+  /** A demonstration was used in this file, and how many fixes it made. */
   demoUsed: boolean;
+  demos: number;
   guideOpen: boolean;
   editing: string | null;
   editError: string | null;
@@ -43,7 +44,7 @@ export interface CaseUI {
 
 export function newCaseUI(session: Session, day?: string): CaseUI {
   return {
-    session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, helpLevel: 0, demoUsed: false, guideOpen: false,
+    session, checked: false, checksRun: 0, noteOpen: false, mathOpen: false, hintOpen: false, helpLevel: 0, demoUsed: false, demos: 0, guideOpen: false,
     editing: null, editError: null, recording: null, tab: 'books', day, firstCheck: null, feedback: null,
   };
 }
@@ -250,7 +251,7 @@ export function renderWorkbench(ui: CaseUI): string {
             ? `<div class="next step-${step.kind}" data-testid="coach"><span class="next-n">${step.kind === 'done' ? 'Done' : `Problem ${Math.min(prog.fixed + 1, prog.total)} of ${prog.total}`}</span><p class="next-t">${gloss(step.title)}</p><p class="next-a">${gloss(step.action)}${step.entryIds.length + step.txnIds.length ? ' <button type="button" class="link" data-act="show-target">Show me the row</button>' : ''}</p>${step.topic ? `<details class="why"><summary>Why?</summary><p>${gloss(guideTopic(step.topic).why)}</p><p><b>How to tell:</b> ${gloss(guideTopic(step.topic).tell)} <a href="#/guide/${step.topic}">Open the guide</a></p></details>` : ''}</div>`
             : `<p class="next">${esc(coachText(report, pairs))}</p>`
       }
-      ${guided && !solved && step && step.kind !== 'done' ? `<button type="button" class="btn small help-btn level-${Math.min(ui.helpLevel, 2)}" data-act="toggle-hint" data-testid="help" aria-expanded="${ui.hintOpen}">${ui.helpLevel === 0 ? 'Hint' : ui.helpLevel === 1 ? 'More help' : ui.demoUsed ? 'Show me the row' : 'Show me how'}</button>` : ''}
+      ${guided && !solved && step && step.kind !== 'done' ? `<button type="button" class="btn small help-btn level-${Math.min(ui.helpLevel, 2)}" data-act="toggle-hint" data-testid="help" aria-expanded="${ui.hintOpen}">${ui.helpLevel === 0 ? 'Hint' : ui.helpLevel === 1 ? 'More help' : 'Show me how'}</button>` : ''}
       ${showHint ? `<p class="hint">${gloss(cl[0].text)}</p>` : noClueHint ? `<p class="hint">${gloss("The difference is $0.00, so the amounts are fine. What is left is a category: read the client's note, then look at where each transfer is filed.")}</p>` : ''}
     </section>
 
@@ -445,7 +446,7 @@ function renderDock(ui: CaseUI, prog: Progress | null, solved: boolean, next: Ne
   const status = solved
     ? `<p class="dock-status done">${ICON.check}<span>Reconciled and right</span></p>`
     : prog
-      ? `<div class="prog" role="img" aria-label="${prog.fixed} of ${prog.total} problems fixed"><span class="dots">${Array.from({ length: prog.total }, (_, i) => `<i class="${i < prog.fixed ? 'on' : ''} ${earnedDot && i === prog.fixed - 1 ? 'pop' : ''}"></i>`).join('')}</span><span class="prog-text">${prog.fixed} of ${prog.total}<span class="wide"> fixed</span></span></div>`
+      ? `<div class="prog" role="img" aria-label="${prog.fixed} of ${prog.total} problems fixed"><span class="dots">${Array.from({ length: prog.total }, (_, i) => `<i class="${i < prog.fixed ? 'on' : ''} ${earnedDot && i === prog.fixed - 1 ? 'pop' : ''}"></i>`).join('')}</span><span class="prog-text">${prog.fixed} of ${prog.total}<span class="wide"> fixed${ui.demos ? `, ${ui.demos} shown to you` : ''}</span></span></div>`
       : '<p class="dock-status"><span>No hints<span class="wide"> until you check</span></span></p>';
   return `
   <footer class="dock ${solved ? 'is-solved' : ''}" aria-label="Case actions">
