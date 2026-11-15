@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 79; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 85; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -278,9 +278,26 @@ async function main() {
   await go('#/record');
   ok((await text('[data-testid=record-status]')).startsWith('In progress') && (await js(`return document.querySelectorAll('.rec-reqs li').length`)) === 5 && (await js(`return document.querySelectorAll('.rec-reqs li.done').length`)) >= 3 && (await text('[data-testid=record]')).includes('not a professional certification'), 'practice record: five requirements, real progress, and it says it is not a certification');
 
+  // ---------- sign in: a device profile; any well-formed email is accepted at once, and the page says nothing is sent
+  await go('#/');
+  ok((await js(`return !!$('[data-testid=signin-link]')`)) && (await js(`return !!$('[data-testid=signin-nudge]')`)), 'the desk offers Sign in once there is progress to keep');
+  await go('#/signin');
+  const typeEmail = (v) => js(`const f = $('[data-account-form]'); f.querySelector('input').value = ${JSON.stringify(v)}; f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))`);
+  await typeEmail('not an email');
+  ok((await text('[data-testid=acct-err]')).includes('does not look like an email') && (await evaluate(`localStorage.getItem('ledger-fix-lab:v23:profile')`)) === null, 'sign in refuses text that is not an email and stores nothing');
+  await typeEmail('Judge@Example.com');
+  ok((await text('[data-testid=acct-in]')) === 'You are signed in' && (await text('.acct-mail')) === 'judge@example.com' && (await text('[data-testid=acct-note]')).includes('not sent anywhere'), 'sign in accepts an email at once and says it stays in this browser');
+  await go('#/');
+  ok((await text('[data-testid=who]')) === 'J' && !(await js(`return !!$('[data-testid=signin-nudge]')`)), 'the desk shows the profile mark after sign in');
+  await go('');
+  ok((await text('[data-account-link]')) === 'Your desk', 'the landing nav leads a signed-in learner to the desk');
+  await go('#/signin');
+  await click('[data-account=out]');
+  ok((await text('h1')) === 'Sign in' && (await evaluate(`localStorage.getItem('ledger-fix-lab:v23:profile')`)) === null && (await evaluate(`localStorage.getItem('ledger-fix-lab:v18:basics-done')`)) === '1', 'sign out removes the email and keeps the progress');
+
   // ---------- terms (draft)
   await go('#/terms');
-  ok((await text('h1')) === 'Terms and Conditions' && (await text('[data-testid=terms-draft]')).includes('Draft') && (await js(`return document.querySelectorAll('.legal-sec').length`)) === 8, 'terms page: eight plain sections, clearly marked as a draft');
+  ok((await text('h1')) === 'Terms and Conditions' && (await text('[data-testid=terms-draft]')).includes('Draft') && (await js(`return document.querySelectorAll('.legal-sec').length`)) === 8 && (await text('main')).includes('Signing in is optional'), 'terms page: eight plain sections, clearly marked as a draft');
 
   // ---------- field guide (phone)
   await go('#/guide/owner');

@@ -14,6 +14,7 @@ import { newBasics, nextBasics, renderBasics, tapBasics, type BasicsState } from
 import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './ui/drill';
 import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
+import { loadProfile, renderAccount, signIn, signOut, type AccountState } from './ui/account';
 import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
@@ -92,6 +93,15 @@ function renderHome(): void {
   app.innerHTML = renderDesk(completed, history);
 }
 
+/** Sign in (#/signin): an email names the profile on this device; nothing leaves the browser. */
+let account: AccountState = { tried: null };
+function renderAccountPage(): void {
+  currentId = null;
+  document.body.dataset.page = 'guide';
+  document.title = 'Sign in | Ledger Fix Lab';
+  app.innerHTML = renderAccount(loadProfile(), account, completed);
+}
+
 function route(): void {
   let resolved = null;
   try {
@@ -113,6 +123,12 @@ function route(): void {
   if (/^#\/basics/.test(location.hash)) {
     if (basics?.done) basics = newBasics();
     renderBasicsPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/signin/.test(location.hash)) {
+    account = { tried: null };
+    renderAccountPage();
     window.scrollTo(0, 0);
     return;
   }
@@ -279,6 +295,11 @@ function dispatch(action: Action): void {
 
 app.addEventListener('click', (ev) => {
   if ((ev.target as HTMLElement).closest('[data-act-print]')) return window.print();
+  if ((ev.target as HTMLElement).closest('[data-account=out]')) {
+    signOut();
+    account = { tried: null };
+    return renderAccountPage();
+  }
   const bs = (ev.target as HTMLElement).closest<HTMLElement>('[data-basics-pick], [data-basics]');
   if (bs && basics) {
     basics = bs.dataset.basicsPick ? tapBasics(basics, bs.dataset.basicsPick) : nextBasics(basics);
@@ -430,6 +451,16 @@ app.addEventListener('change', (ev) => {
 });
 
 app.addEventListener('submit', (ev) => {
+  const acct = (ev.target as HTMLElement).closest<HTMLFormElement>('[data-account-form]');
+  if (acct) {
+    ev.preventDefault();
+    const typed = (acct.elements.namedItem('email') as HTMLInputElement).value;
+    account = { tried: signIn(typed) ? null : typed };
+    renderAccountPage();
+    if (account.tried !== null) app.querySelector<HTMLInputElement>('#acct-email')?.focus();
+    else window.scrollTo(0, 0);
+    return;
+  }
   const ui = current();
   if (!ui) return;
   ev.preventDefault();

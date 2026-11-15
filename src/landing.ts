@@ -24,6 +24,14 @@ document.addEventListener('click', (e) => {
   if ((e.target as Element).closest('[data-theme-toggle]')) setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 });
 
+// ---------- a returning learner goes straight to the desk
+try {
+  if (localStorage.getItem('ledger-fix-lab:v23:profile')) {
+    const a = document.querySelector<HTMLAnchorElement>('[data-account-link]');
+    if (a) { a.textContent = 'Your desk'; a.href = 'app.html#/'; }
+  }
+} catch { /* storage blocked: the link stays "Sign in" */ }
+
 // ---------- plain words
 initTerms('app.html#/guide/words');
 document.querySelectorAll<HTMLElement>('[data-gloss]').forEach(glossElement);

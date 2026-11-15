@@ -23,9 +23,10 @@ const SECTIONS: { h: string; p: string[] }[] = [
     ],
   },
   {
-    h: '3. No account, and where your progress lives',
+    h: '3. No account needed, and where your progress lives',
     p: [
-      'You do not sign up. Your progress (finished files, skill record, streak, theme) is saved only in this browser, in its local storage. We do not receive it.',
+      'You do not need to sign up. Your progress (finished files, skill record, streak, theme) is saved only in this browser, in its local storage. We do not receive it.',
+      'Signing in is optional. The email you enter names your profile in this browser. It is not sent to us, it is not checked, and no account is created on a server in this build.',
       'Clearing your browser data, or using another device, starts you from zero. We cannot restore it.',
       'The pages load their fonts from Google Fonts, so Google receives a normal web request from your browser. The site is hosted on GitHub Pages, which keeps its own server logs.',
     ],

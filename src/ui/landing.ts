@@ -2,6 +2,7 @@ import { SKILL_LABEL } from '../core/explain';
 import { generateFile, todaySeed } from '../core/generator';
 import { CASES } from '../core/scenarios';
 import { skillStats, weakestSkills, type SkillAttempt } from '../core/skills';
+import { loadProfile, profileLink } from './account';
 import { basicsDone } from './basics';
 import { dailyHref, practiceHref } from './routes';
 import { gloss } from './terms';
@@ -59,6 +60,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
         <div class="home-days">${week.map((w) => `<span class="${w.done ? 'on' : ''} ${w.today ? 'today' : ''}"><i></i>${esc(w.label)}</span>`).join('')}</div>
       </div>
     </div>
+    ${(zeroDone || d1) && !loadProfile() ? `<a class="warm quiet" href="#/signin" data-testid="signin-nudge"><span class="warm-t"><b>Put a name on your progress</b><span>Sign in with an email. No password, and it stays on this device.</span></span><span class="btn">Sign in</span></a>` : ''}
     <a class="warm quiet" href="#/basics"><span class="warm-t"><b>Start from zero</b><span>New to bookkeeping? Five ideas in two minutes: statement, books, matching, difference, categories.</span></span><span class="btn">${basicsDone() ? 'Again' : 'Start'}</span></a>
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
     <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
@@ -73,7 +75,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
       ${rung('5', plan ? practiceHref(newSeed(), weak) : '#/upgrade', 'Practice 4 and beyond', 'Unlimited files, and your practice record stays current.', plan ? 'open' : 'locked', 'Practice plan')}
       ${rung('T', '#/guide', 'Theory and topic practice', `Seven topics. All the theory is open; practice rounds are free for ${FREE_TOPIC_DRILLS}, the other ${7 - FREE_TOPIC_DRILLS} come with the plan.`, 'open', plan ? 'All open' : `${FREE_TOPIC_DRILLS} of 7 free`)}
     </ol>
-    <p class="ladder-note">Your progress is saved in this browser only. Accounts, to keep it across devices, are not built yet.</p>
+    <p class="ladder-note">Your progress is saved in this browser only. <a href="#/signin">Sign in</a> puts your name on it; accounts that follow you across devices come later.</p>
     ${
       stats.length
         ? `<div class="record">
@@ -91,7 +93,7 @@ export function renderDesk(done: Completed, history: SkillAttempt[]): string {
   return `
   <header class="nav">
     <a class="brand" href="./" aria-label="Ledger Fix Lab, back to the main page"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
-    <div class="nav-right"><a class="nav-link" href="#/upgrade">Practice plan</a>${themeButton(loadTheme())}</div>
+    <div class="nav-right"><a class="nav-link" href="#/upgrade">Practice plan</a>${profileLink(loadProfile())}${themeButton(loadTheme())}</div>
   </header>
   <main class="home desk-page">
     ${path(done, history)}
