@@ -13,7 +13,9 @@ const escHtml = (s: string): string => s.replace(/[&<>"']/g, (c) => ESC[c]);
 export function gloss(text: string): string {
   return splitTerms(text)
     .map((p) => (p.term ? `<button type="button" class="term" data-term="${p.term.id}">${escHtml(p.text)}</button>` : escHtml(p.text)))
-    .join('');
+    .join('')
+    // a full stop or comma right after a term stays on the term's line
+    .replace(/(<button type="button" class="term"[^>]*>[^<]*<\/button>)([.,;:!?)]+)/g, '<span class="nb">$1$2</span>');
 }
 
 /** Mark glossary words inside existing markup (static pages): walks text nodes, skips links and buttons. */
@@ -28,9 +30,14 @@ export function glossElement(root: HTMLElement): void {
     const pieces = splitTerms(node.data);
     if (!pieces.some((p) => p.term && !used.has(p.term.id))) continue;
     const frag = document.createDocumentFragment();
+    let glue: HTMLElement | null = null;
     for (const p of pieces) {
       if (!p.term || used.has(p.term.id)) {
-        frag.append(p.text);
+        // a full stop or comma right after a term stays on the term's line
+        const lead = glue ? /^[.,;:!?)]+/.exec(p.text)?.[0] ?? '' : '';
+        if (glue && lead) glue.append(lead);
+        glue = null;
+        frag.append(p.text.slice(lead.length));
         continue;
       }
       used.add(p.term.id);
@@ -39,7 +46,10 @@ export function glossElement(root: HTMLElement): void {
       b.className = 'term';
       b.dataset.term = p.term.id;
       b.textContent = p.text;
-      frag.append(b);
+      glue = document.createElement('span');
+      glue.className = 'nb';
+      glue.append(b);
+      frag.append(glue);
     }
     node.replaceWith(frag);
   }
