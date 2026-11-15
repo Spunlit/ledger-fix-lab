@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 94; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 95; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -324,6 +324,15 @@ async function main() {
   await go('#/signin');
   await click('[data-account=out]');
   ok((await text('h1')) === 'Sign in' && (await evaluate(`localStorage.getItem('ledger-fix-lab:v23:profile')`)) === null && (await evaluate(`localStorage.getItem('ledger-fix-lab:v18:basics-done')`)) === '1', 'sign out removes the email and keeps the progress');
+
+  // ---------- a tour belongs to its screen: leaving the screen closes it
+  await go('#/case/maple-pine-oct');
+  await click('[data-act=tour]');
+  await sleep(300);
+  const tourOpen = await js(`return !!$('[data-testid=tour]')`);
+  await go('#/');
+  await sleep(400);
+  ok(tourOpen && !(await js(`return !!$('.tour')`)), 'an open tour closes when the route changes');
 
   // ---------- terms (draft)
   await go('#/terms');

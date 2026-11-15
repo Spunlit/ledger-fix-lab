@@ -531,6 +531,7 @@ function renderSolved(ui: CaseUI, report: CheckReport, next: NextStep): string {
     <div class="solved-actions">
       <a class="btn" href="${next.href}">${esc(next.label)}</a>
       <button type="button" class="btn ghost" data-act="copy-report">Copy client summary</button>
+      <a class="btn ghost" href="#/check">Check your own books</a>
       ${isGuided(s) ? '' : '<button type="button" class="btn ghost" data-act="copy-result">Copy my result</button><a class="btn ghost" href="#/">Home</a>'}
     </div>
   </section>`;

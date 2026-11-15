@@ -22,7 +22,7 @@ import { renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
-import { startTour, tourSeen, type TourStep } from './ui/tour';
+import { endTour, startTour, tourSeen, type TourStep } from './ui/tour';
 import { loadTheme, saveTheme, themeButton } from './ui/util';
 import { FREE_TOPIC_DRILLS, saveDrillRun } from './ui/util';
 import { canOpenPractice, dailyStreak, loadCompleted, loadHistory, loadOpenedPractice, loadPlan, parseDollarsToCents, saveCompleted, saveHistory, saveOpenedPractice, savePlan } from './ui/util';
@@ -128,6 +128,8 @@ let shownHash = '';
 function route(): void {
   cameFrom = shownHash;
   shownHash = location.hash;
+  // A tour or demonstration belongs to the screen it was started on: leaving that screen closes it.
+  if (cameFrom !== shownHash) endTour(false);
   let resolved = null;
   try {
     resolved = resolve(location.hash);
