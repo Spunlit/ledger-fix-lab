@@ -16,7 +16,7 @@ export const PRICE = { monthly: 12, yearly: 96 } as const;
 const check = `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 export function renderPaywall(st: PaywallState, plan: Plan | null): string {
-  const hitLimit = Boolean(st.returnTo) && !plan;
+  const hitLimit = Boolean(st.returnTo) && st.returnTo !== '#/check' && !plan;
   const yearly = st.billing === 'yearly';
   const price = yearly ? `$${PRICE.yearly}<small>/year</small>` : `$${PRICE.monthly}<small>/month</small>`;
   return `
@@ -32,7 +32,7 @@ export function renderPaywall(st: PaywallState, plan: Plan | null): string {
             <h1 id="pw-h">Unlimited practice is on.</h1>
             <p class="pw-sub">Every practice file is built around the mistakes you miss most. Billed ${plan.billing === 'yearly' ? `$${PRICE.yearly}/year` : `$${PRICE.monthly}/month`} after the 7-day trial in the real product; in this demo nothing is charged.</p>
             <div class="pw-actions">
-              ${st.returnTo ? '<button type="button" class="btn primary big" data-pw="open">Open my practice file</button>' : '<a class="btn primary big" href="#/">Back to practice</a>'}
+              ${st.returnTo ? `<button type="button" class="btn primary big" data-pw="open">${st.returnTo === '#/check' ? 'Back to my books' : 'Open my practice file'}</button>` : '<a class="btn primary big" href="#/">Back to practice</a>'}
               <button type="button" class="btn ghost" data-pw="cancel">Cancel demo plan</button>
             </div>
           </section>`
@@ -52,6 +52,7 @@ export function renderPaywall(st: PaywallState, plan: Plan | null): string {
       <p class="pw-trial">7-day free trial. Cancel anytime.</p>
       <ul class="pw-list">
         <li>${check} Unlimited practice files aimed at your weak spots</li>
+        <li>${check} Check your own books: every finding, every month</li>
         <li>${check} Your full skill history across every file</li>
         <li>${check} Harder files: more rows, more traps, timed mode <small>(coming soon)</small></li>
         <li>${check} Month-end tracks: credit cards, payroll, sales tax <small>(coming soon)</small></li>
@@ -72,7 +73,7 @@ export function renderPaywall(st: PaywallState, plan: Plan | null): string {
 
     <section class="pw-free">
       <h2>Free forever</h2>
-      <p>Both guided cases, a new file of the day every day, your skill record, and ${FREE_PRACTICE_FILES} practice file.</p>
+      <p>Both guided cases, a new file of the day every day, your skill record, ${FREE_PRACTICE_FILES} practice file, and the first three findings in your own books.</p>
       <a class="link" href="#/">Keep using the free version</a>
       <p class="pw-terms">By starting a plan you agree to the <a href="#/terms">Terms and Conditions</a> (draft).</p>
     </section>`

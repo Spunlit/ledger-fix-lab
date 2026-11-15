@@ -261,7 +261,7 @@ export function renderWorkbench(ui: CaseUI): string {
       <button type="button" class="link small" data-act="toggle-note" aria-expanded="${ui.noteOpen}">${ui.noteOpen ? 'Hide note' : 'Read the full note'}</button>
     </aside>
 
-    ${ui.checked ? (solved ? renderSolved(ui, report, next) : renderReview(report)) : ''}
+    ${ui.checked ? (solved ? renderSolved(ui, report, next) : renderReview(report, toolsOf(s))) : ''}
 
     ${pairs ? renderPairs(view, s, pairs, r.bookBalanceCents, guide, guideList) : renderLists(view, s, state.entries, lines, guide, guideList)}
   </main>
@@ -463,12 +463,14 @@ function renderDock(ui: CaseUI, prog: Progress | null, solved: boolean, next: Ne
 
 // ---------------------------------------------------------------- after a check
 
-function renderReview(report: CheckReport): string {
+function renderReview(report: CheckReport, tools: Set<Tool>): string {
   const ex = explain(report);
+  // A case that has no "record a bank line" tool can only lose a line by deleting it, so the way back is Undo.
+  if (!tools.has('record')) ex.integrity = ex.integrity.map((t) => t.replace('Record it from the statement.', 'It was deleted: press Undo to bring it back.'));
   const rows: [string, string, boolean, string[]][] = [
     ['integrity', 'Each transaction recorded exactly once', report.integrity.ok, ex.integrity],
     ['amounts', 'Amounts match the bank', report.amounts.ok, ex.amounts],
-    ['cleared', 'Cleared items ticked correctly', report.cleared.ok, ex.cleared],
+    ['cleared', tools.has('cleared') ? 'Cleared items ticked correctly' : 'Nothing left uncleared', report.cleared.ok, ex.cleared],
     ['categories', 'Categories right', report.categories.ok, ex.categories],
   ];
   const failing = rows.filter((x) => !x[2]);

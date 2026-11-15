@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 90; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 92; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -229,6 +229,17 @@ async function main() {
   await js(`const b = $('[data-check-text=bank]'); b.value = b.value.replace('SQUARE INC DEPOSIT,860.00', 'SQUARE INC DEPOSIT,861.00'); b.dispatchEvent(new Event('input', { bubbles: true }))`);
   await click('[data-check=run]');
   ok((await js(`return document.querySelectorAll('.ck-card').length`)) === 3 && (await text('[data-testid=check-lock]')).includes('more finding') && (await text('[data-testid=check-diff]')) === '+$235.89', 'checker: with your own files three findings are free and the rest sit behind the plan');
+  await click('[data-testid=check-lock]');
+  await sleep(200);
+  await click('[data-pw=checkout]');
+  await click('[data-pw=confirm]');
+  ok((await text('[data-pw=open]')) === 'Back to my books', 'checker: the lock opens the plan page, and the plan page leads back');
+  await click('[data-pw=open]');
+  await sleep(200);
+  ok((await js(`return document.querySelectorAll('.ck-card').length`)) === 6 && !(await js(`return !!$('[data-testid=check-lock]')`)) && (await js(`return $('[data-check-text=bank]').value.includes('861.00')`)), 'checker: with the plan every finding is shown, and the files are still there');
+  await go('#/upgrade');
+  await click('[data-pw=cancel]');
+  await go('#/check');
   await js(`const b = $('[data-check-text=books]'); b.value = '<img src=x onerror=window.__xss=1>,1.00'; `);
   await click('[data-check=run]');
   ok((await evaluate('window.__xss')) === undefined && !(await js(`return !!$('.ck-out img')`)), 'checker: text from a file is shown as text, never run as markup');

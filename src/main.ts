@@ -121,7 +121,13 @@ function renderAccountPage(): void {
   app.innerHTML = renderAccount(loadProfile(), account, completed);
 }
 
+/** The route shown before the current one. */
+let cameFrom = '';
+let shownHash = '';
+
 function route(): void {
+  cameFrom = shownHash;
+  shownHash = location.hash;
   let resolved = null;
   try {
     resolved = resolve(location.hash);
@@ -186,6 +192,8 @@ function route(): void {
     return;
   }
   if (/^#\/upgrade/.test(location.hash)) {
+    // Coming from the lock in "Check your own books": the plan page leads back to the same files.
+    if (cameFrom === '#/check') paywall = { ...paywall, returnTo: '#/check' };
     renderUpgrade();
     window.scrollTo(0, 0);
     return;
