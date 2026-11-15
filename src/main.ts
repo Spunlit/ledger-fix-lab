@@ -568,6 +568,24 @@ app.addEventListener('mouseover', (ev) => {
   if (lit.length > 1) lit.forEach((el) => el.classList.add('peer'));
 });
 
+// Check your own books: a CSV file can also be dropped onto either box.
+app.addEventListener('dragover', (ev) => {
+  if ((ev.target as HTMLElement).closest?.('.ck-in')) ev.preventDefault();
+});
+app.addEventListener('drop', (ev) => {
+  const box = (ev.target as HTMLElement).closest?.('.ck-in');
+  const f = ev.dataTransfer?.files?.[0];
+  if (!box || !f) return;
+  ev.preventDefault();
+  const which = box.querySelector<HTMLElement>('[data-check-text]')?.dataset.checkText === 'bank' ? 'bank' : 'books';
+  if (f.size > 1_000_000) return window.alert('That file is larger than 1 MB. Export one month of one account as CSV and try again.');
+  readCheckBoxes();
+  f.text().then((text) => {
+    check = { ...check, [which]: text, sample: false, ran: false };
+    if (/^#\/check/.test(location.hash)) renderCheckPage();
+  });
+});
+
 initWorkbenchEvents(app);
 window.addEventListener('hashchange', route);
 route();

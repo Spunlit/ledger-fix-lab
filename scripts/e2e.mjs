@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 95; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 96; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -222,6 +222,8 @@ async function main() {
   await go('#/check');
   await click('[data-check=run]');
   ok((await text('[data-testid=check-error]')).includes('empty'), 'checker: an empty file gets a plain error, not a crash');
+  await js(`const dt = new DataTransfer(); dt.items.add(new File(['Date,Description,Amount\\n4/2/2026,Coffee,-4.50'], 'bank.csv', { type: 'text/csv' })); $('[data-check-text=bank]').dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt })); await new Promise(r => setTimeout(r, 300))`);
+  ok((await js(`return $('[data-check-text=bank]').value`)).includes('Coffee,-4.50'), 'checker: a CSV file dropped on a box is read into it');
   await click('[data-testid=check-sample]');
   ok((await text('[data-testid=check-diff]')) === '+$234.89' && (await js(`return [...document.querySelectorAll('.ck-card')].map(c => c.dataset.kind).join(',')`)) === 'duplicate,amount,missing,notAtBank,category' && (await text('[data-testid=check-verdict]')).includes('explained to the cent by the 4 lines') && !(await js(`return !!$('[data-testid=check-lock]')`)), 'checker: the sample files give +$234.89, all five kinds of finding, explained to the cent, nothing locked');
   ok((await text('.ck-card[data-kind=amount]')).includes('two digits look swapped') && (await text('.ck-card[data-kind=category]')).includes('Transfer from savings'), 'checker: it names the swapped digits and the transfer filed as income');

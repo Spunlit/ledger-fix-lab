@@ -148,7 +148,7 @@ function results(s: CheckState, plan: Plan | null): string {
 export function renderCheck(s: CheckState, plan: Plan | null): string {
   const box = (id: 'bank' | 'books', label: string, hint: string, value: string) => `
     <div class="ck-in">
-      <div class="ck-in-top"><label for="ck-${id}">${label}</label><label class="ck-file">Choose a CSV file<input type="file" accept=".csv,text/csv,text/plain" data-check-file="${id}"></label></div>
+      <div class="ck-in-top"><label for="ck-${id}">${label}</label><label class="ck-file">Choose or drop a CSV file<input type="file" accept=".csv,text/csv,text/plain" data-check-file="${id}"></label></div>
       <textarea id="ck-${id}" data-check-text="${id}" rows="7" spellcheck="false" placeholder="${hint}">${esc(value)}</textarea>
     </div>`;
   return `${nav()}
