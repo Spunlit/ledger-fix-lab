@@ -122,7 +122,7 @@ function results(s: CheckState, plan: Plan | null): string {
       ? 'The totals agree, and there is still something to look at.'
       : r.difference === 0
         ? `The totals agree, but ${money.length} ${money.length === 1 ? 'line does' : 'lines do'} not pair up. Mistakes can cancel each other out.`
-        : `The ${formatCents(Math.abs(r.difference))} difference is explained to the cent by the ${money.length} ${money.length === 1 ? 'line' : 'lines'} below.`;
+        : `The ${formatCents(Math.abs(r.difference))} difference is explained to the cent by ${locked > 0 ? `${money.length} lines. The first ${open.length} are below.` : `the ${money.length} ${money.length === 1 ? 'line' : 'lines'} below.`}`;
   return `
   <section class="ck-out" aria-live="polite" data-testid="check-result">
     <div class="ck-figs">

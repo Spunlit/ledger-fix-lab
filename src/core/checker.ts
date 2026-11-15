@@ -154,7 +154,8 @@ export function parseCsv(text: string, what: string): ParsedCsv {
   const rows = splitCsv(text).map((cells, i) => ({ cells, row: i + 1 })).filter((r) => r.cells.some((c) => c !== ''));
   if (!rows.length) return { lines: [], skipped: [], error: `The ${what} is empty. Paste the rows or choose a CSV file.` };
   // Some banks put a summary above the table, so the header is looked for in the first rows, not only the first.
-  const headerAt = rows.slice(0, 12).findIndex((r) => usable(findColumns(r.cells)));
+  // A header holds labels only: a row with a date in it is data, whatever words its description has.
+  const headerAt = rows.slice(0, 12).findIndex((r) => usable(findColumns(r.cells)) && !r.cells.some((x) => parseDate(x) !== null));
   let cols: Columns;
   let body: typeof rows;
   if (headerAt >= 0) {

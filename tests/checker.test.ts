@@ -64,6 +64,11 @@ describe('check your own books: reading files', () => {
       ['2026-04-02', 'CHECKCARD SHELL OIL', -4820],
       ['2026-04-05', 'CHECK 1042', -18000],
     ]);
+    // no header, and a description that happens to hold the words debit and credit
+    expect(got('04/02/2026,DEBIT CARD CREDIT VOUCHER,-5.00\n04/03/2026,COFFEE,-4.50')).toEqual([
+      ['2026-04-02', 'DEBIT CARD CREDIT VOUCHER', -500],
+      ['2026-04-03', 'COFFEE', -450],
+    ]);
     // a ledger register with separate Payment and Deposit columns
     expect(got('Date,Ref No.,Payee,Memo,Payment,Deposit,Balance\n04/02/2026,,Shell,van fuel,48.20,,951.80\n04/03/2026,,Square,,,"1,250.00","2,201.80"')).toEqual([
       ['2026-04-02', 'Shell', -4820],
