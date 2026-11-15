@@ -521,7 +521,7 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
 .ck-lock .btn { grid-column: 2; grid-row: 1 / span 2; }
 @media (max-width: 720px) {
   .ck-ins { grid-template-columns: 1fr; }
-  .ck-in textarea { min-height: 132px; }
+  .ck-in textarea { min-height: 132px; font-size: 16px; } /* 16px: iOS does not zoom the page on focus */
   .ck-figs { grid-template-columns: 1fr 1fr; }
   .ck-figs div:last-child { grid-column: 1 / -1; }
   .ck-line { grid-template-columns: minmax(0, 1fr) auto; }

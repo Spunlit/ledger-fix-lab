@@ -231,3 +231,9 @@
 - Fixed: an open tour or demonstration stayed on screen after leaving the page with the browser's Back button; it now closes on a route change (e2e check added).
 - A 404 page in the product's look. Deck slide 5 now ends on the checker (real phone screenshot); slide 7 lists the month-end check.
 - Checked: 146 unit tests, 96 e2e checks, locally and on the live site (v24.8).
+
+## v24.9 to v24.12 (Nov 15, night)
+- Checker findings lead to a practice file aimed at the same kinds of mistake. Header detection ignores data rows; the verdict says how many findings are shown; links use the readable text colour; 16px text in the boxes on phones.
+- Punctuation after a glossary term no longer wraps onto its own line.
+- CI: one deploy failed because the exhaustive engine test timed out on the runner once the heavier checker tests ran beside it; test timeout raised to 30 s. Verified that the live bundle hash equals the local build.
+- Checked: 146 unit tests, 96 e2e checks on the live site.
