@@ -533,3 +533,9 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
 .ck-tools { display: flex; justify-content: flex-end; }
 .ck-practice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .ck-practice span { font: 500 12px/1.4 var(--font-mono); color: var(--ink-3); margin-right: 4px; }
+
+/* desk: the path first, then the tools as a quiet grid */
+.tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tools .warm { margin-bottom: 0; align-items: flex-start; height: 100%; box-sizing: border-box; }
+.tools .warm .btn { flex: none; }
+@media (max-width: 760px) { .tools { grid-template-columns: minmax(0, 1fr); } }

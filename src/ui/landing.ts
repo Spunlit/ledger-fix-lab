@@ -63,11 +63,6 @@ function path(done: Completed, history: SkillAttempt[]): string {
       </div>
     </div>
     ${(zeroDone || d1) && !loadProfile() ? `<a class="warm quiet" href="#/signin" data-testid="signin-nudge"><span class="warm-t"><b>Put a name on your progress</b><span>Sign in with an email. No password, and it stays on this device.</span></span><span class="btn">Sign in</span></a>` : ''}
-    <a class="warm quiet" href="#/basics"><span class="warm-t"><b>Start from zero</b><span>New to bookkeeping? Five ideas in two minutes: statement, books, matching, difference, categories.</span></span><span class="btn">${basicsDone() ? 'Again' : 'Start'}</span></a>
-    <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
-    <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
-    <a class="warm quiet" href="#/check" data-testid="check-entry"><span class="warm-t"><b>Check your own books</b><span>${lastRun ? `Last check: ${esc(monthName(lastRun.month))}, ${lastRun.findings} ${lastRun.findings === 1 ? 'line' : 'lines'} to look at. Do the next month when its statement arrives.` : 'Put your bank statement next to your books. Nothing is uploaded. Sample files included.'}</span></span><span class="btn">Open</span></a>
-    <a class="warm quiet" href="#/record"><span class="warm-t"><b>Practice record</b><span>Proof of what you have done, on one page you can print. It stays current while you keep practising.</span></span><span class="btn">Open</span></a>
     <h2 class="ladder-h">Your path</h2>
     <ol class="ladder" data-testid="ladder">
       ${rung('0', '#/basics', 'Start from zero', 'Five ideas in two minutes.', zeroDone ? 'done' : 'open', 'Free')}
@@ -79,6 +74,13 @@ function path(done: Completed, history: SkillAttempt[]): string {
       ${rung('T', '#/guide', 'Theory and topic practice', `Seven topics. All the theory is open; practice rounds are free for ${FREE_TOPIC_DRILLS}, the other ${7 - FREE_TOPIC_DRILLS} come with the plan.`, 'open', plan ? 'All open' : `${FREE_TOPIC_DRILLS} of 7 free`)}
     </ol>
     <p class="ladder-note">Your progress is saved in this browser only. <a href="#/signin">Sign in</a> puts your name on it; accounts that follow you across devices come later.</p>
+    <h2 class="ladder-h">Tools</h2>
+    <div class="tools">
+    <a class="warm quiet" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn">Start</span></a>
+    <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
+    <a class="warm quiet" href="#/check" data-testid="check-entry"><span class="warm-t"><b>Check your own books</b><span>${lastRun ? `Last check: ${esc(monthName(lastRun.month))}, ${lastRun.findings} ${lastRun.findings === 1 ? 'line' : 'lines'} to look at. Do the next month when its statement arrives.` : 'Put your bank statement next to your books. Nothing is uploaded. Sample files included.'}</span></span><span class="btn">Open</span></a>
+    <a class="warm quiet" href="#/record"><span class="warm-t"><b>Practice record</b><span>Proof of what you have done, on one page you can print. It stays current while you keep practising.</span></span><span class="btn">Open</span></a>
+    </div>
     ${
       stats.length
         ? `<div class="record">
