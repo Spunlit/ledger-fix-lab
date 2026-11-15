@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 76; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 77; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -266,7 +266,11 @@ async function main() {
     if (pick) await click(`[data-basics-pick=${pick}]`);
     await click('[data-basics=next]');
   }
-  ok((await text('[data-testid=basics-done]')).includes('five ideas') && (await evaluate(`localStorage.getItem('ledger-fix-lab:v18:basics-done')`)) === '1', 'basics lesson finishes and is remembered');
+  ok((await text('[data-testid=basics-done]')).includes('five ideas') && !(await js(`return !!$('.drill-end a[href="#/drill"]')`)) && (await evaluate(`localStorage.getItem('ledger-fix-lab:v18:basics-done')`)) === '1', 'basics lesson finishes and is remembered');
+
+  // ---------- practice record: honest status from real progress
+  await go('#/record');
+  ok((await text('[data-testid=record-status]')).startsWith('In progress') && (await js(`return document.querySelectorAll('.rec-reqs li').length`)) === 5 && (await js(`return document.querySelectorAll('.rec-reqs li.done').length`)) >= 3 && (await text('[data-testid=record]')).includes('not a professional certification'), 'practice record: five requirements, real progress, and it says it is not a certification');
 
   // ---------- terms (draft)
   await go('#/terms');

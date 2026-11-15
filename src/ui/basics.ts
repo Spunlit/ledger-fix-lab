@@ -50,10 +50,9 @@ export function renderBasics(s: BasicsState): string {
       <h1 data-testid="basics-done">You know the five ideas</h1>
       <p class="drill-sub">A bank statement, the books, matching, the difference, categories. A full case uses exactly these, on fourteen lines, with a coach beside you.</p>
       <div class="drill-actions">
-        <a class="btn primary big" href="#/case/${CASES[0].id}">Start case 1</a>
-        <a class="btn big" href="#/drill">60-second warm-up</a>
+        <a class="btn primary big" href="#/case/${CASES[0].id}">Practice: start case 1</a>
+        <a class="btn big" href="#/guide">More theory: the field guide</a>
       </div>
-      <a class="link" href="#/guide">Read the field guide: seven things to check</a>
     </section>
   </main>`;
   }

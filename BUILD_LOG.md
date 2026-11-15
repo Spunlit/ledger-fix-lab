@@ -193,3 +193,9 @@
 - "Show me how" is available on every problem (after Hint and More help), not once per file; the progress bar says how many fixes were shown.
 - The "why learn this" block now cites primary sources: Intuit help on duplicate bank-feed transactions, IRS Topic 254 (the taxpayer answers for the return), AIPB Certified Bookkeeper designation (bank reconciliation and error correction are tested). The page states it is independent, not affiliated or endorsed, and issues no certificate.
 - Checked: 117 unit tests, 76 e2e checks.
+
+## v21 (Nov 15, ~00:40 UTC)
+- After Start from zero the choice is practice (case 1) or more theory (the guide); the warm-up button is gone from that screen.
+- New: practice record (app.html#/record). Five requirements for level 1, first-check accuracy per skill, a "current" status that lapses 30 days after the last file solved without hints, optional name, print to PDF. It states that it is not a certification and that Ledger Fix Lab is not an accredited body. Pure logic in src/core/record.ts with tests.
+- Positioning decided with the founder: no self-issued "certificate"; a record of practice that stays current fits a subscription, a one-time certificate would fit a course.
+- Checked: 122 unit tests, 77 e2e checks.

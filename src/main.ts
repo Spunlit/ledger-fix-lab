@@ -16,6 +16,7 @@ import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
+import { renderRecord, saveRecordName } from './ui/record';
 import { resolve } from './ui/routes';
 import { initTerms } from './ui/terms';
 import { startTour, tourSeen, type TourStep } from './ui/tour';
@@ -112,6 +113,14 @@ function route(): void {
   if (/^#\/basics/.test(location.hash)) {
     if (basics?.done) basics = newBasics();
     renderBasicsPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/record/.test(location.hash)) {
+    currentId = null;
+    document.body.dataset.page = 'guide';
+    document.title = 'Practice record | Ledger Fix Lab';
+    app.innerHTML = renderRecord(completed, history);
     window.scrollTo(0, 0);
     return;
   }
@@ -261,6 +270,7 @@ function dispatch(action: Action): void {
 }
 
 app.addEventListener('click', (ev) => {
+  if ((ev.target as HTMLElement).closest('[data-act-print]')) return window.print();
   const bs = (ev.target as HTMLElement).closest<HTMLElement>('[data-basics-pick], [data-basics]');
   if (bs && basics) {
     basics = bs.dataset.basicsPick ? tapBasics(basics, bs.dataset.basicsPick) : nextBasics(basics);
@@ -454,3 +464,9 @@ app.addEventListener('mouseover', (ev) => {
 initWorkbenchEvents(app);
 window.addEventListener('hashchange', route);
 route();
+
+// The optional name on the practice record is remembered in this browser only.
+app.addEventListener('input', (ev) => {
+  const el = ev.target as HTMLInputElement;
+  if (el.matches?.('[data-record-name]')) saveRecordName(el.value);
+});

@@ -57,6 +57,7 @@ function path(done: Completed, history: SkillAttempt[]): string {
     <a class="warm quiet" href="#/basics"><span class="warm-t"><b>Start from zero</b><span>New to bookkeeping? Five ideas in two minutes: statement, books, matching, difference, categories.</span></span><span class="btn">${basicsDone() ? 'Again' : 'Start'}</span></a>
     <a class="warm" href="#/drill"><span class="warm-t"><b>60-second warm-up</b><span>Five quick rounds: tap the line that is wrong. Good on a phone.${drillRec.runs ? ` Best: ${drillRec.best} of 5 on the first tap.` : ''}</span></span><span class="btn primary">Start</span></a>
     <a class="warm quiet" href="#/guide"><span class="warm-t"><b>Field guide</b><span>Seven things to check in any set of books: what you see, how to tell, what to do.</span></span><span class="btn">Read</span></a>
+    <a class="warm quiet" href="#/record"><span class="warm-t"><b>Practice record</b><span>Proof of what you have done, on one page you can print. It stays current while you keep practising.</span></span><span class="btn">Open</span></a>
     <div class="path">
       ${step('1', `#/case/${CASES[0].id}`, CASES[0].title, 'Guided, 6 min. Duplicates and categories.', d1, !d1)}
       ${step('2', `#/case/${CASES[1].id}`, CASES[1].title, 'Guided, 10 min. The full reconciliation.', d2, d1 && !d2)}
