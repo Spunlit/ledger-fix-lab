@@ -224,3 +224,10 @@
 - Checker: the plan page returns to the same files; "Copy the list" gives the findings as plain text; reads real export shapes (a summary above the table, no header row, a DEBIT/CREDIT first column, separate Payment and Deposit columns); detects books kept with the signs the other way round and says so; findings link to the matching topic drills; remembers only the statement month and the count, shown on the desk as the last check.
 - Review wording fits case 1 (no Cleared column, no record tool). Landing: a short section for "your own books".
 - Checked: 144 unit tests, 94 e2e checks, locally and on the live site.
+
+## v24.5 to v24.8 (Nov 15, night)
+- Checker: pairing reworked for large files (two files of 2000 lines pair in about a second; test added), a junk-input fuzz test (400 files, never throws, findings always equal the difference), drop a CSV onto a box.
+- Desk: the path first, tools as a grid; "Start from zero" appears once instead of three times. Solved files link to "Check your own books". Guide ends with it too.
+- Fixed: an open tour or demonstration stayed on screen after leaving the page with the browser's Back button; it now closes on a route change (e2e check added).
+- A 404 page in the product's look. Deck slide 5 now ends on the checker (real phone screenshot); slide 7 lists the month-end check.
+- Checked: 146 unit tests, 96 e2e checks, locally and on the live site (v24.8).
