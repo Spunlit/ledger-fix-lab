@@ -3,6 +3,8 @@
 **Books that balance can still be wrong. Practice catching it, and get graded on the result.**
 Live: https://spunlit.github.io/ledger-fix-lab/ (free, no sign-up)
 
+![The landing page: Books that balance can still be wrong](pitch/img/readme-landing.jpg)
+
 A browser trainer for beginners. You fix the books of a made-up small business against its bank statement: delete the
 duplicate, correct the swapped digits, record the bank fee nobody entered, leave the uncashed check alone, move the
 owner's money out of Sales. A deterministic engine grades the **books you end with**: not only whether the difference
@@ -11,6 +13,8 @@ is $0.00, but whether the books are right. When you have the skill, the same mat
 Track: Skills. For working adults in the US (25 to 45) who keep the books for their own side business, or who are
 starting to keep books for others. They pay out of pocket (B2C). Evidence and open questions:
 [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md). Deck: [pitch/LedgerFixLab_pitch.pdf](pitch/LedgerFixLab_pitch.pdf).
+
+![A real screen from case 2: the difference is $0.00, three checks pass, profit is overstated by $5,000](pitch/img/readme-trap.jpg)
 
 ## For judges: a 3-minute tour
 1. **Start from zero** (`app.html#/basics`): five ideas in two minutes, one tap each, for someone who has never kept
