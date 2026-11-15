@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 92; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 93; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -225,6 +225,9 @@ async function main() {
   await click('[data-testid=check-sample]');
   ok((await text('[data-testid=check-diff]')) === '+$234.89' && (await js(`return [...document.querySelectorAll('.ck-card')].map(c => c.dataset.kind).join(',')`)) === 'duplicate,amount,missing,notAtBank,category' && (await text('[data-testid=check-verdict]')).includes('explained to the cent by the 4 lines') && !(await js(`return !!$('[data-testid=check-lock]')`)), 'checker: the sample files give +$234.89, all five kinds of finding, explained to the cent, nothing locked');
   ok((await text('.ck-card[data-kind=amount]')).includes('two digits look swapped') && (await text('.ck-card[data-kind=category]')).includes('Transfer from savings'), 'checker: it names the swapped digits and the transfer filed as income');
+  await click('[data-testid=check-copy]');
+  await sleep(250);
+  ok(/^Cop(ied|y failed)/.test(await text('[data-testid=check-copy]')), 'checker: the list can be copied as plain text (or says why not)');
   // a person's own files: the first three findings are free, the rest need the plan
   await js(`const b = $('[data-check-text=bank]'); b.value = b.value.replace('SQUARE INC DEPOSIT,860.00', 'SQUARE INC DEPOSIT,861.00'); b.dispatchEvent(new Event('input', { bubbles: true }))`);
   await click('[data-check=run]');

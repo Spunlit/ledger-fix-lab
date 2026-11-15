@@ -43,6 +43,28 @@ function card(f: Finding): string {
   </li>`;
 }
 
+const plainLine = (label: string, l: CsvLine) => `   ${label} row ${l.row}: ${l.text}, ${day(l.date)}, ${formatSignedCents(l.cents)}`;
+
+/** The findings as plain text, to paste into notes or an email. Only what is shown on the page. */
+export function findingsText(s: CheckState, plan: Plan | null): string {
+  const bank = parseCsv(s.bank, 'bank statement');
+  const books = parseCsv(s.books, 'books');
+  if (bank.error || books.error) return '';
+  const r = reconcile(bank.lines, books.lines);
+  const open = s.sample || plan ? r.findings : r.findings.slice(0, FREE_FINDINGS);
+  return [
+    'Bank and books check (Ledger Fix Lab)',
+    `Bank ${formatSignedCents(r.bankTotal)}, books ${formatSignedCents(r.booksTotal)}, difference ${formatSignedCents(r.difference)}. ${r.matched} lines paired.`,
+    '',
+    ...open.flatMap((f, i) => [
+      `${i + 1}. ${KIND[f.kind].title}${f.kind === 'amount' && f.swapped ? ' (two digits look swapped)' : ''}`,
+      ...(f.bank ? [plainLine('Bank', f.bank)] : []),
+      ...(f.books ? [plainLine('Books', f.books)] : []),
+      `   ${KIND[f.kind].fix}`,
+    ]),
+  ].join('\n');
+}
+
 const nav = () => `
   <header class="nav">
     <a class="brand" href="./" aria-label="Ledger Fix Lab, back to the main page"><span class="mark" aria-hidden="true"></span>Ledger Fix Lab</a>
@@ -76,6 +98,7 @@ function results(s: CheckState, plan: Plan | null): string {
     </div>
     <p class="ck-verdict" data-testid="check-verdict">${esc(verdict)} <span>${r.matched} ${r.matched === 1 ? 'line' : 'lines'} paired.</span></p>
     <ol class="ck-list">${open.map(card).join('')}</ol>
+    ${open.length ? '<div class="ck-tools"><button type="button" class="btn" data-check="copy" data-testid="check-copy">Copy the list</button></div>' : ''}
     ${locked > 0 ? `<a class="ck-lock" href="#/upgrade" data-testid="check-lock"><b>${locked} more ${locked === 1 ? 'finding' : 'findings'}</b><span>The first ${FREE_FINDINGS} are free. All of them come with the Practice plan.</span><span class="btn primary">See the plan</span></a>` : ''}
     ${skipped ? `<p class="acct-fine">${skipped} ${skipped === 1 ? 'row was' : 'rows were'} left out: ${esc([...bank.skipped, ...books.skipped].slice(0, 3).map((k) => `row ${k.row} (${k.why})`).join(', '))}${skipped > 3 ? ', and more' : ''}.</p>` : ''}
     <p class="acct-fine">This points at lines to look at. It does not know what really happened, so the decision on each line is yours.</p>

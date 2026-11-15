@@ -529,3 +529,5 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
   .ck-lock { grid-template-columns: 1fr; }
   .ck-lock .btn { grid-column: 1; grid-row: auto; margin-top: 8px; }
 }
+
+.ck-tools { display: flex; justify-content: flex-end; }

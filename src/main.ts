@@ -16,7 +16,7 @@ import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { loadProfile, renderAccount, signIn, signOut, type AccountState } from './ui/account';
 import { SAMPLE_BANK, SAMPLE_BOOKS } from './core/checker';
-import { newCheck, renderCheck, type CheckState } from './ui/check';
+import { findingsText, newCheck, renderCheck, type CheckState } from './ui/check';
 import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
@@ -329,6 +329,12 @@ app.addEventListener('click', (ev) => {
   if ((ev.target as HTMLElement).closest('[data-act-print]')) return window.print();
   const ck = (ev.target as HTMLElement).closest<HTMLElement>('[data-check]');
   if (ck) {
+    if (ck.dataset.check === 'copy') {
+      const done = (label: string) => (ck.textContent = label);
+      if (!navigator.clipboard) return void done('Copy failed: select the text instead');
+      navigator.clipboard.writeText(findingsText(check, plan)).then(() => done('Copied'), () => done('Copy failed: select the text instead'));
+      return;
+    }
     if (ck.dataset.check === 'sample') check = { bank: SAMPLE_BANK, books: SAMPLE_BOOKS, sample: true, ran: true };
     else if (ck.dataset.check === 'clear') check = newCheck();
     else {

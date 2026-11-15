@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { findingsText } from '../src/ui/check';
 import { looksSwapped, parseCsv, parseDate, parseMoney, reconcile, SAMPLE_BANK, SAMPLE_BOOKS, similarity, splitCsv, type CsvLine } from '../src/core/checker';
 
 const line = (row: number, date: string, text: string, cents: number, category: string | null = null): CsvLine => ({ row, date, text, cents, category });
@@ -129,5 +130,21 @@ describe('check your own books: pairing', () => {
       expect(used.filter((f) => f.bank).length + r.matched).toBe(bank.length);
       expect(used.filter((f) => f.books).length + r.matched).toBe(books.length);
     }
+  });
+});
+
+describe('check your own books: the list as text', () => {
+  it('lists every finding of the sample files with its lines and what to do', () => {
+    const t = findingsText({ bank: SAMPLE_BANK, books: SAMPLE_BOOKS, sample: true, ran: true }, null);
+    expect(t).toContain('difference +$234.89. 9 lines paired.');
+    expect(t).toContain('1. In the books twice, at the bank once');
+    expect(t).toContain('2. The amounts differ (two digits look swapped)');
+    expect(t).toContain('Bank row 12: MONTHLY MAINTENANCE FEE, Apr 30, \u2212$12.00');
+    expect(t.split('\n').filter((l) => /^\d\./.test(l))).toHaveLength(5);
+  });
+
+  it('copies only the free findings for a person without the plan', () => {
+    const t = findingsText({ bank: SAMPLE_BANK, books: SAMPLE_BOOKS, sample: false, ran: true }, null);
+    expect(t.split('\n').filter((l) => /^\d\./.test(l))).toHaveLength(3);
   });
 });
