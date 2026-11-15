@@ -478,3 +478,7 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
 .who:active { transform: scale(0.94); }
 .ladder-note a { color: var(--ink-2); text-underline-offset: 3px; }
 @media (max-width: 520px) { .acct-row { grid-template-columns: 1fr; } .acct-facts { grid-template-columns: 1fr 1fr; } .acct-facts div:last-child { grid-column: 1 / -1; } .acct-facts dd { font-size: 26px; } }
+
+/* phone header: three links never wrap; the plan link lives in the ladder below */
+.nav .brand, .nav .nav-link { white-space: nowrap; }
+@media (max-width: 520px) { body[data-page='home'] .nav .nav-link[href='#/upgrade'] { display: none; } }

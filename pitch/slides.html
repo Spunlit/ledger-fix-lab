@@ -2,221 +2,280 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Ledger Fix Lab — pitch</title>
+<title>Ledger Fix Lab, pitch deck</title>
+<!-- Ten slides in the product's own look. Every screenshot is taken from the real site by pitch/shots.mjs;
+     every number comes from the repository (tests, engine) or a cited source. Build: node pitch/build-pdf.mjs -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
 <style>
-  @font-face { font-family: 'Public Sans'; font-weight: 400 800; src: url('../public/fonts/public-sans-latin-normal.woff2') format('woff2'); }
-  @font-face { font-family: 'Public Sans'; font-style: italic; font-weight: 400; src: url('../public/fonts/public-sans-latin-italic.woff2') format('woff2'); }
   @page { size: 1280px 720px; margin: 0; }
-  :root { --paper:#f2f5f8; --surface:#fff; --ink:#14233c; --ink2:#4a5a72; --rule:#d3dbe5; --pencil:#2153c6; --red:#b42318; --green:#0e7a4b; --marker:#ffe36e; --markersoft:#fff6c7; }
+  :root { --bg: #02070A; --ink: #EEF4F7; --ink-2: #A8BAC4; --ink-3: #6E848F; --line: rgba(255, 255, 255, 0.11); --card: rgba(255, 255, 255, 0.045); --blue: #0297DE; --sky: #8CCBEA; --orange: #FC734D; --green: #7FC6A6; --rose: #E58A97; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body { font-family: 'Public Sans', system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .s { width: 1280px; height: 720px; background: var(--paper); position: relative; overflow: hidden; padding: 60px 76px 56px; break-after: page; page-break-after: always; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  body { font-family: 'Inter', system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .s { width: 1280px; height: 720px; position: relative; overflow: hidden; padding: 54px 72px 70px; background: var(--bg); break-after: page; page-break-after: always; }
   .s:last-child { break-after: auto; page-break-after: auto; }
-  h1 { font-size: 72px; line-height: 1; letter-spacing: -0.03em; margin: 0 0 22px; font-weight: 800; }
-  h2 { font-size: 42px; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 30px; font-weight: 800; max-width: 22ch; text-wrap: balance; }
-  h3 { font-size: 21px; margin: 0 0 8px; font-weight: 750; }
-  p, li { font-size: 20px; line-height: 1.45; margin: 0 0 10px; }
-  ul { margin: 0; padding-left: 24px; }
-  .muted { color: var(--ink2); }
-  .foot { position: absolute; left: 76px; right: 76px; bottom: 22px; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink2); border-top: 1px solid var(--rule); padding-top: 8px; }
-  .mark { display: inline-block; width: 44px; height: 44px; border: 3px solid var(--ink); border-radius: 8px; position: relative; vertical-align: middle; margin-right: 14px; }
-  .mark::after { content: ''; position: absolute; left: 12px; top: 3px; width: 12px; height: 22px; border: solid var(--green); border-width: 0 5px 5px 0; transform: rotate(45deg); }
-  .brand { font-size: 26px; font-weight: 800; display: flex; align-items: center; margin-bottom: 70px; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--ink); }
-  .grid3 > div { padding: 18px 26px 0 0; }
-  .grid3 > div + div { padding-left: 26px; border-left: 1px solid var(--rule); }
-  .label { font-size: 15px; font-weight: 700; color: var(--pencil); margin-bottom: 6px; }
-  .sheet { background: var(--surface); border: 1px solid var(--rule); border-top: 5px solid var(--ink); padding: 14px 26px; }
-  .sheet .row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 21px; }
-  .sheet .row:last-child { border-bottom: 0; }
-  .sheet .num { font-size: 30px; font-weight: 800; }
-  .ok { color: var(--green); } .bad { color: var(--red); }
-  .dbl { border-bottom: 5px double currentColor; }
-  .quote { border-left: 4px solid var(--pencil); padding: 6px 0 6px 22px; margin-top: 30px; }
-  .quote p { font-size: 26px; font-style: italic; margin: 0 0 6px; }
-  .quote span { font-size: 15px; color: var(--ink2); }
-  .shot { position: relative; background-repeat: no-repeat; background-color: #fff; border: 1px solid var(--rule); box-shadow: 0 10px 30px rgb(20 35 60 / 0.14); }
-  .shot.fade::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: linear-gradient(rgb(255 255 255 / 0), #fff); }
-  .grid3 p { font-size: 23px; }
-  table { border-collapse: collapse; width: 100%; }
-  td { font-size: 19px; padding: 13px 14px 13px 0; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.4; }
-  td:first-child { font-weight: 750; width: 300px; }
-  tr:first-child td { border-top: 2px solid var(--ink); }
-  .angle { margin-top: 26px; background: var(--markersoft); border-left: 4px solid var(--marker); padding: 14px 22px; }
-  .angle p { margin: 0; font-size: 21px; }
-  .flow { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 2px solid var(--ink); margin-bottom: 26px; }
-  .flow div { padding: 14px 16px 0 0; font-size: 17px; line-height: 1.35; }
-  .flow div + div { padding-left: 16px; border-left: 1px solid var(--rule); }
-  .flow b { display: block; font-size: 15px; color: var(--pencil); margin-bottom: 4px; }
-  .big { font-size: 84px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
-  ul[style*='21px'] li { font-size: 21px; margin-bottom: 12px; }
-  .biz p { font-size: 23px; } .biz h3 { font-size: 24px; color: var(--pencil); }
-  .ev h3 { font-size: 19px; }
-  .ev li { font-size: 18.5px; margin-bottom: 10px; line-height: 1.38; }
-  .tag { display: inline-block; font-size: 14px; font-weight: 700; padding: 2px 10px; border-radius: 3px; margin-bottom: 10px; }
-  .t-obs { background: #e9f6ef; color: var(--green); } .t-inf { background: #e8eefc; color: var(--pencil); } .t-unk { background: #fdf0ee; color: var(--red); }
-  .links { font-size: 21px; line-height: 1.8; }
-  .links b { display: inline-block; width: 70px; color: var(--ink2); font-weight: 600; }
+  .s > * { position: relative; z-index: 1; }
+
+  /* the light: one glow, placed differently per slide */
+  .glow { position: absolute; z-index: 0; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, rgba(252, 115, 77, 0.95) 0%, rgba(252, 115, 77, 0.6) 13%, rgba(2, 151, 222, 0.5) 34%, rgba(2, 151, 222, 0.17) 58%, rgba(2, 151, 222, 0) 100%); }
+  .glow.hero { width: 2100px; height: 1100px; left: -410px; top: 235px; }
+  .glow.low { width: 1700px; height: 760px; left: -210px; top: 560px; opacity: 0.75; }
+  .glow.side { width: 1100px; height: 1100px; left: 760px; top: -190px; opacity: 0.5; }
+  .glow.corner { width: 1000px; height: 900px; left: -520px; top: 330px; opacity: 0.5; }
+
+  .lab { font: 500 13px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 22px; }
+  h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; margin: 0; letter-spacing: -0.012em; }
+  h1 { font-size: 118px; line-height: 0.96; }
+  h2 { font-size: 58px; line-height: 1.02; max-width: 21ch; }
+  h1 em, h2 em { font-style: italic; }
+  p { margin: 0; font-size: 20px; line-height: 1.45; color: var(--ink-2); }
+  b { color: var(--ink); font-weight: 600; }
+  .foot { position: absolute; z-index: 2; left: 72px; right: 72px; bottom: 26px; display: flex; justify-content: space-between; font: 400 11.5px/1 'Geist Mono', monospace; color: var(--ink-3); }
+  .foot .mark { display: inline-block; width: 11px; height: 11px; border: 3px solid var(--blue); border-bottom: 0; border-radius: 7px 7px 0 0; margin-right: 9px; vertical-align: -1px; }
+  .src { font: 400 11.5px/1.5 'Geist Mono', monospace; color: var(--ink-3); }
+  .shot { display: block; border-radius: 14px; box-shadow: 0 0 0 1px var(--line), 0 30px 70px rgba(0, 0, 0, 0.55); }
+  .card { background: var(--card); box-shadow: inset 0 0 0 1px var(--line); border-radius: 16px; padding: 24px 26px; }
+  .num { font-family: 'Instrument Serif', serif; font-size: 92px; line-height: 0.9; color: var(--ink); letter-spacing: -0.02em; }
+  .k { font: 500 12.5px/1.4 'Geist Mono', monospace; color: var(--ink-3); }
+
+  /* 1 cover */
+  .cover { text-align: center; padding-top: 86px; }
+  .cover .lab { margin-bottom: 34px; }
+  .cover h1 { margin: 0 auto; }
+  .cover .sub { margin: 30px auto 0; font-size: 24px; color: var(--ink); max-width: 30ch; }
+  .cover .links { position: absolute; left: 0; right: 0; bottom: 64px; display: flex; justify-content: center; gap: 14px; }
+  .pill { display: inline-block; padding: 13px 22px; border-radius: 999px; background: rgba(2, 7, 10, 0.62); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22); font: 500 15px/1 'Geist Mono', monospace; color: #fff; text-decoration: none; }
+  .pill.solid { background: #fff; color: #02070A; box-shadow: none; }
+
+  /* 2 problem */
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; }
+  .three .card { min-height: 236px; display: flex; flex-direction: column; }
+  .three p { font-size: 18px; margin-top: 16px; }
+  .three .src { margin-top: auto; padding-top: 14px; }
+  .who { margin-top: 28px; font-size: 19px; max-width: 78ch; }
+
+  /* 3 the trap */
+  .trap h2 { max-width: 24ch; }
+  .trap .shot { width: 830px; margin: 26px auto 0; }
+  .trap .cap { text-align: center; margin-top: 16px; font-size: 16.5px; }
+
+  /* 4 product */
+  .split { display: grid; grid-template-columns: 400px 1fr; gap: 44px; align-items: start; margin-top: 34px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .steps li { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .steps li:last-child { border-bottom: 0; }
+  .steps i { font: 400 34px/1 'Instrument Serif', serif; font-style: normal; color: var(--sky); }
+  .steps b { display: block; font-size: 19px; }
+  .steps span { display: block; font-size: 16px; color: var(--ink-2); margin-top: 3px; line-height: 1.4; }
+  .crop { width: 692px; height: 432px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--line), 0 30px 70px rgba(0, 0, 0, 0.55); }
+  .crop img { width: 100%; display: block; }
+
+  /* 5 phones */
+  .phones { display: grid; grid-template-columns: 370px repeat(3, 218px); gap: 36px; align-items: start; margin-top: 8px; }
+  .phones h2 { font-size: 54px; }
+  .phones .txt { padding-top: 22px; } .phones .txt p { margin-top: 22px; font-size: 19px; }
+  .help { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .help span { font: 500 13px/1 'Geist Mono', monospace; padding: 9px 12px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+  .ph { text-align: left; }
+  .ph .frame { width: 218px; height: 472px; border-radius: 24px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 26px 60px rgba(0, 0, 0, 0.6); }
+  .ph img { width: 100%; display: block; }
+  .ph p { font-size: 15px; margin-top: 14px; line-height: 1.35; }
+
+  /* 6 engineering */
+  .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 44px; }
+  .four .card { padding: 30px 24px 26px; } .four .num { font-size: 112px; }
+  .four p { font-size: 17px; margin-top: 18px; line-height: 1.4; }
+  .facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 44px; margin-top: 38px; }
+  .facts p { font-size: 18.5px; padding-left: 20px; position: relative; }
+  .facts p::before { content: ''; position: absolute; left: 0; top: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+  /* 7 retention */
+  .ret { display: grid; grid-template-columns: 430px 1fr; gap: 44px; align-items: start; margin-top: 34px; }
+  .ret .list { display: grid; gap: 18px; }
+  .ret .list b { display: block; font-size: 19px; }
+  .ret .list span { display: block; font-size: 16px; color: var(--ink-2); margin-top: 4px; line-height: 1.4; }
+  .ret .shot { width: 662px; }
+
+  /* 8 business */
+  .biz { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 18px; margin-top: 40px; }
+  .biz h3 { font: 500 13px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 16px; }
+  .biz .price { font: 400 66px/0.95 'Instrument Serif', serif; color: var(--ink); }
+  .biz .price small { font: 400 15px/1.3 'Inter', sans-serif; color: var(--ink-2); display: block; margin-top: 8px; }
+  .biz ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+  .biz li { font-size: 15.5px; color: var(--ink-2); line-height: 1.35; }
+  .biz .main { background: rgba(2, 151, 222, 0.13); box-shadow: inset 0 0 0 1px rgba(2, 151, 222, 0.5); }
+  .rows { display: grid; gap: 0; }
+  .rows div { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; color: var(--ink-2); }
+  .rows div:last-child { border-bottom: 0; }
+  .rows b { white-space: nowrap; }
+  .honest { margin-top: 26px; font-size: 17.5px; max-width: 96ch; }
+
+  /* 9 why not AI */
+  .cmp { margin-top: 40px; display: grid; gap: 0; }
+  .cmp div { display: grid; grid-template-columns: 300px 1fr 150px; gap: 24px; align-items: center; padding: 19px 22px; border-bottom: 1px solid var(--line); font-size: 18.5px; color: var(--ink-2); }
+  .cmp div b { font-size: 19px; }
+  .cmp div em { font: 500 13px/1 'Geist Mono', monospace; font-style: normal; text-align: right; color: var(--rose); }
+  .cmp .us { border-bottom: 0; border-radius: 14px; background: rgba(2, 151, 222, 0.13); box-shadow: inset 0 0 0 1px rgba(2, 151, 222, 0.5); color: var(--ink); margin-top: 8px; }
+  .cmp .us em { color: var(--green); }
+  .ai { margin-top: 30px; font-size: 18.5px; max-width: 92ch; }
+
+  /* 10 status */
+  .status { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 18px; margin-top: 44px; }
+  .status h3 { font: 500 13px/1 'Geist Mono', monospace; margin: 0 0 14px; }
+  .status .real h3 { color: var(--green); }
+  .status .demo h3 { color: var(--sky); }
+  .status .none h3 { color: var(--rose); }
+  .status .card { padding: 28px 28px 30px; } .status p { font-size: 18.5px; line-height: 1.45; }
+  .next { margin-top: 30px; font-size: 19px; max-width: 92ch; }
+  .end { position: absolute; left: 72px; right: 72px; bottom: 62px; display: flex; gap: 14px; }
 </style>
 </head>
 <body>
 
-<!-- 1. Title -->
+<section class="s cover">
+  <i class="glow hero"></i>
+  <p class="lab">Business Cup 2.0, Skills track</p>
+  <h1>Books that balance<br>can still be <em>wrong.</em></h1>
+  <p class="sub">Ledger Fix Lab is bookkeeping practice that grades your result.</p>
+  <div class="links"><span class="pill solid">spunlit.github.io/ledger-fix-lab</span><span class="pill">github.com/Spunlit/ledger-fix-lab</span></div>
+</section>
+
 <section class="s">
-  <div class="brand"><span class="mark"></span>Ledger Fix Lab</div>
-  <div class="grid2" style="grid-template-columns: 1.15fr 0.85fr; align-items: center;">
-    <div>
-      <h1 style="font-size:60px; max-width: 15ch;">Practice your first bookkeeping cleanup before a client pays for it.</h1>
-      <p class="muted" style="font-size:22px; max-width: 34ch;">Realistic client books, graded on whether they end up right, not just balanced. A new file every day.</p>
+  <i class="glow side"></i>
+  <p class="lab">The problem</p>
+  <h2>Millions keep their own books. <em>Nobody checks them.</em></h2>
+  <div class="three">
+    <div class="card"><div class="num">29.8M</div><p>US businesses with no employees. The owner is the bookkeeper.</p><p class="src">US Census Bureau, Nonemployer Statistics 2022</p></div>
+    <div class="card"><div class="num">2 in 3</div><p>Small-business owners do their own bookkeeping.</p><p class="src">QuickBooks Business Owner Report, Dec 2025 ("more than two-thirds")</p></div>
+    <div class="card"><div class="num">You</div><p>The taxpayer answers for the return, whoever or whatever prepared it.</p><p class="src">IRS Tax Topic 254</p></div>
+  </div>
+  <p class="who"><b>Our user:</b> a working adult in the US, 25 to 45, who runs a side business or is starting to keep books for others. Courses explain the rules. Nothing tells them their own books are wrong.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>2 / 10</span></div>
+</section>
+
+<section class="s trap">
+  <i class="glow low"></i>
+  <p class="lab">The moment the product is built around</p>
+  <h2>The bank agrees to the cent. <em>Profit is off by $5,000.</em></h2>
+  <img class="shot" src="img/trap.png" alt="The review screen: difference $0.00, three checks pass, the category check fails, profit overstated by $5,000.00">
+  <p class="cap">A real screen from case 2. The owner moved savings into the account, and the books call it sales.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>3 / 10</span></div>
+</section>
+
+<section class="s">
+  <i class="glow corner"></i>
+  <p class="lab">The product</p>
+  <h2>Fix real mistakes. <em>Get graded on the result.</em></h2>
+  <div class="split">
+    <ol class="steps">
+      <li><i>0</i><div><b>Start from zero</b><span>Five ideas in two minutes. No experience needed.</span></div></li>
+      <li><i>1</i><div><b>Match</b><span>Pair each bank line with a line in the books.</span></div></li>
+      <li><i>2</i><div><b>Fix</b><span>Delete the duplicate, correct the amount, add what is missing, change the category.</span></div></li>
+      <li><i>3</i><div><b>Check</b><span>Four checks grade the books you end with.</span></div></li>
+    </ol>
+    <div class="crop"><img src="img/work.png" alt="The working screen of case 1: bank, books and difference, the coach's next step, books and bank line by line"></div>
+  </div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>4 / 10</span></div>
+</section>
+
+<section class="s">
+  <i class="glow low"></i>
+  <p class="lab">Learning</p>
+  <div class="phones">
+    <div class="txt">
+      <h2>From zero,<br><em>on a phone</em></h2>
+      <p>No sign-up. Every bookkeeping word can be tapped for a plain explanation.</p>
+      <p>Help climbs only when asked:</p>
+      <div class="help"><span>Hint</span><span>More help</span><span>Show me how</span></div>
     </div>
-    <div>
-      <div class="sheet">
-        <div class="row"><span>Reconciliation difference</span><span class="num ok">$0.00</span></div>
-        <div class="row"><span>Net profit, as booked</span><span class="num bad">$10,410.76</span></div>
-        <div class="row"><span>Net profit, actually</span><span class="num">$5,410.76</span></div>
+    <div class="ph"><div class="frame"><img src="img/phone-basics.png" alt="Start from zero, step 1 of 5, on a phone"></div><p><b>Start from zero.</b> Five ideas, one tap each.</p></div>
+    <div class="ph"><div class="frame"><img src="img/phone-drill.png" alt="A warm-up drill round on a phone"></div><p><b>60-second drills.</b> Tap the line that is wrong.</p></div>
+    <div class="ph"><div class="frame"><img src="img/phone-desk.png" alt="The practice desk on a phone: next up, today's file"></div><p><b>Your desk.</b> One clear next step.</p></div>
+  </div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>5 / 10</span></div>
+</section>
+
+<section class="s">
+  <i class="glow side"></i>
+  <p class="lab">Engineering</p>
+  <h2>A grader you can <em>trust</em></h2>
+  <div class="four">
+    <div class="card"><div class="num">4</div><p>separate checks: every transaction once, amounts, cleared items, categories</p></div>
+    <div class="card"><div class="num">900</div><p>generated files, each proven broken as handed over and solvable</p></div>
+    <div class="card"><div class="num">126</div><p>unit tests on the engine, run before every deploy</p></div>
+    <div class="card"><div class="num">85</div><p>browser checks of the whole product, run against the live site</p></div>
+  </div>
+  <div class="facts">
+    <p>Money is whole cents. No rounding errors, ever.</p>
+    <p>Any correct fix passes. Two real identical purchases are not a duplicate.</p>
+    <p>Undo restores the exact previous state.</p>
+    <p>No backend, no AI in the grading: the same books always get the same grade.</p>
+  </div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>6 / 10</span></div>
+</section>
+
+<section class="s">
+  <i class="glow corner"></i>
+  <p class="lab">Retention</p>
+  <h2>A reason to come back <em>tomorrow</em></h2>
+  <div class="ret">
+    <div class="list">
+      <div><b>Today's file</b><span>A new client every day, with no hints. A streak counts the days.</span></div>
+      <div><b>Skill record</b><span>First-check accuracy for each kind of mistake.</span></div>
+      <div><b>Weak-spot files</b><span>Practice built from what you miss most.</span></div>
+      <div><b>Practice record</b><span>A printable page that stays current for 30 days after your last file.</span></div>
+    </div>
+    <img class="shot" src="img/ladder.png" alt="The path on the desk: finished steps, open steps and steps that come with the Practice plan">
+  </div>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>7 / 10</span></div>
+</section>
+
+<section class="s">
+  <i class="glow low"></i>
+  <p class="lab">Business</p>
+  <h2>Free to learn. <em>$12 a month</em> to keep sharp.</h2>
+  <div class="biz">
+    <div class="card"><h3>Free</h3><div class="price">$0</div><ul><li>Start from zero</li><li>Both guided cases</li><li>Today's file, every day</li><li>All theory, three topic drills</li></ul></div>
+    <div class="card main"><h3>Practice</h3><div class="price">$12<small>a month, or $96 a year. 7-day trial.</small></div><ul><li>Unlimited practice files</li><li>Files aimed at weak spots</li><li>Keeps the practice record current</li></ul></div>
+    <div class="card"><h3>What people pay today</h3>
+      <div class="rows">
+        <div><span>One practice client file, self-graded (QBO Dojo)</span><b>$49 to $119</b></div>
+        <div><span>Intuit bookkeeping course (Coursera)</span><b>$59 a month</b></div>
+        <div><span>Ceiling: 5% of ~20M owners who keep their own books, at $96 a year</span><b>~$100M ARR</b></div>
       </div>
-      <p class="muted" style="font-size:15px; margin-top:12px;">Both lines at once, from case 2 in the live product.</p>
     </div>
   </div>
-  <div class="links" style="margin-top:44px;"><div><b>Live</b>spunlit.github.io/ledger-fix-lab</div><div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div></div>
-  <div class="foot"><span>Business Cup 2.0, Skills track. Web, free, no sign-up.</span><span>1</span></div>
+  <p class="honest"><b>Honest status:</b> the checkout is a demo and no card is charged. Nobody has paid yet. The ceiling is arithmetic on public numbers (29.8M × two-thirds), not a forecast.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>8 / 10</span></div>
 </section>
 
-<!-- 2. Person and problem -->
 <section class="s">
-  <h2>A new bookkeeper's first cleanup happens on a paying client's books</h2>
-  <div class="grid3">
-    <div><div class="label">Who</div><p>A new US freelance bookkeeper, 25–45, who has finished a course or the free QuickBooks certification.</p></div>
-    <div><div class="label">When</div><p>The first cleanup job: months of messy books, bank-feed duplicates, entries typed in by hand.</p></div>
-    <div><div class="label">What goes wrong</div><p>They force the reconciliation to $0.00 by deleting the wrong thing, or leave owner money booked as income. The client's profit figure is wrong.</p></div>
+  <i class="glow side"></i>
+  <p class="lab">"Won't AI do the bookkeeping?"</p>
+  <h2>Software enters the lines. <em>Someone has to check them.</em></h2>
+  <div class="cmp">
+    <div><b>Courses and YouTube</b><span>Explain the rules.</span><em>No practice graded</em></div>
+    <div><b>QuickBooks Test Drive</b><span>A free sandbox company.</span><em>Nothing checks you</em></div>
+    <div><b>An AI chat</b><span>Answers questions. You still sign the books.</span><em>No fixed grade</em></div>
+    <div class="us"><b>Ledger Fix Lab</b><span>You fix a client's books. The end result is graded, the same way every time.</span><em>Graded practice</em></div>
   </div>
-  <div class="quote">
-    <p>“I don't have any hands-on experience yet.”</p>
-    <span>A newly certified ProAdvisor asking how to start paid bookkeeping, Intuit community, June 2023</span>
-  </div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>2</span></div>
+  <p class="ai">The mistakes practiced here are the ones automation makes: a bank feed that reconnects imports the same lines twice (Intuit help), and an auto-category calls a transfer a sale.</p>
+  <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>9 / 10</span></div>
 </section>
 
-<!-- 3. Evidence -->
-<section class="s ev">
-  <h2>What we know, what we infer, and what we don't</h2>
-  <div class="grid3" style="border-top:0;">
-    <div><span class="tag t-obs">Observed</span>
-      <ul>
-        <li>Newly certified bookkeepers ask how to get hands-on experience (Intuit community, 2023 and 2024).</li>
-        <li>A paid product (QBO Gym, now in Akadian) sells "hands-on experience before taking on real clients".</li>
-        <li>Personal training spend on offer: ProAdvisor free; Intuit cert on Coursera $59/mo; Akadian bundle $847; Bookkeeper Launch $2,999.</li>
-        <li>Cleanup is sold as freelance work on Upwork and Fiverr.</li>
-      </ul></div>
-    <div><span class="tag t-inf">Inferred</span>
-      <ul>
-        <li>New freelancers already pay out of pocket to become client-ready.</li>
-        <li>The gap between a certificate and a first paid cleanup is real, and someone already charges to fill it.</li>
-        <li>Recurring forum errors (duplicates, transfers booked as income, deleted reconciled items) are teachable patterns.</li>
-      </ul></div>
-    <div><span class="tag t-unk">Unknown</span>
-      <ul>
-        <li>Willingness to pay for this simulator.</li>
-        <li>Retention after the first cases.</li>
-        <li>Buyer age mix; competitor sales volumes.</li>
-        <li>Our evidence base is small: forum posts and price pages. Reddit could not be fetched.</li>
-      </ul></div>
-  </div>
-  <div class="foot"><span>Prices are list offers, not verified sales. Sources in PRODUCT_STRATEGY.md in the repo.</span><span>3</span></div>
-</section>
-
-<!-- 4. Alternatives -->
 <section class="s">
-  <h2>Free practice exists. Feedback on your actual books doesn't.</h2>
-  <table>
-    <tr><td>QuickBooks Online Test Drive</td><td>Free sample company. Nothing tells you when you're wrong.</td></tr>
-    <tr><td>Courses and certification</td><td>Teach the software and the theory, not a messy client file.</td></tr>
-    <tr><td>ChatGPT, YouTube</td><td>Explain what to do. Can't see what you actually did to the books.</td></tr>
-    <tr><td>Paid practice (Akadian / QBO Gym)</td><td>Closest competitor. Its format and grading we could not verify.</td></tr>
-  </table>
-  <div class="angle"><p><b>Our angle:</b> one realistic client file at a time, graded on the end state, catching "balanced but wrong", ending with a summary you'd send the client. An advantage we have not yet proven with users.</p></div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>4</span></div>
-</section>
-
-<!-- 5. Key interaction -->
-<section class="s" style="padding-top:44px;">
-  <h2 style="margin-bottom:20px; max-width:none;">The reconciliation says $0.00. The books are still wrong by $5,000.</h2>
-  <div class="shot" style="width:1060px; height:445px; background-image:url(img/trap.png); background-size:1120px auto; background-position:-22px -322px;"></div>
-  <p class="muted" style="font-size:18px; margin-top:14px;">Case 2: the owner's own $5,000 transfer was booked as sales. Three checks pass; the fourth names the row and the profit effect.</p>
-  <div class="foot"><span>Screenshot of the live site. Synthetic client data.</span><span>5</span></div>
-</section>
-
-<!-- 6. Loop -->
-<section class="s" style="padding-top:44px;">
-  <h2 style="margin-bottom:18px; max-width:none;">A new client file every day, aimed at what you miss</h2>
-  <div class="shot" style="width:1128px; height:250px; background-image:url(img/daily.png); background-size:1170px auto; background-position:-40px -568px;"></div>
-  <div class="grid3" style="margin-top:22px;">
-    <div><div class="label">File of the day</div><p style="font-size:20px;">A fresh, generated client file. The same file for everyone, new every day.</p></div>
-    <div><div class="label">Skill record</div><p style="font-size:20px;">Each file records which kinds of problem you caught on the first check.</p></div>
-    <div><div class="label">Weak-spot practice</div><p style="font-size:20px;">Practice files plant more of the problems you miss, as often as you want.</p></div>
+  <i class="glow hero"></i>
+  <p class="lab">Where we are</p>
+  <h2>What is real <em>today</em></h2>
+  <div class="status">
+    <div class="card real"><h3>Working, on the live site</h3><p>Grading engine and file generator. Two guided cases, today's file, drills, field guide, practice record. Public repository, tests on every deploy.</p></div>
+    <div class="card demo"><h3>Demo, and labelled so</h3><p>Checkout: no card, nothing charged. Sign in: a profile on this device, no server.</p></div>
+    <div class="card none"><h3>Not yet</h3><p>User interviews, paying users, retention data.</p></div>
   </div>
-  <div class="foot"><span>Screenshot of the live site. Skill record shown with sample history.</span><span>6</span></div>
-</section>
-
-<!-- 7. Engineering -->
-<section class="s">
-  <h2>Every file is proven solvable before you see it</h2>
-  <div class="grid2" style="grid-template-columns: 0.9fr 1.1fr; gap: 56px;">
-    <div>
-      <div class="big"><span class="dbl">2</span> <span class="muted" style="font-size:40px; font-weight:600;">of 524,288</span></div>
-      <p style="margin-top:22px; font-size:21px;">Case 2 states tried by the test suite: every combination of deletions, ticks and recording. Only the two valid solutions pass; many others reach $0.00 and still fail, by design.</p>
-    </div>
-    <ul style="font-size:21px;">
-      <li>A truth model per transaction, four independent checks, money in integer cents.</li>
-      <li>The generator only returns a file that passes the validator, fails as handed over, and is solved by its own reference solution. 900 generated files are checked in tests.</li>
-      <li>Any correct end state passes; every shortcut (plugging an amount, deleting the uncleared check) has a test.</li>
-      <li>68 unit tests, a 39-step browser test on the live URL, CI before every deploy. No backend; nothing leaves the browser.</li>
-    </ul>
-  </div>
-  <div class="foot"><span>Open source: src/core/generator.ts, tests/, scripts/e2e.mjs</span><span>7</span></div>
-</section>
-
-<!-- 8. Business -->
-<section class="s biz">
-  <h2>Who pays, and why they would</h2>
-  <div class="grid2" style="gap:56px;">
-    <div>
-      <h3>Buyer</h3><p>The new freelance bookkeeper, paying personally, in the months before and after a first cleanup client.</p>
-      <h3 style="margin-top:22px;">Price we will test: $12 a month</h3><p>Free: both cases, the file of the day, the skill record. Paid: unlimited weak-spot files and month-end tracks (credit cards, payroll, sales tax). Well under the $59 a month they already pay for courses.</p>
-    </div>
-    <div>
-      <h3>Why it can recur</h3><p>Practice is a habit, not a purchase: the daily file and the weak-spot loop are built and working today. Whether people actually return is unknown.</p>
-      <h3 style="margin-top:22px;">First customers</h3><p>Where learners already ask for practice: the Intuit ProAdvisor community, r/Bookkeeping, course alumni groups. Later, course creators who want graded practice for their students.</p>
-    </div>
-  </div>
-  <div class="foot"><span>Nothing is for sale yet. No revenue, users or retention exist; nothing on this slide is measured.</span><span>8</span></div>
-</section>
-
-<!-- 9. Risks -->
-<section class="s">
-  <h2>What could kill it</h2>
-  <table>
-    <tr><td>Free is good enough</td><td>Test Drive plus YouTube may satisfy most learners. We have to show the check is worth paying for.</td></tr>
-    <tr><td>Nobody comes back</td><td>The daily file is our bet on a habit. If daily return stays low, the subscription case fails.</td></tr>
-    <tr><td>Realism ceiling</td><td>Generated files use four business types and seven problem kinds. Real cleanups are messier.</td></tr>
-    <tr><td>A shrinking field</td><td>BLS projects bookkeeping clerk jobs down 6% from 2024 to 2034, still with about 170k openings a year.</td></tr>
-    <tr><td>An incumbent</td><td>Akadian already sells practice to the same people, with an audience.</td></tr>
-  </table>
-  <div class="foot"><span>Ledger Fix Lab</span><span>9</span></div>
-</section>
-
-<!-- 10. Today vs next -->
-<section class="s">
-  <h2>Working today, and the next test</h2>
-  <div class="grid3">
-    <div><div class="label">Working today</div><p>Two guided cases, a generated file of the day, weak-spot practice, a skill record, four checks, clues, cleanup summary. Tests and CI.</p></div>
-    <div><div class="label">Not built</div><p>Accounts, payments, month-end tracks, any QuickBooks or bank connection. All clients are synthetic.</p></div>
-    <div><div class="label">Next experiment (not run)</div><p>Share the daily file in learner communities for two weeks. Measure completion, day-7 return and sign-ups for the paid plan, against a bar set in advance.</p></div>
-  </div>
-  <div class="links" style="margin-top:46px;"><div><b>Live</b>spunlit.github.io/ledger-fix-lab</div><div><b>Code</b>github.com/Spunlit/ledger-fix-lab</div></div>
-  <div class="foot"><span>Ledger Fix Lab</span><span>10</span></div>
+  <p class="next"><b>Next test:</b> share today's file in bookkeeping-learner communities for two weeks. Measure completion, day-7 return and plan sign-ups against a bar set in advance.</p>
+  <div class="end"><span class="pill solid">spunlit.github.io/ledger-fix-lab</span><span class="pill">github.com/Spunlit/ledger-fix-lab</span></div>
 </section>
 
 </body>
