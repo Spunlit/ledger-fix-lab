@@ -219,8 +219,15 @@ export interface CheckResult {
 }
 
 const STOP = new Set(['the', 'and', 'inc', 'llc', 'pos', 'card', 'debit', 'purchase', 'checkcard', 'ach', 'online', 'from', 'for']);
+const tokenCache = new Map<string, Set<string>>();
 function tokens(text: string): Set<string> {
-  return new Set(text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !STOP.has(t)));
+  let t = tokenCache.get(text);
+  if (!t) {
+    t = new Set(text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter((w) => w.length >= 3 && !/^\d+$/.test(w) && !STOP.has(w)));
+    if (tokenCache.size > 20000) tokenCache.clear();
+    tokenCache.set(text, t);
+  }
+  return t;
 }
 /** Share of the shorter description's words found in the other one: 0 to 1. */
 export function similarity(a: string, b: string): number {
@@ -237,12 +244,6 @@ function dayNumber(isoDay: string | null): number | null {
   const [y, m, d] = isoDay.split('-').map(Number);
   return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
 }
-/** Days apart; a missing date counts as the edge of the window, so it can still match by amount. */
-function gap(a: CsvLine, b: CsvLine): number {
-  const x = dayNumber(a.date);
-  const y = dayNumber(b.date);
-  return x === null || y === null ? WINDOW_DAYS : Math.abs(x - y);
-}
 const digits = (cents: number) => String(Math.abs(cents)).split('').sort().join('');
 /** 9415 and 9145: the same digits in another order, the classic typing slip. */
 export function looksSwapped(a: number, b: number): boolean {
@@ -258,9 +259,28 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
   const pairs: { bank: CsvLine; books: CsvLine }[] = [];
   const findings: Finding[] = [];
 
+  // Day numbers are worked out once; two files of a couple of thousand lines mean millions of comparisons.
+  const dayOf = new Map<CsvLine, number | null>();
+  for (const l of bank) dayOf.set(l, dayNumber(l.date));
+  for (const l of books) dayOf.set(l, dayNumber(l.date));
+  const gap = (x: CsvLine, y: CsvLine) => {
+    const p = dayOf.get(x)!;
+    const q = dayOf.get(y)!;
+    return p === null || q === null ? WINDOW_DAYS : Math.abs(p - q);
+  };
+
   // 1. the same amount, close in time: the nearest dates pair first, then the more alike descriptions
+  const byCents = new Map<number, CsvLine[]>();
+  for (const k of books) {
+    const same = byCents.get(k.cents);
+    if (same) same.push(k);
+    else byCents.set(k.cents, [k]);
+  }
   const exact: { b: CsvLine; k: CsvLine; g: number; s: number }[] = [];
-  for (const b of bank) for (const k of books) if (b.cents === k.cents && gap(b, k) <= WINDOW_DAYS) exact.push({ b, k, g: gap(b, k), s: similarity(b.text, k.text) });
+  for (const b of bank) for (const k of byCents.get(b.cents) ?? []) {
+    const g = gap(b, k);
+    if (g <= WINDOW_DAYS) exact.push({ b, k, g, s: similarity(b.text, k.text) });
+  }
   exact.sort((x, y) => x.g - y.g || y.s - x.s || x.b.row - y.b.row || x.k.row - y.k.row);
   for (const c of exact) {
     if (!bankFree.has(c.b) || !booksFree.has(c.k)) continue;
@@ -269,14 +289,24 @@ export function reconcile(bank: CsvLine[], books: CsvLine[]): CheckResult {
     pairs.push({ bank: c.b, books: c.k });
   }
 
-  // 2. the same payment with a different amount: alike descriptions, close in time, the same direction
-  const near: { b: CsvLine; k: CsvLine; g: number; s: number; sw: boolean }[] = [];
-  for (const b of bankFree) for (const k of booksFree) {
-    const s = similarity(b.text, k.text);
-    const sw = looksSwapped(b.cents, k.cents);
-    if (b.cents !== k.cents && Math.sign(b.cents) === Math.sign(k.cents) && gap(b, k) <= WINDOW_DAYS && s >= 0.5) near.push({ b, k, g: gap(b, k), s, sw });
+  // 2. the same payment with a different amount: alike descriptions, close in time, the same direction.
+  //    Each bank line keeps only its three best candidates, so the list stays short on large files.
+  type Near = { b: CsvLine; k: CsvLine; g: number; s: number; sw: boolean };
+  const best = (x: Near, y: Near) => Number(y.sw) - Number(x.sw) || y.s - x.s || x.g - y.g || x.b.row - y.b.row || x.k.row - y.k.row;
+  const near: Near[] = [];
+  const leftBooks = [...booksFree];
+  for (const b of bankFree) {
+    const mine: Near[] = [];
+    for (const k of leftBooks) {
+      if (b.cents < 0 !== k.cents < 0) continue;
+      const g = gap(b, k);
+      if (g > WINDOW_DAYS) continue;
+      const sim = similarity(b.text, k.text);
+      if (sim >= 0.5) mine.push({ b, k, g, s: sim, sw: looksSwapped(b.cents, k.cents) });
+    }
+    near.push(...mine.sort(best).slice(0, 3));
   }
-  near.sort((x, y) => Number(y.sw) - Number(x.sw) || y.s - x.s || x.g - y.g || x.b.row - y.b.row);
+  near.sort(best);
   for (const c of near) {
     if (!bankFree.has(c.b) || !booksFree.has(c.k)) continue;
     bankFree.delete(c.b);

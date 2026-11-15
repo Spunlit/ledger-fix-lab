@@ -54,6 +54,7 @@ export function renderGuide(): string {
       <div class="drill-actions">
         <a class="btn primary big" href="#/drill">60-second warm-up</a>
         <a class="btn big" href="#/case/maple-pine-oct">Start case 1</a>
+        <a class="btn big" href="#/check">Check your own books</a>
       </div>
       <p class="guide-fine">The trainer models one bank account for a sole proprietor on a cash basis. It teaches the cleanup habit; it is not tax advice.</p>
     </section>

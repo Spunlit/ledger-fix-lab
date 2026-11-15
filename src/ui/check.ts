@@ -49,6 +49,8 @@ export const monthName = (m: string | null) => (m ? new Date(`${m}-01T00:00:00Z`
 
 export const newCheck = (): CheckState => ({ bank: '', books: '', sample: false, ran: false });
 export const FREE_FINDINGS = 3;
+/** More cards than this make a page nobody reads; the copied list still has every finding. */
+const SHOWN_FINDINGS = 150;
 
 const day = (iso: string | null) => (iso ? new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'no date');
 
@@ -129,7 +131,8 @@ function results(s: CheckState, plan: Plan | null): string {
     </div>
     <p class="ck-verdict" data-testid="check-verdict">${esc(verdict)} <span>${r.matched} ${r.matched === 1 ? 'line' : 'lines'} paired.</span></p>
     ${flipped ? '<p class="acct-note" data-testid="check-flipped"><b>Signs turned over.</b> Your books list money out as positive numbers, so they were read the other way round to pair with the bank.</p>' : ''}
-    <ol class="ck-list">${open.map(card).join('')}</ol>
+    <ol class="ck-list">${open.slice(0, SHOWN_FINDINGS).map(card).join('')}</ol>
+    ${open.length > SHOWN_FINDINGS ? `<p class="acct-fine">Showing the first ${SHOWN_FINDINGS} of ${open.length} findings. "Copy the list" has all of them. This many usually means the two files cover different months or accounts.</p>` : ''}
     ${
       open.length
         ? `<div class="ck-practice"><span>Practice what showed up</span>${[...new Set(open.map((f) => KIND[f.kind].topic))].map((t) => `<a class="btn small" href="#/drill/${t}">${esc(guideTopic(t).title)}</a>`).join('')}</div>`

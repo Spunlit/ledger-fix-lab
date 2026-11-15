@@ -142,6 +142,16 @@ describe('check your own books: pairing', () => {
     expect(statementMonth([{ row: 2, date: null, text: 'a', cents: 1, category: null }])).toBeNull();
   });
 
+  it('pairs two files of 2000 lines each, alike and unlike, without stalling', () => {
+    const make = (tag: string, shift: number) => Array.from({ length: 2000 }, (_, i) => line(i + 2, `2026-04-${String(1 + (i % 28)).padStart(2, '0')}`, `Vendor ${tag}${i} store`, -(100 + i * 7) - shift));
+    const started = Date.now();
+    const same = reconcile(make('a', 0), make('a', 0));
+    const unlike = reconcile(make('a', 0), make('b', 3));
+    expect(same.matched).toBe(2000);
+    expect(unlike.findings.reduce((n, f) => n + f.effectCents, 0)).toBe(unlike.difference);
+    expect(Date.now() - started).toBeLessThan(10_000);
+  });
+
   it('knows a transposition from an ordinary difference', () => {
     expect(looksSwapped(-9145, -9415)).toBe(true);
     expect(looksSwapped(-9145, -9150)).toBe(false);
