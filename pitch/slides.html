@@ -172,6 +172,11 @@
   .tri figure { margin: 0; }
   .tri .shot { width: 100%; }
   .tri figcaption { font-size: 17px; color: var(--ink-2); margin-top: 14px; line-height: 1.4; }
+  .tri3 { display: grid; grid-template-columns: 700px 1fr; grid-template-rows: auto auto; gap: 14px 22px; margin-top: 4px; }
+  .tri3 figure { margin: 0; }
+  .tri3 .wide { grid-row: 1 / span 2; }
+  .tri3 .shot { width: 100%; }
+  .tri3 figcaption { font-size: 16.5px; color: var(--ink-2); margin-top: 10px; line-height: 1.35; }
   .ways { display: grid; gap: 14px; }
   .ways h3 { font: 500 12.5px/1 'Geist Mono', monospace; color: var(--sky); margin: 0 0 10px; }
   .ways p { font-size: 18px; }
@@ -260,11 +265,9 @@
 
 <section class="s">
   <i class="glow corner"></i>
-  <p class="lab">The free trainer</p>
-  <h2 style="max-width:none">Practice with a <em>coach beside you</em></h2>
-  <div class="tri">
+  <div class="tri3">
+    <figure class="wide"><img class="shot" src="img/p-hint.png" alt="A guided case: the coach's next step with a hint under it, books and bank line by line"><figcaption><b>Hint.</b> A clue, then the exact row.</figcaption></figure>
     <figure><img class="shot" src="img/p-tour-z.png" alt="The tour lights one part of the screen and explains it"><figcaption><b>Tour.</b> What each part of the screen is.</figcaption></figure>
-    <figure><img class="shot" src="img/p-hint-z.png" alt="A hint under the coach's next step"><figcaption><b>Hint.</b> A clue, then the exact row.</figcaption></figure>
     <figure><img class="shot" src="img/p-demo-z.png" alt="Show me how: a three-step demonstration that makes the move"><figcaption><b>Show me how.</b> It makes one move and explains it.</figcaption></figure>
   </div>
   <div class="foot"><span><i class="mark"></i>Ledger Fix Lab</span><span>6 / 9</span></div>
