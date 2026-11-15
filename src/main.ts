@@ -15,6 +15,8 @@ import { newDrill, nextDrill, renderDrill, tapDrill, type DrillState } from './u
 import { GUIDE, type GuideId } from './core/guide';
 import { renderGuide } from './ui/guide';
 import { loadProfile, renderAccount, signIn, signOut, type AccountState } from './ui/account';
+import { SAMPLE_BANK, SAMPLE_BOOKS } from './core/checker';
+import { newCheck, renderCheck, type CheckState } from './ui/check';
 import { renderDesk } from './ui/landing';
 import { renderTerms } from './ui/legal';
 import { renderRecord, saveRecordName } from './ui/record';
@@ -93,6 +95,23 @@ function renderHome(): void {
   app.innerHTML = renderDesk(completed, history);
 }
 
+/** Check your own books (#/check): two CSV files paired in the browser. The texts live here, never in storage. */
+let check: CheckState = newCheck();
+function renderCheckPage(): void {
+  currentId = null;
+  document.body.dataset.page = 'guide';
+  document.title = 'Check your own books | Ledger Fix Lab';
+  app.innerHTML = renderCheck(check, plan);
+}
+/** Keeps what was typed in the two boxes across a re-render. */
+function readCheckBoxes(): void {
+  const v = (id: string) => app.querySelector<HTMLTextAreaElement>(`[data-check-text=${id}]`)?.value;
+  const bank = v('bank');
+  const books = v('books');
+  if (bank === undefined || books === undefined) return;
+  if (bank !== check.bank || books !== check.books) check = { ...check, bank, books, sample: false };
+}
+
 /** Sign in (#/signin): an email names the profile on this device; nothing leaves the browser. */
 let account: AccountState = { tried: null };
 function renderAccountPage(): void {
@@ -123,6 +142,11 @@ function route(): void {
   if (/^#\/basics/.test(location.hash)) {
     if (basics?.done) basics = newBasics();
     renderBasicsPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (/^#\/check/.test(location.hash)) {
+    renderCheckPage();
     window.scrollTo(0, 0);
     return;
   }
@@ -295,6 +319,18 @@ function dispatch(action: Action): void {
 
 app.addEventListener('click', (ev) => {
   if ((ev.target as HTMLElement).closest('[data-act-print]')) return window.print();
+  const ck = (ev.target as HTMLElement).closest<HTMLElement>('[data-check]');
+  if (ck) {
+    if (ck.dataset.check === 'sample') check = { bank: SAMPLE_BANK, books: SAMPLE_BOOKS, sample: true, ran: true };
+    else if (ck.dataset.check === 'clear') check = newCheck();
+    else {
+      readCheckBoxes();
+      check = { ...check, ran: true };
+    }
+    renderCheckPage();
+    if (check.ran) app.querySelector('.ck-out')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    return;
+  }
   if ((ev.target as HTMLElement).closest('[data-account=out]')) {
     signOut();
     account = { tried: null };
@@ -439,6 +475,21 @@ app.addEventListener('click', (ev) => {
 });
 
 app.addEventListener('change', (ev) => {
+  const file = ev.target as HTMLInputElement;
+  if (file.matches?.('[data-check-file]') && file.files?.[0]) {
+    const which = file.dataset.checkFile === 'bank' ? 'bank' : 'books';
+    const f = file.files[0];
+    if (f.size > 1_000_000) {
+      window.alert('That file is larger than 1 MB. Export one month of one account as CSV and try again.');
+      return;
+    }
+    readCheckBoxes();
+    f.text().then((text) => {
+      check = { ...check, [which]: text, sample: false, ran: false };
+      if (/^#\/check/.test(location.hash)) renderCheckPage();
+    });
+    return;
+  }
   const ui = current();
   if (!ui) return;
   const t = ev.target as HTMLInputElement | HTMLSelectElement;

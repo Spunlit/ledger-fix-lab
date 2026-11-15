@@ -208,3 +208,14 @@
 ## v22.1 (Nov 15, ~01:40 UTC)
 - Reviewed five skills the founder sent. Installed only emilkowalski/skills (three markdown skills at commit 0f2e23b, MIT, no scripts or hooks), project-local. Not installed: dream-loop (needs Blender and a paid image API), mengto/skills and fil.design html-demo (not needed before the deadline), hairline (a new npm dependency).
 - Applied its motion rules in the app: one strong ease-out, exact transition properties, press feedback (scale 0.97) on buttons and cards.
+
+## v23 (Nov 15, night, founder asleep; rollback tag `seen-by-owner-v22.1`)
+- Sign in (app.html#/signin): an email names a profile on this device. Any well-formed email is accepted at once; no password, no server, and the page says so. Desk shows "Sign in" or the profile mark, and offers it once there is progress to keep. Terms updated.
+- Deck v4 (pitch/slides.html → pitch/LedgerFixLab_pitch.pdf, 10 pages) in the product's look, built from real screenshots (pitch/shots.mjs). Design rules and QA from Anthropic's first-party pptx skill; every page rendered and inspected. Sources re-checked: Census 29.8M confirmed; the "two-thirds" figure is cited as reported by CNBC Select.
+- Speaker notes, demo script and judge Q&A in Russian: pitch/PITCH_RU.md.
+- Fixed: desk header wrapped on phones after the new link.
+
+## v24 (Nov 15, night)
+- New: Check your own books (app.html#/check). Two CSV files (bank statement, books) are read in the browser, nothing uploaded. core/checker.ts parses money as integer cents and pairs the lines; findings: in the books twice, amounts differ (with a swapped-digits flag), at the bank but not in the books, in the books but not at the bank yet, income that reads like a transfer. The findings always add up to the difference (tested on 200 shuffled files). Sample files of a made-up business included. With a person's own files the first three findings are free, the rest come with the plan.
+- Landing: badge, plan lists and a FAQ item for it. README rewritten to the current product. New share image (public/og.png). Removed unused src/ui/hero.ts.
+- Checked: 139 unit tests, 90 e2e checks locally.

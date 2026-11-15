@@ -26,7 +26,7 @@ const profile = mkdtempSync(join(tmpdir(), 'lfl-e2e-'));
 const browser = spawn(browserPath, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EXPECTED_CHECKS = 85; // a run that stops early must not count as green
+const EXPECTED_CHECKS = 90; // a run that stops early must not count as green
 let failures = 0;
 let ran = 0;
 const ok = (cond, msg) => {
@@ -218,6 +218,21 @@ async function main() {
   await go(practice);
   ok((await text('.badge')) === 'Practice file' && (await js(`return document.querySelectorAll('tr[data-entry]').length`)) >= 10, 'practice file renders a generated client file');
 
+  // ---------- check your own books: two CSV files paired in the browser; the sample shows all five kinds
+  await go('#/check');
+  await click('[data-check=run]');
+  ok((await text('[data-testid=check-error]')).includes('empty'), 'checker: an empty file gets a plain error, not a crash');
+  await click('[data-testid=check-sample]');
+  ok((await text('[data-testid=check-diff]')) === '+$234.89' && (await js(`return [...document.querySelectorAll('.ck-card')].map(c => c.dataset.kind).join(',')`)) === 'duplicate,amount,missing,notAtBank,category' && (await text('[data-testid=check-verdict]')).includes('explained to the cent by the 4 lines') && !(await js(`return !!$('[data-testid=check-lock]')`)), 'checker: the sample files give +$234.89, all five kinds of finding, explained to the cent, nothing locked');
+  ok((await text('.ck-card[data-kind=amount]')).includes('two digits look swapped') && (await text('.ck-card[data-kind=category]')).includes('Transfer from savings'), 'checker: it names the swapped digits and the transfer filed as income');
+  // a person's own files: the first three findings are free, the rest need the plan
+  await js(`const b = $('[data-check-text=bank]'); b.value = b.value.replace('SQUARE INC DEPOSIT,860.00', 'SQUARE INC DEPOSIT,861.00'); b.dispatchEvent(new Event('input', { bubbles: true }))`);
+  await click('[data-check=run]');
+  ok((await js(`return document.querySelectorAll('.ck-card').length`)) === 3 && (await text('[data-testid=check-lock]')).includes('more finding') && (await text('[data-testid=check-diff]')) === '+$235.89', 'checker: with your own files three findings are free and the rest sit behind the plan');
+  await js(`const b = $('[data-check-text=books]'); b.value = '<img src=x onerror=window.__xss=1>,1.00'; `);
+  await click('[data-check=run]');
+  ok((await evaluate('window.__xss')) === undefined && !(await js(`return !!$('.ck-out img')`)), 'checker: text from a file is shown as text, never run as markup');
+
   // ---------- the ladder's lock: topic practice for a later topic leads to the plan page (theory stays open)
   await go('#/drill/owner');
   ok(await js(`return !!$('.pw-card')`), 'a locked topic drill opens the plan page for a free user');
@@ -280,7 +295,7 @@ async function main() {
 
   // ---------- sign in: a device profile; any well-formed email is accepted at once, and the page says nothing is sent
   await go('#/');
-  ok((await js(`return !!$('[data-testid=signin-link]')`)) && (await js(`return !!$('[data-testid=signin-nudge]')`)), 'the desk offers Sign in once there is progress to keep');
+  ok((await js(`return !!$('[data-testid=signin-link]')`)) && (await js(`return !!$('[data-testid=signin-nudge]')`)) && (await js(`return !!$('[data-testid=check-entry]')`)), 'the desk offers Sign in once there is progress to keep');
   await go('#/signin');
   const typeEmail = (v) => js(`const f = $('[data-account-form]'); f.querySelector('input').value = ${JSON.stringify(v)}; f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))`);
   await typeEmail('not an email');

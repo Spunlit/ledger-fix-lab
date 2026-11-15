@@ -482,3 +482,50 @@ body[data-page='home'], body[data-page='drill'], body[data-page='guide'], body[d
 /* phone header: three links never wrap; the plan link lives in the ladder below */
 .nav .brand, .nav .nav-link { white-space: nowrap; }
 @media (max-width: 520px) { body[data-page='home'] .nav .nav-link[href='#/upgrade'] { display: none; } }
+
+/* ================= check your own books (#/check) */
+.check-page { max-width: 980px; }
+.ck-ins { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ck-in { display: grid; gap: 8px; min-width: 0; }
+.ck-in-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ck-in-top > label:first-child { font-weight: 600; font-size: 16px; color: var(--ink); }
+.ck-file { font: 500 12.5px/1.2 var(--font-mono); color: var(--blue); cursor: pointer; padding: 6px 0; text-decoration: underline; text-underline-offset: 3px; }
+.ck-file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.ck-file:focus-within { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+.ck-in textarea { box-sizing: border-box; width: 100%; min-height: 168px; resize: vertical; padding: 12px 14px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); font: 400 13px/1.55 var(--font-mono); color: var(--ink); white-space: pre; overflow: auto; }
+.ck-in textarea::placeholder { color: var(--ink-3); }
+.ck-in textarea:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--blue); }
+.ck-out { display: grid; gap: 18px; scroll-margin-top: 16px; }
+.ck-figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ck-figs div { padding: 16px 18px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); display: grid; gap: 6px; }
+.ck-figs span { font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+.ck-figs b { font-size: clamp(19px, 2.6vw, 26px); font-weight: 600; color: var(--ink); }
+.ck-figs .off b { color: var(--amber); }
+.ck-figs .ok b { color: var(--green); }
+.ck-verdict { font-size: 18px; line-height: 1.5; color: var(--ink); max-width: 70ch; }
+.ck-verdict span { color: var(--ink-3); }
+.ck-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ck-card { padding: 18px 20px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); display: grid; gap: 10px; }
+.ck-card h3 { font-size: 17px; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ck-card h3 em { font: 500 11.5px/1 var(--font-mono); font-style: normal; padding: 5px 9px; border-radius: 999px; background: var(--amber-soft); color: var(--amber); white-space: nowrap; }
+.ck-line { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 9px 12px; border-radius: 9px; background: var(--surface-2); }
+.ck-src { font: 500 11.5px/1.4 var(--font-mono); color: var(--ink-3); }
+.ck-text { color: var(--ink); overflow-wrap: anywhere; }
+.ck-text small { display: block; font-size: 13px; color: var(--ink-3); }
+.ck-card p { font-size: 15px; color: var(--ink-2); line-height: 1.5; }
+.ck-card p a { color: var(--blue); }
+.ck-eff { font-size: 13.5px !important; color: var(--ink-3) !important; }
+.ck-lock { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 18px 20px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--blue), var(--shadow); text-decoration: none; color: var(--ink); }
+.ck-lock b { font-size: 17px; }
+.ck-lock span:not(.btn) { grid-column: 1; color: var(--ink-2); font-size: 14.5px; }
+.ck-lock .btn { grid-column: 2; grid-row: 1 / span 2; }
+@media (max-width: 720px) {
+  .ck-ins { grid-template-columns: 1fr; }
+  .ck-in textarea { min-height: 132px; }
+  .ck-figs { grid-template-columns: 1fr 1fr; }
+  .ck-figs div:last-child { grid-column: 1 / -1; }
+  .ck-line { grid-template-columns: minmax(0, 1fr) auto; }
+  .ck-src { grid-column: 1 / -1; }
+  .ck-lock { grid-template-columns: 1fr; }
+  .ck-lock .btn { grid-column: 1; grid-row: auto; margin-top: 8px; }
+}

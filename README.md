@@ -1,49 +1,50 @@
 # Ledger Fix Lab
 
-**Practice your first bookkeeping cleanup before a client pays for it.**
+**Books that balance can still be wrong. Practice catching it, and get graded on the result.**
 Live: https://spunlit.github.io/ledger-fix-lab/ (free, no sign-up)
 
-Realistic client books with the mistakes real books have: duplicate imports, swapped digits, bank fees nobody
-recorded, checks that haven't cleared, and owner money booked as income. You reconcile them to the bank statement,
-and a deterministic engine grades the **end state of the books**: not just whether the difference is $0.00, but
-whether the books are actually right.
+A browser trainer for beginners. You fix the books of a made-up small business against its bank statement: delete the
+duplicate, correct the swapped digits, record the bank fee nobody entered, leave the uncashed check alone, move the
+owner's money out of Sales. A deterministic engine grades the **books you end with**: not only whether the difference
+is $0.00, but whether the books are right. When you have the skill, the same matching checks your own two CSV files.
 
-Track: Skills (bookkeeping) · Built for: new US freelance bookkeepers who have finished a course or certification
-but have no hands-on cleanup experience. Evidence and open questions: [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md).
+Track: Skills. For working adults in the US (25 to 45) who keep the books for their own side business, or who are
+starting to keep books for others. They pay out of pocket (B2C). Evidence and open questions:
+[PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md). Deck: [pitch/LedgerFixLab_pitch.pdf](pitch/LedgerFixLab_pitch.pdf).
 
-## For judges: a 2-minute tour
-1. **Landing page:** a calling card: what it is, why it matters when software enters the lines, the path from zero,
-   the seven mistakes, pricing. Day/night switch.
-   **Start from zero** (`app.html#/basics`) teaches five ideas in two minutes, one tap each, for someone who has never
-   kept books. Case 1 then opens with a 30-second tour that lights each part of the screen and explains it.
-2. **Warm-up drill** (`app.html#/drill`, best on a phone): five one-tap rounds, "tap the line that is wrong". Rounds are
-   cut from generated files and answered by the same checks that grade full files.
-3. **Case 2 ("Balanced, but wrong"):** a coach names one problem at a time, the row it is about and what to click;
-   every fix says what changed ("Difference $99.37 to $84.37"). Press *Check the books* and read the review.
-4. **Today's file:** a generated client file, no hints (exam mode). Its first check feeds your skill record.
-5. **Practice my weak spots, second practice file:** the paywall (Practice plan, $12/month or $96/year, 7-day trial).
-   Checkout is a clearly labelled demo: no card, nothing charged.
+## For judges: a 3-minute tour
+1. **Start from zero** (`app.html#/basics`): five ideas in two minutes, one tap each, for someone who has never kept
+   books. Every bookkeeping word in the product can be tapped for a plain explanation.
+2. **Case 1** (`app.html#/case/maple-pine-oct`): a short tour lights each part of the screen. The coach names one
+   problem at a time. Press *Hint* three times: a clue, then the row, then *Show me how* makes the move for you.
+3. **Case 2, "Balanced, but wrong"** (`app.html#/case/rivera-mar`): bring the difference to $0.00 and press *Check
+   the books*. Three checks pass, the fourth says profit is overstated by $5,000.
+4. **Your desk** (`app.html#/`): the path as a ladder (done, open, with the plan), today's file, the skill record.
+   A locked step opens the Practice plan ($12 a month or $96 a year). Checkout is a labelled demo: no card, no charge.
+5. **Check your own books** (`app.html#/check`): press *Try the sample files*. The $234.89 difference is explained to
+   the cent by four lines, and a transfer filed as income is flagged although it balances.
+6. **Warm-up drill** (`app.html#/drill`, best on a phone) and the **field guide** (`app.html#/guide`).
 
-## Guided vs. unguided
-Guided cases have a coach (the single next step, from the same checks that grade the file), instant feedback after every move, a progress count and an optional hint, and show only the tools
-the case needs (case 1: delete and category). Files of the day and practice files are exams: no hints or feedback
-until you check, and only they feed the skill record.
+## What is real and what is a demo
+**Working, in the browser, with no server:**
+- the interactive books (tick cleared, edit an amount, change a category, delete, record a bank line), undo, start over;
+- four independent checks with explanations, clues, profit before and after, a client-ready cleanup summary;
+- the coach and three levels of help in guided cases; exam mode with no hints for the file of the day and practice files;
+- a generator of client files, each returned only if it is valid, broken as handed over, and solved by its own
+  reference solution (900 generated files are checked in tests);
+- the file of the day (the same for everyone, new every UTC day), streak, skill record from first checks, weak-spot files;
+- warm-up and topic drills, the field guide with a glossary, the "Start from zero" lesson;
+- the practice record (a printable page of what you have done; it says it is not a certificate);
+- **Check your own books**: reads two CSV files in the browser (nothing is uploaded), pairs the lines and lists what to
+  look at; the findings always add up to the difference.
 
-## The two cases
-| | Case | What it practices |
-|---|---|---|
-| 1 | **The doubled import** (Maple & Pine Design Studio, Oct) | Duplicate bank-feed imports vs genuine identical purchases; expense categories; why deleting the wrong $412.50 row "balances" but is wrong. |
-| 2 | **Balanced, but wrong** (Rivera Mobile Detailing, Mar) | Recording a bank fee from the statement, catching a transposed amount ($84.37 typed as $48.37), leaving an outstanding check in place, removing a duplicate, and reclassifying the owner's $5,000 transfer from Sales to Owner's contribution — the reconciliation hits $0.00 while profit is still overstated by $5,000. |
+**Demo, and labelled so in the product:**
+- Checkout: the paywall and plan locks work, but no card is asked for and nothing is charged.
+- Sign in: an email names a profile on this device. There is no server, no password and no cross-device account.
 
-## A new client file every day
-Beyond the two guided cases, a generator builds fresh client files from four business types, planting 3–5 kinds of
-problem (duplicates, transposed amounts, missing bank fees, outstanding checks, wrong categories, owner money booked as
-income/expense) plus traps like genuine repeat purchases. Every file is returned only if it passes the scenario
-validator, fails as handed over, and is solved by its own reference solution (900 generated files are checked in
-tests).
-- **File of the day** (`#/daily`): the same file for everyone, new every UTC day.
-- **Skill record**: the first check on each file records which kinds of problem you caught (kept in your browser).
-- **Weak-spot practice** (`#/practice/<seed>/<skills>`): files that plant more of what you miss.
+**Not built, not measured:** user accounts on a server, payments, QuickBooks/Xero/bank connections, an AI tutor.
+No interviews, users, revenue or retention data exist. All practice businesses and the sample files are fictional.
+The trainer models one bank account on a cash basis; real books can be more complicated.
 
 ## How grading works
 Four independent checks on the final state, plus the reconciliation arithmetic:
@@ -52,43 +53,31 @@ Four independent checks on the final state, plus the reconciliation arithmetic:
 3. A row is ticked cleared exactly when it is on this statement (outstanding items stay unticked).
 4. Every row is in the right category; the effect on net profit is shown in dollars.
 
-`Difference = adjusted bank balance − book balance = statement ending − cleared balance`. $0.00 is necessary, never
-sufficient. Any correct end state passes (either duplicate copy; editing the transposed amount or re-recording it).
-Clues use real bookkeeper heuristics on the live difference (matches a bank line, matches ticked rows, divisible by
-9 → swapped digits). On completion you get a client-ready cleanup summary generated from what changed.
-
-## Who it is for
-Working adults in the US (25–45) who keep the books for their own side business or freelance work (29.8 M nonemployer
-businesses, Census 2022; over two-thirds of small-business owners do their own bookkeeping, QuickBooks Dec 2025), and
-working adults building a side income doing bookkeeping for others. They pay out of pocket (B2C).
-
-## What is real vs. not
-**Real:** the interactive books (tick cleared, edit amount, change category, delete, record a bank line), undo and
-start over, reconciliation worksheet, four checks with explanations, clues, P&L before/after, cleanup summary,
-completion remembered in your browser. All in the browser; nothing is sent anywhere.
-
-**Synthetic / not built:** all client files are fictional training data (the generated ones too). Simplified single-account model, no
-QuickBooks/Xero/bank connection, no accounts. The paywall works (free tier: both cases, daily files, 1 practice
-file), but checkout is simulated: no card data is collected and nothing is charged. Demand and retention are unmeasured.
+`Difference = adjusted bank balance − book balance`. $0.00 is necessary, never sufficient. Any correct end state
+passes (either copy of a duplicate; editing a swapped amount or re-recording it). Two real identical purchases are not
+a duplicate. Money is integer cents everywhere; formatting happens only on output. There is no AI in the grading: the
+same books always get the same grade.
 
 ## Run and test
 ```bash
 npm install
 npm run dev                 # local dev server
-npm test                    # 122 unit tests incl. exhaustive state-space checks and 900 generated files
-npm run build && npm run preview          # production build, works offline (fonts bundled)
-node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/   # 79 browser checks, headless Chrome/Edge
-node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # same checks against the live site
+npm test                    # 139 unit tests, incl. exhaustive state-space checks and 900 generated files
+npm run build && npx vite preview --port 4173          # production build, served locally
+node scripts/e2e.mjs http://localhost:4173/ledger-fix-lab/      # 90 browser checks, headless Chrome/Edge
+node scripts/e2e.mjs https://spunlit.github.io/ledger-fix-lab/  # the same checks against the live site
+node pitch/shots.mjs && node pitch/build-pdf.mjs                # deck screenshots from the real product, then the PDF
 ```
-CI (GitHub Actions) runs the unit tests and build before every deploy to GitHub Pages.
+CI (GitHub Actions) runs the unit tests and the build before every deploy to GitHub Pages. The pages load their fonts
+from Google Fonts; without a network the system fonts are used and everything else works.
 
 ## Structure
-- `src/core/` — pure engine, no DOM: `engine.ts` (actions, undo, reconciliation, checks, validation),
-  `scenarios.ts` (the two cases), `generator.ts` (generated files), `skills.ts` (skill record), `clues.ts`, `explain.ts`, `report.ts`, `money.ts` (integer cents only).
-  `coach.ts` (next step for guided cases), `drill.ts` (warm-up rounds), `feedback.ts`, `match.ts`.
-- `index.html`, `src/landing.*` — the landing page (static, self-contained CSS and a small script).
-- `app.html`, `src/main.ts`, `src/ui/`, `src/*.css` — the trainer (vanilla TypeScript, hash routes). Fonts: Manrope + Inter via Google Fonts. `guide.ts` is the field guide (also the coach's "Why?").
-- `tests/` — Vitest; `scripts/e2e.mjs` — browser checks.
-- `pitch/` — pitch deck source and PDF.
+- `src/core/`: the pure core, no DOM. `engine.ts` (actions, undo, reconciliation, checks, validation), `scenarios.ts`
+  (the two cases), `generator.ts`, `skills.ts`, `coach.ts`, `clues.ts`, `feedback.ts`, `match.ts`, `drill.ts`,
+  `guide.ts`, `glossary.ts`, `basics.ts`, `record.ts`, `checker.ts` (your own CSV files), `profile.ts`, `money.ts`.
+- `index.html`, `src/landing.*`: the landing page (static, its own CSS and a small script).
+- `app.html`, `src/main.ts`, `src/ui/`, `src/*.css`: the trainer (vanilla TypeScript, hash routes).
+- `tests/`: Vitest. `scripts/e2e.mjs`: browser checks over the DevTools protocol, no extra dependencies.
+- `pitch/`: deck source (`slides.html`), the PDF, and speaker notes in Russian (`PITCH_RU.md`).
 
-Fonts: Public Sans, SIL Open Font License 1.1 (see `public/fonts/README.txt`).
+Typefaces: Instrument Serif, Inter and Geist Mono (SIL Open Font License), served by Google Fonts.

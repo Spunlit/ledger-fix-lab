@@ -62,13 +62,13 @@
   .trap .cap { text-align: center; margin-top: 16px; font-size: 16.5px; }
 
   /* 4 product */
-  .split { display: grid; grid-template-columns: 400px 1fr; gap: 44px; align-items: start; margin-top: 34px; }
+  .split { display: grid; grid-template-columns: 400px 1fr; gap: 44px; align-items: start; margin-top: 22px; }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-  .steps li { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .steps li { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .steps li:last-child { border-bottom: 0; }
   .steps i { font: 400 34px/1 'Instrument Serif', serif; font-style: normal; color: var(--sky); }
-  .steps b { display: block; font-size: 19px; }
-  .steps span { display: block; font-size: 16px; color: var(--ink-2); margin-top: 3px; line-height: 1.4; }
+  .steps b { display: block; font-size: 18px; }
+  .steps span { display: block; font-size: 15px; color: var(--ink-2); margin-top: 2px; line-height: 1.35; }
   .crop { width: 692px; height: 432px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--line), 0 30px 70px rgba(0, 0, 0, 0.55); }
   .crop img { width: 100%; display: block; }
 
@@ -148,7 +148,7 @@
   <h2>Millions keep their own books. <em>Nobody checks them.</em></h2>
   <div class="three">
     <div class="card"><div class="num">29.8M</div><p>US businesses with no employees. The owner is the bookkeeper.</p><p class="src">US Census Bureau, Nonemployer Statistics 2022</p></div>
-    <div class="card"><div class="num">2 in 3</div><p>Small-business owners do their own bookkeeping.</p><p class="src">QuickBooks Business Owner Report, Dec 2025 ("more than two-thirds")</p></div>
+    <div class="card"><div class="num">2 in 3</div><p>Small-business owners do their own bookkeeping.</p><p class="src">"More than two-thirds": QuickBooks survey, Dec 2025, as reported by CNBC Select</p></div>
     <div class="card"><div class="num">You</div><p>The taxpayer answers for the return, whoever or whatever prepared it.</p><p class="src">IRS Tax Topic 254</p></div>
   </div>
   <p class="who"><b>Our user:</b> a working adult in the US, 25 to 45, who runs a side business or is starting to keep books for others. Courses explain the rules. Nothing tells them their own books are wrong.</p>
@@ -172,8 +172,9 @@
     <ol class="steps">
       <li><i>0</i><div><b>Start from zero</b><span>Five ideas in two minutes. No experience needed.</span></div></li>
       <li><i>1</i><div><b>Match</b><span>Pair each bank line with a line in the books.</span></div></li>
-      <li><i>2</i><div><b>Fix</b><span>Delete the duplicate, correct the amount, add what is missing, change the category.</span></div></li>
+      <li><i>2</i><div><b>Fix</b><span>Delete the duplicate, correct the amount, add what is missing.</span></div></li>
       <li><i>3</i><div><b>Check</b><span>Four checks grade the books you end with.</span></div></li>
+      <li><i>4</i><div><b>Your own books</b><span>Two CSV files, paired in your browser.</span></div></li>
     </ol>
     <div class="crop"><img src="img/work.png" alt="The working screen of case 1: bank, books and difference, the coach's next step, books and bank line by line"></div>
   </div>
@@ -204,8 +205,8 @@
   <div class="four">
     <div class="card"><div class="num">4</div><p>separate checks: every transaction once, amounts, cleared items, categories</p></div>
     <div class="card"><div class="num">900</div><p>generated files, each proven broken as handed over and solvable</p></div>
-    <div class="card"><div class="num">126</div><p>unit tests on the engine, run before every deploy</p></div>
-    <div class="card"><div class="num">85</div><p>browser checks of the whole product, run against the live site</p></div>
+    <div class="card"><div class="num">139</div><p>unit tests on the engine, run before every deploy</p></div>
+    <div class="card"><div class="num">90</div><p>browser checks of the whole product, run against the live site</p></div>
   </div>
   <div class="facts">
     <p>Money is whole cents. No rounding errors, ever.</p>
@@ -237,8 +238,8 @@
   <p class="lab">Business</p>
   <h2>Free to learn. <em>$12 a month</em> to keep sharp.</h2>
   <div class="biz">
-    <div class="card"><h3>Free</h3><div class="price">$0</div><ul><li>Start from zero</li><li>Both guided cases</li><li>Today's file, every day</li><li>All theory, three topic drills</li></ul></div>
-    <div class="card main"><h3>Practice</h3><div class="price">$12<small>a month, or $96 a year. 7-day trial.</small></div><ul><li>Unlimited practice files</li><li>Files aimed at weak spots</li><li>Keeps the practice record current</li></ul></div>
+    <div class="card"><h3>Free</h3><div class="price">$0</div><ul><li>Start from zero</li><li>Both guided cases</li><li>Today's file, every day</li><li>All theory, three topic drills</li><li>Your own books: three findings</li></ul></div>
+    <div class="card main"><h3>Practice</h3><div class="price">$12<small>a month, or $96 a year. 7-day trial.</small></div><ul><li>Unlimited practice files</li><li>Files aimed at weak spots</li><li>Keeps the practice record current</li><li>Your own books: every finding</li></ul></div>
     <div class="card"><h3>What people pay today</h3>
       <div class="rows">
         <div><span>One practice client file, self-graded (QBO Dojo)</span><b>$49 to $119</b></div>
@@ -270,7 +271,7 @@
   <p class="lab">Where we are</p>
   <h2>What is real <em>today</em></h2>
   <div class="status">
-    <div class="card real"><h3>Working, on the live site</h3><p>Grading engine and file generator. Two guided cases, today's file, drills, field guide, practice record. Public repository, tests on every deploy.</p></div>
+    <div class="card real"><h3>Working, on the live site</h3><p>Grading engine and file generator. Two guided cases, today's file, drills, field guide, practice record, a checker for your own CSV files. Public repository, tests on every deploy.</p></div>
     <div class="card demo"><h3>Demo, and labelled so</h3><p>Checkout: no card, nothing charged. Sign in: a profile on this device, no server.</p></div>
     <div class="card none"><h3>Not yet</h3><p>User interviews, paying users, retention data.</p></div>
   </div>
