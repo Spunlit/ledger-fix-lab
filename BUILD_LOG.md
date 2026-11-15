@@ -204,3 +204,7 @@
 - Desk shows the path as a ladder: Start from zero, Practice 1, Practice 2, today file, Practice 3 (one free), Practice 4+ (plan), theory and topic practice (3 of 7 topic drills free). Locked rungs lead to the plan page; the theory itself stays open.
 - No accounts: the brief requires the main scenario without registration, and a static site has no backend. The desk says so: progress lives in this browser, accounts are not built yet.
 - Checked: 122 unit tests, 79 e2e checks.
+
+## v22.1 (Nov 15, ~01:40 UTC)
+- Reviewed five skills the founder sent. Installed only emilkowalski/skills (three markdown skills at commit 0f2e23b, MIT, no scripts or hooks), project-local. Not installed: dream-loop (needs Blender and a paid image API), mengto/skills and fil.design html-demo (not needed before the deadline), hairline (a new npm dependency).
+- Applied its motion rules in the app: one strong ease-out, exact transition properties, press feedback (scale 0.97) on buttons and cards.
